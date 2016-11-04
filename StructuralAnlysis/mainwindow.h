@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "analyze.h"
+#include <QGraphicsScene>
 
 namespace Ui {
 class MainWindow;
@@ -25,8 +26,12 @@ private slots:
 
     void readFile(std::string fileName);
 
+    void drawStructure();
+
 private:
     Ui::MainWindow *ui;
+    QGraphicsScene *scene;
+    QGraphicsLineItem *myStrucLine;
     Analyze myStruct();
 
 };

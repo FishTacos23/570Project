@@ -5,6 +5,8 @@
 #include <fstream>
 #include "analyze.h"
 #include <iostream>
+#include <QPainter>
+#include <QGraphicsLineItem>
 
 static Analyze myStructure;
 
@@ -29,7 +31,11 @@ void MainWindow::on_actionOpen_triggered()
 
     readFile(fileName);
 
+    scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+
     // draw structure
+    drawStructure();
 
 }
 
@@ -167,28 +173,57 @@ void MainWindow::readFile(std::string fileName)
     // make sure you are reading the file
     std::cout << "The structure is a: " << myStructure.StructType << std::endl;
     std::cout << "The joint coordinates are: " << std::endl;
-    for(int i = 0; i < myStructure.xstruct.size();i++)
+    for(uint i = 0; i < myStructure.xstruct.size();i++)
     {
         std::cout << myStructure.xstruct[i][0] << " " << myStructure.xstruct[i][1] << std::endl;
     }
     std::cout << "The members are from joints: " << std::endl;
-    for(int i = 0; i < myStructure.conn.size();i++)
+    for(uint i = 0; i < myStructure.conn.size();i++)
     {
         std::cout << myStructure.conn[i][0] << " " << myStructure.conn[i][1] << std::endl;
     }
     std::cout << "The constraints are: " << std::endl;
-    for(int i  = 0; i < myStructure.constMat.size(); i++)
+    for(uint i  = 0; i < myStructure.constMat.size(); i++)
     {
         std::cout << myStructure.constMat[i][0] << " " << myStructure.constMat[i][1] << std::endl;
     }
     std::cout << "The joint loads are: " << std::endl;
-    for(int i = 0; i < myStructure.loadMat.size(); i++)
+    for(uint i = 0; i < myStructure.loadMat.size(); i++)
     {
         std::cout << myStructure.loadMat[i][0] << " " << myStructure.loadMat[i][1] << " " << myStructure.loadMat[i][2] << std::endl;
     }
     std::cout << "The member properties are: " << std::endl;
-    for(int i = 0; i < myStructure.properties.size(); i++)
+    for(uint i = 0; i < myStructure.properties.size(); i++)
     {
         std::cout << myStructure.properties[i] << std::endl;
+    }
+}
+
+void MainWindow::drawStructure()
+{
+    QPainter myDrawing;
+
+    // draw a line for each member
+    for(uint i = 0; i < myStructure.conn.size();i++)
+    {
+        // get x and y coordinates
+        double x1;
+        double y1;
+        double x2;
+        double y2;
+
+        int m = myStructure.conn[i][0]-1;
+        int n = myStructure.conn[i][1]-1;
+
+        x1 = myStructure.xstruct[m][0];
+        y1 = myStructure.xstruct[m][1];
+        x2 = myStructure.xstruct[n][0];
+        y2 = myStructure.xstruct[n][1];
+
+        QPen linePen(Qt::black);
+        linePen.setWidth(5);
+
+        myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
+
     }
 }

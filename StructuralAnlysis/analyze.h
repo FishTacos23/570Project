@@ -2,6 +2,7 @@
 #define ANALYZE_H
 #include <vector>
 #include "tokenize.h"
+#include <QGraphicsLineItem>
 
 class Analyze
 {
@@ -32,6 +33,8 @@ public:
     std::vector<std::vector<double>> loadMat;
     std::vector<double> properties;
     std::string StructType;
+
+    QGraphicsLineItem strMem;
 
 private:
 
