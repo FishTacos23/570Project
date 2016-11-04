@@ -21,6 +21,7 @@ void Analyze::preprocessing()
 {
     // read input file
 
+
     // get joints and coordinates mat
 
     // get member joint mat

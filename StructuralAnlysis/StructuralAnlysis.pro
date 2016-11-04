@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     analyze.cpp \
-    pframe.cpp
+    pframe.cpp \
+    tokenize.cpp
 
 HEADERS  += mainwindow.h \
     analyze.h \
-    pframe.h
+    pframe.h \
+    tokenize.h
 
 FORMS    += mainwindow.ui

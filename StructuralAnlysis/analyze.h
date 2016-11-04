@@ -1,6 +1,7 @@
 #ifndef ANALYZE_H
 #define ANALYZE_H
 #include <vector>
+#include "tokenize.h"
 
 class Analyze
 {
@@ -24,6 +25,13 @@ public:
     void MatVecMinus();
     void MatBackSelf();
     std::vector<std::vector<double>> StructToJointDisp();
+
+    std::vector<std::vector<double>> xstruct;
+    std::vector<std::vector<int>> conn;
+    std::vector<std::vector<int>> constMat;
+    std::vector<std::vector<double>> loadMat;
+    std::vector<double> properties;
+    std::string StructType;
 
 private:
 
