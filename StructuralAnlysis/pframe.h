@@ -7,10 +7,13 @@ class PFrame
 public:
     PFrame();
 
-    std::vector<double> PFrameLenRot();
-    std::vector<std::vector<double>> PFrameStiff();
-    std::vector<std::vector<double>> PFrameDistrib();
-    std::vector<std::vector<double>> PFrameForce();
+    static std::vector<double> PFrameLenRot();
+    static std::vector<std::vector<double>> PFrameStiff();
+    static std::vector<std::vector<double>> PFrameDistrib();
+    static std::vector<std::vector<double>> PFrameForce();
+
+    int ndofs = 3;
+
 };
 
 #endif // PFRAME_H

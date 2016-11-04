@@ -4,6 +4,8 @@
 #include "tokenize.h"
 #include <QGraphicsLineItem>
 
+// RUN TIME ERROR ON EXITING
+
 class Analyze
 {
 public:
@@ -17,7 +19,7 @@ public:
     void postprocessing();
 
     void getDispl();
-    std::vector<std::vector<double>> StructDOF();
+    void StructDOF();
     std::vector<std::vector<double>> StructToMemCoord();
     void MemToStructStiffs();
     std::vector<std::vector<double>> MatTriangSelf();
@@ -33,11 +35,22 @@ public:
     std::vector<std::vector<double>> loadMat;
     std::vector<double> properties;
     std::string StructType;
+    std::vector<std::vector<int>> SDOF;
 
-    QGraphicsLineItem strMem;
+    //QGraphicsLineItem strMem;
 
 private:
 
+    std::vector<std::vector<double>> KStruct;
+    std::vector<double> FStruct;
+    std::vector<double> UStruct;
+
+    std::vector<std::vector<double>> kmem;
+    std::vector<double> fmem;
+    std::vector<double> umem;
+
+    int njoints;
+    int ndofs;
 
 };
 

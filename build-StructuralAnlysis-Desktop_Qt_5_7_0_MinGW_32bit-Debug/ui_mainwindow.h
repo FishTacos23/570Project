@@ -19,6 +19,9 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -33,7 +36,13 @@ public:
     QAction *actionSave_Results;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
+    QSpacerItem *verticalSpacer_2;
+    QSplitter *splitter;
+    QPushButton *pushButton_ZoomIn;
+    QPushButton *pushButton_ZOut;
+    QSpacerItem *verticalSpacer;
     QGraphicsView *graphicsView;
+    QSpacerItem *verticalSpacer_3;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -56,10 +65,34 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_2, 2, 1, 1, 1);
+
+        splitter = new QSplitter(centralWidget);
+        splitter->setObjectName(QStringLiteral("splitter"));
+        splitter->setOrientation(Qt::Vertical);
+        pushButton_ZoomIn = new QPushButton(splitter);
+        pushButton_ZoomIn->setObjectName(QStringLiteral("pushButton_ZoomIn"));
+        splitter->addWidget(pushButton_ZoomIn);
+        pushButton_ZOut = new QPushButton(splitter);
+        pushButton_ZOut->setObjectName(QStringLiteral("pushButton_ZOut"));
+        splitter->addWidget(pushButton_ZOut);
+
+        gridLayout->addWidget(splitter, 0, 1, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer, 3, 1, 1, 1);
+
         graphicsView = new QGraphicsView(centralWidget);
         graphicsView->setObjectName(QStringLiteral("graphicsView"));
 
-        gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
+        gridLayout->addWidget(graphicsView, 0, 0, 4, 1);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_3, 1, 1, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
@@ -91,6 +124,8 @@ public:
         actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
         actionSolve->setText(QApplication::translate("MainWindow", "Solve", 0));
         actionSave_Results->setText(QApplication::translate("MainWindow", "Save Results", 0));
+        pushButton_ZoomIn->setText(QApplication::translate("MainWindow", "Zoom In", 0));
+        pushButton_ZOut->setText(QApplication::translate("MainWindow", "Zoom Out", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
     } // retranslateUi
 

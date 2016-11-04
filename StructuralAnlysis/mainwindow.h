@@ -28,11 +28,16 @@ private slots:
 
     void drawStructure();
 
+    void on_pushButton_ZoomIn_clicked();
+
+    void on_pushButton_ZOut_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QGraphicsLineItem *myStrucLine;
     Analyze myStruct();
+    int zoom;
 
 };
 

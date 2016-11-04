@@ -1,9 +1,12 @@
 #include "analyze.h"
+#include "pframe.h"
 
 Analyze::Analyze()
 {
 
     // preprocessing
+    njoints = xstruct.size();
+    ndofs = PFrame().ndofs;
 
     // Assemble Struct Stiff Mat
 
@@ -19,14 +22,6 @@ Analyze::Analyze()
 
 void Analyze::preprocessing()
 {
-    // read input file
-
-
-    // get joints and coordinates mat
-
-    // get member joint mat
-
-    // get mat props
 
     // structDOF's
 
@@ -88,8 +83,19 @@ void Analyze::getDispl()
 
 }
 
-std::vector<std::vector<double> > Analyze::StructDOF()
+void Analyze::StructDOF()
 {
+    std::vector<int> row;
+    int num = 1;
+
+    // DOF matrix is # of joints x # of DOFS/Joint
+    for(int i = 0; i < njoints; i++)
+    {
+        for(int j = 0; j < ndofs; j++)
+        {
+
+        }
+    }
 
 }
 

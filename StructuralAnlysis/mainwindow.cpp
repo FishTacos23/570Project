@@ -34,6 +34,8 @@ void MainWindow::on_actionOpen_triggered()
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
 
+    zoom = 10;
+
     // draw structure
     drawStructure();
 
@@ -203,27 +205,67 @@ void MainWindow::drawStructure()
 {
     QPainter myDrawing;
 
+    double rad = 3.14159;
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+    double tempx;
+    double tempy;
+
     // draw a line for each member
     for(uint i = 0; i < myStructure.conn.size();i++)
     {
-        // get x and y coordinates
-        double x1;
-        double y1;
-        double x2;
-        double y2;
+        // get x and y coordinates and rotate them so (+) is up
 
         int m = myStructure.conn[i][0]-1;
         int n = myStructure.conn[i][1]-1;
 
-        x1 = myStructure.xstruct[m][0];
-        y1 = myStructure.xstruct[m][1];
-        x2 = myStructure.xstruct[n][0];
-        y2 = myStructure.xstruct[n][1];
+        tempx = myStructure.xstruct[m][0]*zoom;
+        tempy = myStructure.xstruct[m][1]*zoom;
+
+        x1 = cos(rad)*tempx-sin(rad)*tempy;
+        y1 = sin(rad)*tempx+cos(rad)*tempy;
+
+        tempx = myStructure.xstruct[n][0]*zoom;
+        tempy = myStructure.xstruct[n][1]*zoom;
+
+        x2 = cos(rad)*tempx-sin(rad)*tempy;
+        y2 = sin(rad)*tempx+cos(rad)*tempy;
 
         QPen linePen(Qt::black);
         linePen.setWidth(5);
 
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
 
+    }
+}
+
+void MainWindow::on_pushButton_ZoomIn_clicked()
+{
+
+    // clear the scene of the lines
+    scene->clear();
+
+    // set new zoom factor
+    zoom++;
+
+    // draw the shapes again
+    drawStructure();
+
+}
+
+void MainWindow::on_pushButton_ZOut_clicked()
+{
+    if(zoom > 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
+
+        // set new zoom factor
+        zoom--;
+
+        // draw the shapes again
+        drawStructure();
     }
 }
