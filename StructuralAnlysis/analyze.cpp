@@ -4,26 +4,16 @@
 Analyze::Analyze()
 {
 
-    // preprocessing
-    njoints = xstruct.size();
-    ndofs = PFrame().ndofs;
-
-    // Assemble Struct Stiff Mat
-
-    // Triangularize
-
-    // Assemble Struct Force Vec
-
-    // Back Substitution
-
-    // post processing
-
 }
 
 void Analyze::preprocessing()
 {
 
+    njoints = xstruct.size();
+    ndofs = PFrame().ndofs;
+
     // structDOF's
+    StructDOF();
 
     // loop through members
 
@@ -85,15 +75,44 @@ void Analyze::getDispl()
 
 void Analyze::StructDOF()
 {
-    std::vector<int> row;
     int num = 1;
+    int s = constMat.size();
+    int m;
+    int n;
+
+    // loop through making matrix of 1's of correct size
 
     // DOF matrix is # of joints x # of DOFS/Joint
     for(int i = 0; i < njoints; i++)
     {
+        std::vector<int> row;
+
         for(int j = 0; j < ndofs; j++)
         {
+            row.push_back(1);
+        }
+        SDOF.push_back(row);
+    }
 
+    // loop through const matrix, write zeros to DOF Mat
+    for(int i = 0; i < s; i++)
+    {
+        m = constMat[i][0]-1;
+        n = constMat[i][1]-1;
+
+        SDOF[m][n] = 0;
+    }
+
+    // increment positive numbers
+    for(int i = 0; i < njoints; i++)
+    {
+        for(int j = 0; j < ndofs; j++)
+        {
+            if(SDOF[i][j] > 0)
+            {
+                SDOF[i][j] = num;
+                num++;
+            }
         }
     }
 
@@ -137,4 +156,11 @@ void Analyze::MatBackSelf()
 std::vector<std::vector<double> > Analyze::StructToJointDisp()
 {
 
+}
+
+void Analyze::clearStructVar()
+{
+    KStruct.clear();
+    FStruct.clear();
+    UStruct.clear();
 }

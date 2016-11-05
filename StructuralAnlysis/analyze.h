@@ -4,8 +4,6 @@
 #include "tokenize.h"
 #include <QGraphicsLineItem>
 
-// RUN TIME ERROR ON EXITING
-
 class Analyze
 {
 public:
@@ -29,6 +27,8 @@ public:
     void MatBackSelf();
     std::vector<std::vector<double>> StructToJointDisp();
 
+    void clearStructVar();
+
     std::vector<std::vector<double>> xstruct;
     std::vector<std::vector<int>> conn;
     std::vector<std::vector<int>> constMat;
@@ -36,8 +36,6 @@ public:
     std::vector<double> properties;
     std::string StructType;
     std::vector<std::vector<int>> SDOF;
-
-    //QGraphicsLineItem strMem;
 
 private:
 

@@ -32,17 +32,18 @@ class Ui_MainWindow
 {
 public:
     QAction *actionOpen;
-    QAction *actionSolve;
     QAction *actionSave_Results;
+    QAction *actionClear;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QSpacerItem *verticalSpacer_2;
+    QSpacerItem *verticalSpacer;
+    QSpacerItem *verticalSpacer_3;
     QSplitter *splitter;
     QPushButton *pushButton_ZoomIn;
     QPushButton *pushButton_ZOut;
-    QSpacerItem *verticalSpacer;
+    QPushButton *pushButton_solve;
     QGraphicsView *graphicsView;
-    QSpacerItem *verticalSpacer_3;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -55,10 +56,10 @@ public:
         MainWindow->resize(400, 300);
         actionOpen = new QAction(MainWindow);
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
-        actionSolve = new QAction(MainWindow);
-        actionSolve->setObjectName(QStringLiteral("actionSolve"));
         actionSave_Results = new QAction(MainWindow);
         actionSave_Results->setObjectName(QStringLiteral("actionSave_Results"));
+        actionClear = new QAction(MainWindow);
+        actionClear->setObjectName(QStringLiteral("actionClear"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -68,6 +69,14 @@ public:
         verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         gridLayout->addItem(verticalSpacer_2, 2, 1, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer, 3, 1, 1, 1);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_3, 1, 1, 1, 1);
 
         splitter = new QSplitter(centralWidget);
         splitter->setObjectName(QStringLiteral("splitter"));
@@ -81,23 +90,20 @@ public:
 
         gridLayout->addWidget(splitter, 0, 1, 1, 1);
 
-        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        pushButton_solve = new QPushButton(centralWidget);
+        pushButton_solve->setObjectName(QStringLiteral("pushButton_solve"));
 
-        gridLayout->addItem(verticalSpacer, 3, 1, 1, 1);
+        gridLayout->addWidget(pushButton_solve, 4, 1, 1, 1);
 
         graphicsView = new QGraphicsView(centralWidget);
         graphicsView->setObjectName(QStringLiteral("graphicsView"));
 
-        gridLayout->addWidget(graphicsView, 0, 0, 4, 1);
-
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer_3, 1, 1, 1, 1);
+        gridLayout->addWidget(graphicsView, 0, 0, 5, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 17));
+        menuBar->setGeometry(QRect(0, 0, 400, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         MainWindow->setMenuBar(menuBar);
@@ -110,8 +116,8 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuFile->addAction(actionOpen);
-        menuFile->addAction(actionSolve);
         menuFile->addAction(actionSave_Results);
+        menuFile->addAction(actionClear);
 
         retranslateUi(MainWindow);
 
@@ -122,10 +128,11 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
         actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
-        actionSolve->setText(QApplication::translate("MainWindow", "Solve", 0));
         actionSave_Results->setText(QApplication::translate("MainWindow", "Save Results", 0));
+        actionClear->setText(QApplication::translate("MainWindow", "Clear", 0));
         pushButton_ZoomIn->setText(QApplication::translate("MainWindow", "Zoom In", 0));
         pushButton_ZOut->setText(QApplication::translate("MainWindow", "Zoom Out", 0));
+        pushButton_solve->setText(QApplication::translate("MainWindow", "Solve", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
     } // retranslateUi
 

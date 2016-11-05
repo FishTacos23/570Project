@@ -24,10 +24,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    // read setup file
+
+    // read setup file  // THIS SECTION IS BREAKING DEBUGG!
     // get file name
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
+
+    //std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     readFile(fileName);
 
@@ -39,15 +42,6 @@ void MainWindow::on_actionOpen_triggered()
     // draw structure
     drawStructure();
 
-}
-
-void MainWindow::on_actionSolve_triggered()
-{
-    // perform calculations
-
-    // clear drawing
-
-    // draw new structure
 }
 
 void MainWindow::on_actionSave_Results_triggered()
@@ -216,22 +210,15 @@ void MainWindow::drawStructure()
     // draw a line for each member
     for(uint i = 0; i < myStructure.conn.size();i++)
     {
-        // get x and y coordinates and rotate them so (+) is up
+        // get x and y coordinates
 
         int m = myStructure.conn[i][0]-1;
         int n = myStructure.conn[i][1]-1;
 
-        tempx = myStructure.xstruct[m][0]*zoom;
-        tempy = myStructure.xstruct[m][1]*zoom;
-
-        x1 = cos(rad)*tempx-sin(rad)*tempy;
-        y1 = sin(rad)*tempx+cos(rad)*tempy;
-
-        tempx = myStructure.xstruct[n][0]*zoom;
-        tempy = myStructure.xstruct[n][1]*zoom;
-
-        x2 = cos(rad)*tempx-sin(rad)*tempy;
-        y2 = sin(rad)*tempx+cos(rad)*tempy;
+        x1 = myStructure.xstruct[m][0]*zoom;
+        y1 = -myStructure.xstruct[m][1]*zoom;
+        x2 = myStructure.xstruct[n][0]*zoom;
+        y2 = -myStructure.xstruct[n][1]*zoom;
 
         QPen linePen(Qt::black);
         linePen.setWidth(5);
@@ -243,16 +230,26 @@ void MainWindow::drawStructure()
 
 void MainWindow::on_pushButton_ZoomIn_clicked()
 {
+    if(zoom >= 1)
+    {   // clear the scene of the lines
+        scene->clear();
 
-    // clear the scene of the lines
-    scene->clear();
+        // set new zoom factor
+        zoom++;
 
-    // set new zoom factor
-    zoom++;
+        // draw the shapes again
+        drawStructure();
+    }
+    else if(zoom < 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
 
-    // draw the shapes again
-    drawStructure();
+        zoom = zoom + 0.1;
 
+        // draw the shapes again
+        drawStructure();
+    }
 }
 
 void MainWindow::on_pushButton_ZOut_clicked()
@@ -268,4 +265,42 @@ void MainWindow::on_pushButton_ZOut_clicked()
         // draw the shapes again
         drawStructure();
     }
+    else if(zoom <= 1)
+    {
+        if(zoom > .1)
+        {
+            // clear the scene of the lines
+            scene->clear();
+
+            zoom = zoom - 0.1;
+
+            // draw the shapes again
+            drawStructure();
+        }
+    }
+}
+
+void MainWindow::on_actionClear_triggered()
+{
+    // clear the screan
+    scene->clear();
+
+    // clear variables
+    myStructure.xstruct.clear();
+    myStructure.conn.clear();
+    myStructure.constMat.clear();
+    myStructure.loadMat.clear();
+    myStructure.properties.clear();
+    myStructure.SDOF.clear();
+    myStructure.clearStructVar();
+}
+
+void MainWindow::on_pushButton_solve_released()
+{
+    myStructure.preprocessing();
+    myStructure.AssembleStructStiff();
+    myStructure.Triangularization();
+    myStructure.AssembleStructForce();
+    myStructure.BackSub();
+    myStructure.postprocessing();
 }

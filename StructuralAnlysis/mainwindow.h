@@ -20,8 +20,6 @@ public:
 private slots:
     void on_actionOpen_triggered();
 
-    void on_actionSolve_triggered();
-
     void on_actionSave_Results_triggered();
 
     void readFile(std::string fileName);
@@ -32,12 +30,16 @@ private slots:
 
     void on_pushButton_ZOut_clicked();
 
+    void on_actionClear_triggered();
+
+    void on_pushButton_solve_released();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QGraphicsLineItem *myStrucLine;
     Analyze myStruct();
-    int zoom;
+    double zoom;
 
 };
 
