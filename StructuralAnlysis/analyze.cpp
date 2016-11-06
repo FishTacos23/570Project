@@ -11,25 +11,96 @@ void Analyze::preprocessing()
 
     njoints = xstruct.size();
     ndofs = PFrame().ndofs;
+    nmems = conn.size();
 
     // structDOF's
     StructDOF();
 
     // loop through members
+    std::vector<double> oneLenRot;
 
+    for(int i = 0; i < nmems; i++)
+    {
         // StructToMemCoord
+        std::vector<std::vector<double>> memberCoordinates = StructToMemCoord(i);
 
         // PFrameLenRot
+        oneLenRot = PFrame::PFrameLenRot(memberCoordinates);
 
+        lenRot.push_back(oneLenRot);
+    }
 }
 
 void Analyze::AssembleStructStiff()
 {
-    // loop through members
 
+    // initialize Struct Stiff Mat
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        std::vector<double> row;
+        for(int j = 0; j < nSDOF-1; j++)
+        {
+            row.push_back(0);
+        }
+        KStruct.push_back(row);
+    }
+
+
+    for(int i = 0; i < ndofs*2; i++)
+    {
+        compMtoS.push_back(0);
+    }
+
+    // loop through members
+    for(int i = 0; i < nmems; i++)
+    {
         // PFrameStiff
+        kmem = PFrame::PFrameStiff(lenRot[i],properties);
 
         // MemtoStructStiff
+        for(int j = 0; j < ndofs*2; j++)
+        {
+            compMtoS[j]=0;
+        }
+
+        // loop
+        for(int j = 0; j < 2; j++)
+        {
+            int joint = conn[i][j];
+
+            for(int k = 0; k < ndofs; k++)
+            {
+                if(SDOF[joint-1][k] != 0)
+                {
+                    if(j==0)
+                    {
+                        compMtoS[k] = SDOF[joint-1][k];
+                    }
+                    else
+                    {
+                        compMtoS[k+3] = SDOF[joint-1][k];
+                    }
+                }
+            }
+        }
+
+        // loop through compMtoS
+        for(int j=0; j<ndofs*2; j++)
+        {
+            if(compMtoS[j] != 0)
+            {
+                int m = compMtoS[j]-1;
+                for(int k = 0; k<ndofs*2; k++)
+                {
+                    if(compMtoS[k] != 0)
+                    {
+                        int n = compMtoS[k]-1;
+                        KStruct[m][n] += kmem[j][k];
+                    }
+                }
+            }
+        }
+    }
 }
 
 void Analyze::Triangularization()
@@ -115,12 +186,33 @@ void Analyze::StructDOF()
             }
         }
     }
-
+    nSDOF = num;
 }
 
-std::vector<std::vector<double> > Analyze::StructToMemCoord()
+std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
 {
+    // loop through conn matrix
+    std::vector<std::vector<double>> memCoord;
 
+    std::vector<double> jCoord;
+
+    int j1 = conn[memNum][0];
+    int j2 = conn[memNum][1];
+
+    double x = xstruct[j1-1][0];
+    double y = xstruct[j1-1][1];
+
+    jCoord.push_back(x);
+    jCoord.push_back(y);
+
+    memCoord.push_back(jCoord);
+
+    jCoord[0] = xstruct[j2-1][0];
+    jCoord[1] = xstruct[j2-1][1];
+
+    memCoord.push_back(jCoord);
+
+    return memCoord;
 }
 
 void Analyze::MemToStructStiffs()

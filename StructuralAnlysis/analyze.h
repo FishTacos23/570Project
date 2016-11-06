@@ -18,7 +18,7 @@ public:
 
     void getDispl();
     void StructDOF();
-    std::vector<std::vector<double>> StructToMemCoord();
+    std::vector<std::vector<double>> StructToMemCoord(int memNum);
     void MemToStructStiffs();
     std::vector<std::vector<double>> MatTriangSelf();
     std::vector<std::vector<double>> JointToStructLoad();
@@ -36,6 +36,10 @@ public:
     std::vector<double> properties;
     std::string StructType;
     std::vector<std::vector<int>> SDOF;
+    std::vector<std::vector<double>> lenRot;
+    std::vector<int> jMem;
+    std::vector<int> compMtoS;
+    int nSDOF;
 
 private:
 
@@ -49,6 +53,7 @@ private:
 
     int njoints;
     int ndofs;
+    int nmems;
 
 };
 
