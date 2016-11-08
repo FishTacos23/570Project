@@ -106,21 +106,59 @@ void Analyze::AssembleStructStiff()
 void Analyze::Triangularization()
 {
     // MatTriangSelf
+    int s = KStruct.size();
+
+    // loop through rows
+    for(int i = 1; i < s; i++)
+    {
+        // loop through columns until diagonal
+        for(int j = 0; j < i; j++)
+        {
+            double c = KStruct[i][j];
+            KStruct[i][j] = c/KStruct[j][j];
+            KStruct[j][i] = KStruct[i][j];
+
+            // loop through column decrementing
+            for(int k = j+1; k <= i; k++)
+            {
+                KStruct[i][k] -= c*KStruct[k][j];
+                KStruct[k][i] = KStruct[i][k];
+            }
+        }
+    }
 }
 
 void Analyze::AssembleStructForce()
 {
-    // loop through joints and directions
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        FStruct.push_back(0);
+    }
 
+    // loop through joints and directions
+    int j;
+    int dir;
+
+    for(int i = 0; i < loadMat.size(); i++)
+    {
         // JointToStructLoad
+        j = loadMat[i][0];
+        dir = loadMat[i][1];
+
+        int m = SDOF[j-1][dir-1]-1;
+
+        FStruct[m] = loadMat[i][2];
+    }
 
     // loop through members
-
+    for(int i = 0; i < nmems; i++)
+    {
         // PFrameDistr
 
         // PFrameForce
 
         // MemToStructForce
+    }
 }
 
 void Analyze::BackSub()
