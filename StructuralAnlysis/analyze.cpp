@@ -150,22 +150,25 @@ void Analyze::AssembleStructForce()
         FStruct[m] = loadMat[i][2];
     }
 
-    // loop through members
-    for(int i = 0; i < nmems; i++)
-    {
-        // PFrameDistr
+//    // loop through members - this part will only be needed with distributed loads
+//    for(int i = 0; i < nmems; i++)
+//    {
+//        // PFrameDistr
 
-        // PFrameForce
+//        // PFrameForce
 
-        // MemToStructForce
-    }
+//        // MemToStructForce
+
+//    }
 }
 
 void Analyze::BackSub()
 {
-    // MatVecMinus
+    // MatVecMinus - only needed with suppport displacements
 
     // MatBackSelf
+    MatBackSelf();
+
 }
 
 void Analyze::postprocessing()
@@ -258,11 +261,6 @@ void Analyze::MemToStructStiffs()
 
 }
 
-std::vector<std::vector<double> > Analyze::MatTriangSelf()
-{
-
-}
-
 std::vector<std::vector<double> > Analyze::JointToStructLoad()
 {
 
@@ -275,12 +273,47 @@ void Analyze::MemToStructForce()
 
 void Analyze::MatVecMinus()
 {
-
+    // only needed for support displacement
 }
 
 void Analyze::MatBackSelf()
 {
 
+    std::vector<double> e;
+    std::vector<double> d;
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        e.push_back(0);
+        d.push_back(0);
+        UStruct.push_back(0);
+    }
+
+    // Le = b
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        e[i] = FStruct[i];
+        for(int j = i-1; j >= 0; j--)
+        {
+            e[i] -= e[j]*KStruct[i][j];
+        }
+    }
+
+    // Dd = e
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        d[i] = e[i]/KStruct[i][i];
+    }
+
+    // Lt c = d
+    for(int i = 0; i < nSDOF-1; i++)
+    {
+        int num = nSDOF-i-2;
+        UStruct[num] = d[num];
+        for(int j = i; j > 0; j--)
+        {
+            UStruct[num] -= UStruct[j+num]*KStruct[j+num][num];
+        }
+    }
 }
 
 std::vector<std::vector<double> > Analyze::StructToJointDisp()

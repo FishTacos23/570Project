@@ -20,7 +20,6 @@ public:
     void StructDOF();
     std::vector<std::vector<double>> StructToMemCoord(int memNum);
     void MemToStructStiffs();
-    std::vector<std::vector<double>> MatTriangSelf();
     std::vector<std::vector<double>> JointToStructLoad();
     void MemToStructForce();
     void MatVecMinus();
