@@ -7,14 +7,19 @@
 #include <iostream>
 #include <QPainter>
 #include <QGraphicsLineItem>
+#include <QPointF>
+#include <QGraphicsView>
 
 static Analyze myStructure;
+QPainter myDrawing;
+QPointF myCenter;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    solved = false;
 }
 
 MainWindow::~MainWindow()
@@ -37,11 +42,12 @@ void MainWindow::on_actionOpen_triggered()
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
 
-    zoom = 10;
+    zoom = 3;
 
     // draw structure
     drawStructure();
 
+    ui->graphicsView->centerOn(myCenter);
 }
 
 void MainWindow::on_actionSave_Results_triggered()
@@ -197,15 +203,17 @@ void MainWindow::readFile(std::string fileName)
 
 void MainWindow::drawStructure()
 {
-    QPainter myDrawing;
+    //QPainter myDrawing;
 
-    double rad = 3.14159;
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
+
     double x1;
     double y1;
     double x2;
     double y2;
-    double tempx;
-    double tempy;
 
     // draw a line for each member
     for(uint i = 0; i < myStructure.conn.size();i++)
@@ -220,12 +228,102 @@ void MainWindow::drawStructure()
         x2 = myStructure.xstruct[n][0]*zoom;
         y2 = -myStructure.xstruct[n][1]*zoom;
 
+        if(i == 0)
+        {
+            xmin = x1;
+            xmax = x1;
+            ymin = y1;
+            ymax = y1;
+        }
+        if(x1 > xmax)
+            xmax = x1;
+        if(x2 > xmax)
+            xmax = x2;
+        if(y1 > ymax)
+            ymax = y1;
+        if(y2 > ymax)
+            ymax = y2;
+        if(x1 < xmin)
+            xmin = x1;
+        if(x2 < xmin)
+            xmin = x2;
+        if(y1 < ymin)
+            ymin = y1;
+        if(y2 < ymin)
+            ymin = y2;
+
+
         QPen linePen(Qt::black);
         linePen.setWidth(5);
 
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
 
     }
+
+    myCenter.setX((xmax-xmin)/2);
+    myCenter.setY((ymax-ymin)/2);
+}
+
+void MainWindow::drawDStructure()
+{
+    // clear gview
+    scene->clear();
+
+    double xmin;
+    double xmax;
+    double ymin;
+    double ymax;
+
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+
+    for(uint i = 0; i < myStructure.conn.size();i++)
+    {
+
+        // draw with delta
+        int m = myStructure.conn[i][0]-1;
+        int n = myStructure.conn[i][1]-1;
+
+        x1 = (myStructure.xstruct[m][0]+myStructure.dxstruct[m][0]*dDeform)*zoom;
+        y1 = -(myStructure.xstruct[m][1]+myStructure.dxstruct[m][1]*dDeform)*zoom;
+        x2 = (myStructure.xstruct[n][0]+myStructure.dxstruct[n][0]*dDeform)*zoom;
+        y2 = -(myStructure.xstruct[n][1]+myStructure.dxstruct[n][1]*dDeform)*zoom;
+
+        if(i == 0)
+        {
+            xmin = x1;
+            xmax = x1;
+            ymin = y1;
+            ymax = y1;
+        }
+        if(x1 > xmax)
+            xmax = x1;
+        if(x2 > xmax)
+            xmax = x2;
+        if(y1 > ymax)
+            ymax = y1;
+        if(y2 > ymax)
+            ymax = y2;
+        if(x1 < xmin)
+            xmin = x1;
+        if(x2 < xmin)
+            xmin = x2;
+        if(y1 < ymin)
+            ymin = y1;
+        if(y2 < ymin)
+            ymin = y2;
+
+        QPen linePen(Qt::red);
+        linePen.setWidth(5);
+
+        myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
+    }
+
+    myCenter.setX((xmax-xmin)/2);
+    myCenter.setY((ymax-ymin)/2);
+
 }
 
 void MainWindow::on_pushButton_ZoomIn_clicked()
@@ -238,7 +336,16 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         zoom++;
 
         // draw the shapes again
-        drawStructure();
+        if(solved == true)
+        {
+            drawDStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+
+        ui->graphicsView->centerOn(myCenter);
     }
     else if(zoom < 1)
     {
@@ -248,12 +355,22 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         zoom = zoom + 0.1;
 
         // draw the shapes again
-        drawStructure();
+        if(solved == true)
+        {
+            drawDStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+
+        ui->graphicsView->centerOn(myCenter);
     }
 }
 
 void MainWindow::on_pushButton_ZOut_clicked()
 {
+
     if(zoom > 1)
     {
         // clear the scene of the lines
@@ -263,7 +380,16 @@ void MainWindow::on_pushButton_ZOut_clicked()
         zoom--;
 
         // draw the shapes again
-        drawStructure();
+        if(solved == true)
+        {
+            drawDStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+
+        ui->graphicsView->centerOn(myCenter);
     }
     else if(zoom <= 1)
     {
@@ -275,7 +401,16 @@ void MainWindow::on_pushButton_ZOut_clicked()
             zoom = zoom - 0.1;
 
             // draw the shapes again
-            drawStructure();
+            if(solved == true)
+            {
+                drawDStructure();
+            }
+            else
+            {
+                drawStructure();
+            }
+
+            ui->graphicsView->centerOn(myCenter);
         }
     }
 }
@@ -293,14 +428,33 @@ void MainWindow::on_actionClear_triggered()
     myStructure.properties.clear();
     myStructure.SDOF.clear();
     myStructure.clearStructVar();
+
+    solved = false;
 }
 
 void MainWindow::on_pushButton_solve_released()
 {
-    myStructure.preprocessing();
-    myStructure.AssembleStructStiff();
-    myStructure.Triangularization();
-    myStructure.AssembleStructForce();
-    myStructure.BackSub();
-    myStructure.postprocessing();
+    if(solved == false)
+    {
+        myStructure.preprocessing();
+        myStructure.AssembleStructStiff();
+        myStructure.Triangularization();
+        myStructure.AssembleStructForce();
+        myStructure.BackSub();
+        myStructure.postprocessing();
+
+        dDeform = 1;
+
+        drawDStructure();
+
+        solved = true;
+    }
+}
+
+void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
+{
+    dDeform = 1;
+    dDeform*=position;
+
+    drawDStructure();
 }

@@ -29,6 +29,7 @@ public:
     void clearStructVar();
 
     std::vector<std::vector<double>> xstruct;
+    std::vector<std::vector<double>> dxstruct;
     std::vector<std::vector<int>> conn;
     std::vector<std::vector<int>> constMat;
     std::vector<std::vector<double>> loadMat;
@@ -48,7 +49,7 @@ private:
 
     std::vector<std::vector<double>> kmem;
     std::vector<double> fmem;
-    std::vector<double> umem;
+    std::vector<std::vector<double>> umem;
 
     int njoints;
     int ndofs;

@@ -16,10 +16,13 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLCDNumber>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QStatusBar>
@@ -36,14 +39,17 @@ public:
     QAction *actionClear;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
-    QSpacerItem *verticalSpacer_2;
-    QSpacerItem *verticalSpacer;
-    QSpacerItem *verticalSpacer_3;
+    QGraphicsView *graphicsView;
     QSplitter *splitter;
     QPushButton *pushButton_ZoomIn;
     QPushButton *pushButton_ZOut;
+    QSpacerItem *verticalSpacer_3;
+    QSpacerItem *verticalSpacer_2;
+    QSpacerItem *verticalSpacer;
     QPushButton *pushButton_solve;
-    QGraphicsView *graphicsView;
+    QSlider *horizontalSlider_scaleDisp;
+    QLabel *label;
+    QLCDNumber *lcdNumber;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QToolBar *mainToolBar;
@@ -66,17 +72,10 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        graphicsView = new QGraphicsView(centralWidget);
+        graphicsView->setObjectName(QStringLiteral("graphicsView"));
 
-        gridLayout->addItem(verticalSpacer_2, 2, 1, 1, 1);
-
-        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer, 3, 1, 1, 1);
-
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer_3, 1, 1, 1, 1);
+        gridLayout->addWidget(graphicsView, 0, 0, 4, 1);
 
         splitter = new QSplitter(centralWidget);
         splitter->setObjectName(QStringLiteral("splitter"));
@@ -88,22 +87,48 @@ public:
         pushButton_ZOut->setObjectName(QStringLiteral("pushButton_ZOut"));
         splitter->addWidget(pushButton_ZOut);
 
-        gridLayout->addWidget(splitter, 0, 1, 1, 1);
+        gridLayout->addWidget(splitter, 0, 1, 1, 2);
+
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_3, 1, 2, 1, 1);
+
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer_2, 2, 2, 1, 1);
+
+        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        gridLayout->addItem(verticalSpacer, 3, 2, 1, 1);
 
         pushButton_solve = new QPushButton(centralWidget);
         pushButton_solve->setObjectName(QStringLiteral("pushButton_solve"));
 
-        gridLayout->addWidget(pushButton_solve, 4, 1, 1, 1);
+        gridLayout->addWidget(pushButton_solve, 4, 1, 1, 2);
 
-        graphicsView = new QGraphicsView(centralWidget);
-        graphicsView->setObjectName(QStringLiteral("graphicsView"));
+        horizontalSlider_scaleDisp = new QSlider(centralWidget);
+        horizontalSlider_scaleDisp->setObjectName(QStringLiteral("horizontalSlider_scaleDisp"));
+        horizontalSlider_scaleDisp->setSliderPosition(0);
+        horizontalSlider_scaleDisp->setOrientation(Qt::Horizontal);
 
-        gridLayout->addWidget(graphicsView, 0, 0, 5, 1);
+        gridLayout->addWidget(horizontalSlider_scaleDisp, 5, 0, 1, 1);
+
+        label = new QLabel(centralWidget);
+        label->setObjectName(QStringLiteral("label"));
+
+        gridLayout->addWidget(label, 5, 1, 1, 1);
+
+        lcdNumber = new QLCDNumber(centralWidget);
+        lcdNumber->setObjectName(QStringLiteral("lcdNumber"));
+        lcdNumber->setFrameShadow(QFrame::Plain);
+        lcdNumber->setDigitCount(2);
+
+        gridLayout->addWidget(lcdNumber, 5, 2, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 21));
+        menuBar->setGeometry(QRect(0, 0, 400, 17));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         MainWindow->setMenuBar(menuBar);
@@ -120,6 +145,7 @@ public:
         menuFile->addAction(actionClear);
 
         retranslateUi(MainWindow);
+        QObject::connect(horizontalSlider_scaleDisp, SIGNAL(sliderMoved(int)), lcdNumber, SLOT(display(int)));
 
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
@@ -133,6 +159,7 @@ public:
         pushButton_ZoomIn->setText(QApplication::translate("MainWindow", "Zoom In", 0));
         pushButton_ZOut->setText(QApplication::translate("MainWindow", "Zoom Out", 0));
         pushButton_solve->setText(QApplication::translate("MainWindow", "Solve", 0));
+        label->setText(QApplication::translate("MainWindow", "Scale Factor:", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
     } // retranslateUi
 

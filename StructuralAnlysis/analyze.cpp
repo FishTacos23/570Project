@@ -173,10 +173,31 @@ void Analyze::BackSub()
 
 void Analyze::postprocessing()
 {
+    int s = xstruct.size();
+
+    for(int i = 0; i < s; i++)
+    {
+        std::vector<double> row;
+        for(int j = 0; j < ndofs; j++)
+        {
+            row.push_back(0);
+        }
+        dxstruct.push_back(row);
+    }
+
     // loop through joints and disp
-
-        // StructToJointDisp
-
+        // loop through SDOF
+    for(int i = 0; i < s; i++)
+    {
+        for(int j = 0; j < ndofs; j++)
+        {
+            if(SDOF[i][j] != 0)
+            {
+                int m = SDOF[i][j];
+                dxstruct[i][j] = UStruct[m];
+            }
+        }
+    }
 }
 
 void Analyze::getDispl()
