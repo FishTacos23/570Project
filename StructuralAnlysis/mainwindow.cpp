@@ -525,10 +525,11 @@ void MainWindow::drawForces()
     constPen.setWidth(2);
 
     // loop through constraint matrix
-    for(int i = 0; i < myStructure.constMat.size(); i++)
+    for(int i = 0; i < myStructure.loadMat.size(); i++)
     {
-        int m = myStructure.constMat[i][0]-1;
-        int dir = myStructure.constMat[i][1];
+        int m = dtoi(myStructure.loadMat[i][0])-1;
+        int dir = dtoi(myStructure.loadMat[i][1]);
+        double loadMag = itos(myStructure.loadMat[i][2]);
 
         double x1 = myStructure.xstruct[m][0]*zoom;
         double y1 = -myStructure.xstruct[m][1]*zoom;
