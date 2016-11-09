@@ -49,6 +49,7 @@ void MainWindow::on_actionOpen_triggered()
     // draw structure
     drawStructure();
     drawConstraints();
+    drawForces();
 
     ui->graphicsView->centerOn(myCenter);
 }
@@ -347,12 +348,13 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
             drawStructure();
             drawDStructure();
             drawConstraints();
+            drawForces();
         }
         else
         {
             drawStructure();
-            drawStructure();
             drawConstraints();
+            drawForces();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -370,11 +372,13 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
             drawStructure();
             drawDStructure();
             drawConstraints();
+            drawForces();
         }
         else
         {
             drawStructure();
             drawConstraints();
+            drawForces();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -398,11 +402,13 @@ void MainWindow::on_pushButton_ZOut_clicked()
             drawStructure();
             drawDStructure();
             drawConstraints();
+            drawForces();
         }
         else
         {
             drawStructure();
             drawConstraints();
+            drawForces();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -421,11 +427,13 @@ void MainWindow::on_pushButton_ZOut_clicked()
             {
                 drawDStructure();
                 drawConstraints();
+                drawForces();
             }
             else
             {
                 drawStructure();
                 drawConstraints();
+                drawForces();
             }
 
             ui->graphicsView->centerOn(myCenter);
@@ -519,35 +527,52 @@ void MainWindow::drawConstraints()
 
 void MainWindow::drawForces()
 {
-    QBrush constBrush(Qt::yellow);
-    QPen constPen(Qt::black);
-    constPen.setWidth(2);
+    QBrush momBrush(Qt::transparent);
+    QBrush momBrush2(Qt::yellow);
+    QBrush loadBrush(Qt::green);
+    QPen loadPen(Qt::green);
+    QPen momPen(Qt::yellow);
+    loadPen.setWidth(5);
+    momPen.setWidth(3);
 
     // loop through constraint matrix
-    for(int i = 0; i < myStructure.constMat.size(); i++)
+    for(uint i = 0; i < myStructure.loadMat.size(); i++)
     {
-        int m = myStructure.constMat[i][0]-1;
-        int dir = myStructure.constMat[i][1];
+        int m = (int)myStructure.loadMat[i][0]-1;
+        int dir = (int)myStructure.loadMat[i][1];
+        std::string forceMag = std::to_string(myStructure.loadMat[i][2]);
 
         double x1 = myStructure.xstruct[m][0]*zoom;
         double y1 = -myStructure.xstruct[m][1]*zoom;
 
         if(dir==1)
         {
+            // draw main line
+            myStrucLine = scene->addLine(x1,y1,x1-30*zoom,y1,loadPen);
+
+            // draw triangle
             noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1-5*zoom) << QPointF(x1-10*zoom,y1+5*zoom);
-            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1+5*zoom) << QPointF(x1-10*zoom,y1-5*zoom);
+            noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
         }
         else if(dir==2)
         {
+            // draw main line
+            myStrucLine = scene->addLine(x1,y1,x1,y1-30*zoom,loadPen);
+
+            // draw triangle
             noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1+10*zoom) << QPointF(x1+5*zoom,y1+10*zoom);
-            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1-10*zoom) << QPointF(x1+5*zoom,y1-10*zoom);
+            noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
         }
         else
         {
-            noRot = scene->addRect(x1-5*zoom,y1-5*zoom,10*zoom,10*zoom,constPen,constBrush);
-        }
+            myStructCirc = scene->addEllipse(x1-10*zoom, y1-10*zoom, 20*zoom, 20*zoom,momPen,momBrush);
 
+            // draw triangle
+            noTransShape.clear();
+            noTransShape << QPointF(x1+2,y1-10*zoom) << QPointF(x1-3*zoom,y1-6*zoom) << QPointF(x1-3*zoom,y1-14*zoom);
+            noTrans = scene->addPolygon(noTransShape,momPen,momBrush2);
+        }
     }
 }

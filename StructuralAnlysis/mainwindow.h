@@ -5,6 +5,7 @@
 #include "analyze.h"
 #include <QGraphicsScene>
 #include <QGraphicsRectItem>
+#include <QGraphicsEllipseItem>
 #include <QGraphicsPolygonItem>
 #include <QPolygonF>
 
@@ -53,6 +54,7 @@ private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QGraphicsLineItem *myStrucLine;
+    QGraphicsEllipseItem *myStructCirc;
     Analyze myStruct();
     bool solved;
     double zoom;
