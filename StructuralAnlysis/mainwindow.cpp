@@ -33,10 +33,10 @@ void MainWindow::on_actionOpen_triggered()
 
     // read setup file  // THIS SECTION IS BREAKING DEBUGG!
     // get file name
-    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-    std::string fileName = fileNameQ.toStdString();
+//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+//    std::string fileName = fileNameQ.toStdString();
 
-//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
+    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     readFile(fileName);
 
@@ -476,6 +476,7 @@ void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
     {
         dDeform = 1;
         dDeform*=position;
+<<<<<<< HEAD
 
         drawStructure();
         drawDStructure();
@@ -549,5 +550,9 @@ void MainWindow::drawForces()
             noRot = scene->addRect(x1-5*zoom,y1-5*zoom,10*zoom,10*zoom,constPen,constBrush);
         }
 
+=======
+
+        drawDStructure();
+>>>>>>> 77e5d26b1cb2f4930a005db881541f8e7cf84cbe
     }
 }
