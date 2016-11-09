@@ -9,6 +9,7 @@
 #include <QGraphicsLineItem>
 #include <QPointF>
 #include <QGraphicsView>
+#include <QGraphicsPolygonItem>
 
 static Analyze myStructure;
 QPainter myDrawing;
@@ -41,11 +42,13 @@ void MainWindow::on_actionOpen_triggered()
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
+    scene->setBackgroundBrush(Qt::black);
 
     zoom = 3;
 
     // draw structure
     drawStructure();
+    drawConstraints();
 
     ui->graphicsView->centerOn(myCenter);
 }
@@ -253,7 +256,7 @@ void MainWindow::drawStructure()
             ymin = y2;
 
 
-        QPen linePen(Qt::black);
+        QPen linePen(Qt::white);
         linePen.setWidth(5);
 
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
@@ -268,6 +271,9 @@ void MainWindow::drawDStructure()
 {
     // clear gview
     scene->clear();
+
+    drawStructure();
+    drawConstraints();
 
     double xmin;
     double xmax;
@@ -338,11 +344,15 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         // draw the shapes again
         if(solved == true)
         {
+            drawStructure();
             drawDStructure();
+            drawConstraints();
         }
         else
         {
             drawStructure();
+            drawStructure();
+            drawConstraints();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -357,11 +367,14 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         // draw the shapes again
         if(solved == true)
         {
+            drawStructure();
             drawDStructure();
+            drawConstraints();
         }
         else
         {
             drawStructure();
+            drawConstraints();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -382,11 +395,14 @@ void MainWindow::on_pushButton_ZOut_clicked()
         // draw the shapes again
         if(solved == true)
         {
+            drawStructure();
             drawDStructure();
+            drawConstraints();
         }
         else
         {
             drawStructure();
+            drawConstraints();
         }
 
         ui->graphicsView->centerOn(myCenter);
@@ -404,10 +420,12 @@ void MainWindow::on_pushButton_ZOut_clicked()
             if(solved == true)
             {
                 drawDStructure();
+                drawConstraints();
             }
             else
             {
                 drawStructure();
+                drawConstraints();
             }
 
             ui->graphicsView->centerOn(myCenter);
@@ -445,6 +463,7 @@ void MainWindow::on_pushButton_solve_released()
 
         dDeform = 1;
 
+        drawStructure();
         drawDStructure();
 
         solved = true;
@@ -453,8 +472,82 @@ void MainWindow::on_pushButton_solve_released()
 
 void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
 {
-    dDeform = 1;
-    dDeform*=position;
+    if(solved==true)
+    {
+        dDeform = 1;
+        dDeform*=position;
 
-    drawDStructure();
+        drawStructure();
+        drawDStructure();
+    }
+}
+
+void MainWindow::drawConstraints()
+{
+    QBrush constBrush(Qt::blue);
+    QPen constPen(Qt::black);
+    constPen.setWidth(2);
+
+    // loop through constraint matrix
+    for(int i = 0; i < myStructure.constMat.size(); i++)
+    {
+        int m = myStructure.constMat[i][0]-1;
+        int dir = myStructure.constMat[i][1];
+
+        double x1 = myStructure.xstruct[m][0]*zoom;
+        double y1 = -myStructure.xstruct[m][1]*zoom;
+
+        if(dir==1)
+        {
+            noTransShape.clear();
+            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1-5*zoom) << QPointF(x1-10*zoom,y1+5*zoom);
+            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+        }
+        else if(dir==2)
+        {
+            noTransShape.clear();
+            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1+10*zoom) << QPointF(x1+5*zoom,y1+10*zoom);
+            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+        }
+        else
+        {
+            noRot = scene->addRect(x1-5*zoom,y1-5*zoom,10*zoom,10*zoom,constPen,constBrush);
+        }
+
+    }
+}
+
+void MainWindow::drawForces()
+{
+    QBrush constBrush(Qt::yellow);
+    QPen constPen(Qt::black);
+    constPen.setWidth(2);
+
+    // loop through constraint matrix
+    for(int i = 0; i < myStructure.constMat.size(); i++)
+    {
+        int m = myStructure.constMat[i][0]-1;
+        int dir = myStructure.constMat[i][1];
+
+        double x1 = myStructure.xstruct[m][0]*zoom;
+        double y1 = -myStructure.xstruct[m][1]*zoom;
+
+        if(dir==1)
+        {
+            noTransShape.clear();
+            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1-5*zoom) << QPointF(x1-10*zoom,y1+5*zoom);
+            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+        }
+        else if(dir==2)
+        {
+            noTransShape.clear();
+            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1+10*zoom) << QPointF(x1+5*zoom,y1+10*zoom);
+            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
+        }
+        else
+        {
+            noRot = scene->addRect(x1-5*zoom,y1-5*zoom,10*zoom,10*zoom,constPen,constBrush);
+        }
+
+    }
 }

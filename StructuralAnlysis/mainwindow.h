@@ -4,6 +4,9 @@
 #include <QMainWindow>
 #include "analyze.h"
 #include <QGraphicsScene>
+#include <QGraphicsRectItem>
+#include <QGraphicsPolygonItem>
+#include <QPolygonF>
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +45,10 @@ private slots:
 
     void on_lcdNumber_objectNameChanged(const QString &objectName);
 
+    void drawConstraints();
+
+    void drawForces();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -50,6 +57,9 @@ private:
     bool solved;
     double zoom;
     double dDeform;
+    QGraphicsRectItem *noRot;
+    QGraphicsPolygonItem *noTrans;
+    QPolygonF noTransShape;
 
 };
 

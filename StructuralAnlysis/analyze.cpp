@@ -173,7 +173,7 @@ void Analyze::BackSub()
 
 void Analyze::postprocessing()
 {
-    int s = xstruct.size();
+    int s = SDOF.size();
 
     for(int i = 0; i < s; i++)
     {
@@ -193,7 +193,7 @@ void Analyze::postprocessing()
         {
             if(SDOF[i][j] != 0)
             {
-                int m = SDOF[i][j];
+                int m = SDOF[i][j]-1;
                 dxstruct[i][j] = UStruct[m];
             }
         }
