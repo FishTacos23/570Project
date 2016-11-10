@@ -74,6 +74,7 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         graphicsView = new QGraphicsView(centralWidget);
         graphicsView->setObjectName(QStringLiteral("graphicsView"));
+        graphicsView->setMouseTracking(true);
 
         gridLayout->addWidget(graphicsView, 0, 0, 4, 1);
 
@@ -192,7 +193,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 582, 17));
+        menuBar->setGeometry(QRect(0, 0, 582, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         MainWindow->setMenuBar(menuBar);

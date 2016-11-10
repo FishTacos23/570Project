@@ -42,10 +42,6 @@ private slots:
 
     void on_horizontalSlider_scaleDisp_sliderMoved(int position);
 
-    void on_horizontalSlider_scaleDisp_sliderPressed();
-
-    void on_lcdNumber_objectNameChanged(const QString &objectName);
-
     void drawConstraints();
 
     void drawForces();
@@ -62,6 +58,10 @@ private:
     QGraphicsRectItem *noRot;
     QGraphicsPolygonItem *noTrans;
     QPolygonF noTransShape;
+    double xmax;
+    double xmin;
+    double ymax;
+    double ymin;
 
 };
 

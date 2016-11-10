@@ -14,6 +14,7 @@
 static Analyze myStructure;
 QPainter myDrawing;
 QPointF myCenter;
+QPainterPath text;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,6 +51,9 @@ void MainWindow::on_actionOpen_triggered()
     drawStructure();
     drawConstraints();
     drawForces();
+
+    myCenter.setX((xmax-xmin)/2);
+    myCenter.setY((ymax-ymin)/2);
 
     ui->graphicsView->centerOn(myCenter);
 }
@@ -209,11 +213,6 @@ void MainWindow::drawStructure()
 {
     //QPainter myDrawing;
 
-    double xmin;
-    double xmax;
-    double ymin;
-    double ymax;
-
     double x1;
     double y1;
     double x2;
@@ -263,9 +262,6 @@ void MainWindow::drawStructure()
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
 
     }
-
-    myCenter.setX((xmax-xmin)/2);
-    myCenter.setY((ymax-ymin)/2);
 }
 
 void MainWindow::drawDStructure()
@@ -275,11 +271,7 @@ void MainWindow::drawDStructure()
 
     drawStructure();
     drawConstraints();
-
-    double xmin;
-    double xmax;
-    double ymin;
-    double ymax;
+    drawForces();
 
     double x1;
     double y1;
@@ -327,10 +319,6 @@ void MainWindow::drawDStructure()
 
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
     }
-
-    myCenter.setX((xmax-xmin)/2);
-    myCenter.setY((ymax-ymin)/2);
-
 }
 
 void MainWindow::on_pushButton_ZoomIn_clicked()
@@ -356,7 +344,8 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
             drawConstraints();
             drawForces();
         }
-
+        myCenter.setX((xmax-xmin)/2);
+        myCenter.setY(-(ymax-ymin)/2);
         ui->graphicsView->centerOn(myCenter);
     }
     else if(zoom < 1)
@@ -381,6 +370,8 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
             drawForces();
         }
 
+        myCenter.setX((xmax-xmin)/2);
+        myCenter.setY(-(ymax-ymin)/2);
         ui->graphicsView->centerOn(myCenter);
     }
 }
@@ -411,6 +402,8 @@ void MainWindow::on_pushButton_ZOut_clicked()
             drawForces();
         }
 
+        myCenter.setX((xmax-xmin)/2);
+        myCenter.setY(-(ymax-ymin)/2);
         ui->graphicsView->centerOn(myCenter);
     }
     else if(zoom <= 1)
@@ -436,6 +429,8 @@ void MainWindow::on_pushButton_ZOut_clicked()
                 drawForces();
             }
 
+            myCenter.setX((xmax-xmin)/2);
+            myCenter.setY(-(ymax-ymin)/2);
             ui->graphicsView->centerOn(myCenter);
         }
     }
@@ -554,6 +549,14 @@ void MainWindow::drawForces()
             noTransShape.clear();
             noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1+5*zoom) << QPointF(x1-10*zoom,y1-5*zoom);
             noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
+
+            QFont font;
+            font.setPixelSize(5);
+            font.setBold(false);
+            font.setFamily("Calibri");
+
+            text.addText();
+
         }
         else if(dir==2)
         {
