@@ -384,6 +384,7 @@ void MainWindow::on_pushButton_ZOut_clicked()
         // clear the scene of the lines
         scene->clear();
 
+
         // set new zoom factor
         zoom--;
 
@@ -529,6 +530,7 @@ void MainWindow::drawForces()
     QPen momPen(Qt::yellow);
     loadPen.setWidth(5);
     momPen.setWidth(3);
+    QFont font;
 
     // loop through constraint matrix
     for(uint i = 0; i < myStructure.loadMat.size(); i++)
@@ -536,6 +538,34 @@ void MainWindow::drawForces()
         int m = (int)myStructure.loadMat[i][0]-1;
         int dir = (int)myStructure.loadMat[i][1];
         std::string forceMag = std::to_string(myStructure.loadMat[i][2]);
+
+        // get rid of trailing zeros
+        std::string point = ".";
+        int posdot = forceMag.find(point);
+
+        int strSize = forceMag.size();
+
+        bool nonZero = false;
+
+        if(posdot < strSize)
+        {
+            for(int j = strSize; j >= posdot-1; j--)
+            {
+                if(forceMag.substr(j-1,1)=="0" || forceMag.substr(j,1)==".")
+                {
+                    if(nonZero==false)
+                    {
+                        forceMag.erase(j);
+                    }
+                }
+                else
+                {
+                    nonZero = true;
+                }
+            }
+        }
+
+        QString forceT = QString::fromStdString(forceMag);
 
         double x1 = myStructure.xstruct[m][0]*zoom;
         double y1 = -myStructure.xstruct[m][1]*zoom;
@@ -550,12 +580,13 @@ void MainWindow::drawForces()
             noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1+5*zoom) << QPointF(x1-10*zoom,y1-5*zoom);
             noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
 
-            QFont font;
-            font.setPixelSize(5);
+            font.setPixelSize(30);
             font.setBold(false);
             font.setFamily("Calibri");
 
-            text.addText();
+            text.addText(x1-40*zoom,y1-10*zoom,font, forceT);
+
+            scene->addPath(text,loadPen,loadBrush);
 
         }
         else if(dir==2)
@@ -567,6 +598,15 @@ void MainWindow::drawForces()
             noTransShape.clear();
             noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1-10*zoom) << QPointF(x1+5*zoom,y1-10*zoom);
             noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
+
+            font.setPixelSize(30);
+            font.setBold(false);
+            font.setFamily("Calibri");
+
+            text.addText(x1+15*zoom,y1-40*zoom,font, forceT);
+
+            scene->addPath(text,loadPen,loadBrush);
+
         }
         else
         {
@@ -576,6 +616,15 @@ void MainWindow::drawForces()
             noTransShape.clear();
             noTransShape << QPointF(x1+2,y1-10*zoom) << QPointF(x1-3*zoom,y1-6*zoom) << QPointF(x1-3*zoom,y1-14*zoom);
             noTrans = scene->addPolygon(noTransShape,momPen,momBrush2);
+
+            font.setPixelSize(30);
+            font.setBold(false);
+            font.setFamily("Calibri");
+
+            text.addText(x1*zoom,y1-30*zoom,font, forceT);
+
+            scene->addPath(text,loadPen,loadBrush);
+
         }
     }
 }
