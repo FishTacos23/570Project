@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[17];
-    char stringdata0[315];
+    QByteArrayData data[22];
+    char stringdata0[433];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -45,7 +45,12 @@ QT_MOC_LITERAL(12, 208, 28), // "on_pushButton_solve_released"
 QT_MOC_LITERAL(13, 237, 41), // "on_horizontalSlider_scaleDisp..."
 QT_MOC_LITERAL(14, 279, 8), // "position"
 QT_MOC_LITERAL(15, 288, 15), // "drawConstraints"
-QT_MOC_LITERAL(16, 304, 10) // "drawForces"
+QT_MOC_LITERAL(16, 304, 10), // "drawForces"
+QT_MOC_LITERAL(17, 315, 27), // "on_pushButton_Disp_released"
+QT_MOC_LITERAL(18, 343, 29), // "on_pushButton_Stress_released"
+QT_MOC_LITERAL(19, 373, 25), // "on_checkBox_const_toggled"
+QT_MOC_LITERAL(20, 399, 7), // "checked"
+QT_MOC_LITERAL(21, 407, 25) // "on_checkBox_Force_toggled"
 
     },
     "MainWindow\0on_actionOpen_triggered\0\0"
@@ -57,7 +62,11 @@ QT_MOC_LITERAL(16, 304, 10) // "drawForces"
     "on_actionClear_triggered\0"
     "on_pushButton_solve_released\0"
     "on_horizontalSlider_scaleDisp_sliderMoved\0"
-    "position\0drawConstraints\0drawForces"
+    "position\0drawConstraints\0drawForces\0"
+    "on_pushButton_Disp_released\0"
+    "on_pushButton_Stress_released\0"
+    "on_checkBox_const_toggled\0checked\0"
+    "on_checkBox_Force_toggled"
 };
 #undef QT_MOC_LITERAL
 
@@ -67,7 +76,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      12,   14, // methods
+      16,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -75,18 +84,22 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   74,    2, 0x08 /* Private */,
-       3,    0,   75,    2, 0x08 /* Private */,
-       4,    1,   76,    2, 0x08 /* Private */,
-       7,    0,   79,    2, 0x08 /* Private */,
-       8,    0,   80,    2, 0x08 /* Private */,
-       9,    0,   81,    2, 0x08 /* Private */,
-      10,    0,   82,    2, 0x08 /* Private */,
-      11,    0,   83,    2, 0x08 /* Private */,
-      12,    0,   84,    2, 0x08 /* Private */,
-      13,    1,   85,    2, 0x08 /* Private */,
-      15,    0,   88,    2, 0x08 /* Private */,
-      16,    0,   89,    2, 0x08 /* Private */,
+       1,    0,   94,    2, 0x08 /* Private */,
+       3,    0,   95,    2, 0x08 /* Private */,
+       4,    1,   96,    2, 0x08 /* Private */,
+       7,    0,   99,    2, 0x08 /* Private */,
+       8,    0,  100,    2, 0x08 /* Private */,
+       9,    0,  101,    2, 0x08 /* Private */,
+      10,    0,  102,    2, 0x08 /* Private */,
+      11,    0,  103,    2, 0x08 /* Private */,
+      12,    0,  104,    2, 0x08 /* Private */,
+      13,    1,  105,    2, 0x08 /* Private */,
+      15,    0,  108,    2, 0x08 /* Private */,
+      16,    0,  109,    2, 0x08 /* Private */,
+      17,    0,  110,    2, 0x08 /* Private */,
+      18,    0,  111,    2, 0x08 /* Private */,
+      19,    1,  112,    2, 0x08 /* Private */,
+      21,    1,  115,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -101,6 +114,10 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, QMetaType::Int,   14,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Bool,   20,
+    QMetaType::Void, QMetaType::Bool,   20,
 
        0        // eod
 };
@@ -123,6 +140,10 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 9: _t->on_horizontalSlider_scaleDisp_sliderMoved((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 10: _t->drawConstraints(); break;
         case 11: _t->drawForces(); break;
+        case 12: _t->on_pushButton_Disp_released(); break;
+        case 13: _t->on_pushButton_Stress_released(); break;
+        case 14: _t->on_checkBox_const_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 15: _t->on_checkBox_Force_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -153,13 +174,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 12)
+        if (_id < 16)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 12;
+        _id -= 16;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 12)
+        if (_id < 16)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 12;
+        _id -= 16;
     }
     return _id;
 }

@@ -5,17 +5,14 @@
 #include <fstream>
 #include "analyze.h"
 #include <iostream>
-#include <QPainter>
 #include <QGraphicsLineItem>
 #include <QPointF>
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
 
+// global variables
 static Analyze myStructure;
-QPainter myDrawing;
 QPointF myCenter;
-QPainterPath text;
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,6 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     solved = false;
+    displace = false;
+    constraint = false;
+    force = false;
 }
 
 MainWindow::~MainWindow()
@@ -33,7 +33,6 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionOpen_triggered()
 {
 
-    // read setup file  // THIS SECTION IS BREAKING DEBUGG!
     // get file name
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
@@ -42,6 +41,7 @@ void MainWindow::on_actionOpen_triggered()
 
     readFile(fileName);
 
+    // set up graphics scene
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->setBackgroundBrush(Qt::black);
@@ -50,8 +50,6 @@ void MainWindow::on_actionOpen_triggered()
 
     // draw structure
     drawStructure();
-    drawConstraints();
-    drawForces();
 
     myCenter.setX((xmax-xmin)/2);
     myCenter.setY((ymax-ymin)/2);
@@ -180,40 +178,10 @@ void MainWindow::readFile(std::string fileName)
                 }
         }
     }
-
-    // make sure you are reading the file
-    std::cout << "The structure is a: " << myStructure.StructType << std::endl;
-    std::cout << "The joint coordinates are: " << std::endl;
-    for(uint i = 0; i < myStructure.xstruct.size();i++)
-    {
-        std::cout << myStructure.xstruct[i][0] << " " << myStructure.xstruct[i][1] << std::endl;
-    }
-    std::cout << "The members are from joints: " << std::endl;
-    for(uint i = 0; i < myStructure.conn.size();i++)
-    {
-        std::cout << myStructure.conn[i][0] << " " << myStructure.conn[i][1] << std::endl;
-    }
-    std::cout << "The constraints are: " << std::endl;
-    for(uint i  = 0; i < myStructure.constMat.size(); i++)
-    {
-        std::cout << myStructure.constMat[i][0] << " " << myStructure.constMat[i][1] << std::endl;
-    }
-    std::cout << "The joint loads are: " << std::endl;
-    for(uint i = 0; i < myStructure.loadMat.size(); i++)
-    {
-        std::cout << myStructure.loadMat[i][0] << " " << myStructure.loadMat[i][1] << " " << myStructure.loadMat[i][2] << std::endl;
-    }
-    std::cout << "The member properties are: " << std::endl;
-    for(uint i = 0; i < myStructure.properties.size(); i++)
-    {
-        std::cout << myStructure.properties[i] << std::endl;
-    }
 }
 
 void MainWindow::drawStructure()
 {
-    //QPainter myDrawing;
-
     double x1;
     double y1;
     double x2;
@@ -271,8 +239,6 @@ void MainWindow::drawDStructure()
     scene->clear();
 
     drawStructure();
-    drawConstraints();
-    drawForces();
 
     double x1;
     double y1;
@@ -335,15 +301,15 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         if(solved == true)
         {
             drawStructure();
-            drawDStructure();
-            drawConstraints();
-            drawForces();
+            //drawDStructure();
+            //drawConstraints();
+            //drawForces();
         }
         else
         {
             drawStructure();
-            drawConstraints();
-            drawForces();
+            //drawConstraints();
+            //drawForces();
         }
         myCenter.setX((xmax-xmin)/2);
         myCenter.setY(-(ymax-ymin)/2);
@@ -360,15 +326,15 @@ void MainWindow::on_pushButton_ZoomIn_clicked()
         if(solved == true)
         {
             drawStructure();
-            drawDStructure();
-            drawConstraints();
-            drawForces();
+            //drawDStructure();
+            //drawConstraints();
+            //drawForces();
         }
         else
         {
             drawStructure();
-            drawConstraints();
-            drawForces();
+            //drawConstraints();
+            //drawForces();
         }
 
         myCenter.setX((xmax-xmin)/2);
@@ -393,15 +359,15 @@ void MainWindow::on_pushButton_ZOut_clicked()
         if(solved == true)
         {
             drawStructure();
-            drawDStructure();
-            drawConstraints();
-            drawForces();
+            //drawDStructure();
+            //drawConstraints();
+            //drawForces();
         }
         else
         {
             drawStructure();
-            drawConstraints();
-            drawForces();
+            //drawConstraints();
+            //drawForces();
         }
 
         myCenter.setX((xmax-xmin)/2);
@@ -420,15 +386,15 @@ void MainWindow::on_pushButton_ZOut_clicked()
             // draw the shapes again
             if(solved == true)
             {
-                drawDStructure();
-                drawConstraints();
-                drawForces();
+                //drawDStructure();
+                //drawConstraints();
+                //drawForces();
             }
             else
             {
                 drawStructure();
-                drawConstraints();
-                drawForces();
+                //drawConstraints();
+                //drawForces();
             }
 
             myCenter.setX((xmax-xmin)/2);
@@ -443,15 +409,18 @@ void MainWindow::on_actionClear_triggered()
     // clear the screan
     scene->clear();
 
-
     // clear variables
     myStructure.xstruct.clear();
+    myStructure.dxstruct.clear();
     myStructure.conn.clear();
     myStructure.constMat.clear();
     myStructure.loadMat.clear();
     myStructure.properties.clear();
     myStructure.SDOF.clear();
+    myStructure.lenRot.clear();
     myStructure.clearStructVar();
+    myStructure.compMtoS.clear();
+    myStructure.rmem.clear();
 
     solved = false;
 }
@@ -470,7 +439,6 @@ void MainWindow::on_pushButton_solve_released()
         dDeform = 1;
 
         drawStructure();
-        drawDStructure();
 
         solved = true;
     }
@@ -483,8 +451,11 @@ void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
         dDeform = 1;
         dDeform*=position;
 
-        drawStructure();
-        drawDStructure();
+        //drawStructure();
+        if(displace==true)
+        {
+            drawDStructure();
+        }
     }
 }
 
@@ -495,7 +466,7 @@ void MainWindow::drawConstraints()
     constPen.setWidth(2);
 
     // loop through constraint matrix
-    for(int i = 0; i < myStructure.constMat.size(); i++)
+    for(uint i = 0; i < myStructure.constMat.size(); i++)
     {
         int m = myStructure.constMat[i][0]-1;
         int dir = myStructure.constMat[i][1];
@@ -631,6 +602,97 @@ void MainWindow::drawForces()
             myText->setY(y1-30*zoom);
 
             scene->addItem(myText);
+        }
+    }
+}
+
+void MainWindow::on_pushButton_Disp_released()
+{
+    if(displace == false)
+    {
+        displace = true;
+
+        drawDStructure();
+
+        if(constraint == true)
+        {
+            drawConstraints();
+        }
+        if(force == true)
+        {
+            drawForces();
+        }
+    }
+    if(displace == true)
+    {
+        displace = false;
+
+        scene->clear();
+        drawStructure();
+
+        if(constraint == true)
+        {
+            drawConstraints();
+        }
+        if(force == true)
+        {
+            drawForces();
+        }
+    }
+}
+
+void MainWindow::on_pushButton_Stress_released()
+{
+
+}
+
+void MainWindow::on_checkBox_const_toggled(bool checked)
+{
+    if(checked==true)
+    {
+        constraint = true;
+        drawConstraints();
+    }
+    else
+    {
+        constraint = false;
+        scene->clear();
+        drawStructure();
+
+        // redraw other options if there
+        if(force == true)
+        {
+            drawForces();
+        }
+        if(displace == true)
+        {
+            drawDStructure();
+        }
+    }
+}
+
+void MainWindow::on_checkBox_Force_toggled(bool checked)
+{
+
+    if(checked==true)
+    {
+        force = true;
+        drawForces();
+    }
+    else
+    {
+        force = false;
+        scene->clear();
+        drawStructure();
+
+        // redraw other options if there
+        if(constraint == true)
+        {
+            drawConstraints();
+        }
+        if(displace == true)
+        {
+            drawDStructure();
         }
     }
 }

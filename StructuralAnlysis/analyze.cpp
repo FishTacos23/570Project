@@ -233,12 +233,6 @@ void Analyze::postprocessing()
     CalcReacs();
 }
 
-void Analyze::getDispl()
-{
-    // return joint displacements
-
-}
-
 void Analyze::StructDOF()
 {
     int num = 1;
@@ -310,21 +304,6 @@ std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
     return memCoord;
 }
 
-void Analyze::MemToStructStiffs()
-{
-
-}
-
-std::vector<std::vector<double> > Analyze::JointToStructLoad()
-{
-
-}
-
-void Analyze::MemToStructForce()
-{
-
-}
-
 void Analyze::MatVecMinus()
 {
     // only needed for support displacement
@@ -373,11 +352,6 @@ void Analyze::MatBackSelf()
 void Analyze::CalcReacs()
 {
     rmem = PFrame::PFrameReac(lenRot, kmem, umem, fmem, nmems);
-}
-
-std::vector<std::vector<double> > Analyze::StructToJointDisp()
-{
-
 }
 
 void Analyze::clearStructVar()

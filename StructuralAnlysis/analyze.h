@@ -9,6 +9,7 @@ class Analyze
 public:
     Analyze();
 
+    // main parts of the program
     void preprocessing();
     void AssembleStructStiff();
     void Triangularization();
@@ -16,19 +17,15 @@ public:
     void BackSub();
     void postprocessing();
 
-    void getDispl();
+    // subfunctions
     void StructDOF();
-    std::vector<std::vector<double>> StructToMemCoord(int memNum);
-    void MemToStructStiffs();
-    std::vector<std::vector<double>> JointToStructLoad();
-    void MemToStructForce();
     void MatVecMinus();
     void MatBackSelf();
     void CalcReacs();
-    std::vector<std::vector<double>> StructToJointDisp();
-
     void clearStructVar();
+    std::vector<std::vector<double>> StructToMemCoord(int memNum);
 
+    // variables
     std::vector<std::vector<double>> xstruct;
     std::vector<std::vector<double>> dxstruct;
     std::vector<std::vector<int>> conn;
@@ -38,13 +35,12 @@ public:
     std::string StructType;
     std::vector<std::vector<int>> SDOF;
     std::vector<std::vector<double>> lenRot;
-    std::vector<int> jMem;
     std::vector<std::vector<int>> compMtoS;
-    int nSDOF;
     std::vector<std::vector<double>> rmem;
 
 private:
 
+    // variables
     std::vector<std::vector<double>> KStruct;
     std::vector<double> FStruct;
     std::vector<double> UStruct;
@@ -56,6 +52,7 @@ private:
     int njoints;
     int ndofs;
     int nmems;
+    int nSDOF;
 
 };
 

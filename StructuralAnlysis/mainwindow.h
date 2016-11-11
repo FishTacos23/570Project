@@ -47,6 +47,14 @@ private slots:
 
     void drawForces();
 
+    void on_pushButton_Disp_released();
+
+    void on_pushButton_Stress_released();
+
+    void on_checkBox_const_toggled(bool checked);
+
+    void on_checkBox_Force_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -65,6 +73,11 @@ private:
     double xmin;
     double ymax;
     double ymin;
+
+    bool constraint;
+    bool force;
+    bool displace;
+    bool stress;
 
 };
 
