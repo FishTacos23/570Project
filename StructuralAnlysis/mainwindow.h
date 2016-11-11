@@ -7,6 +7,7 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsEllipseItem>
 #include <QGraphicsPolygonItem>
+#include <QGraphicsTextItem>
 #include <QPolygonF>
 
 namespace Ui {
@@ -57,7 +58,9 @@ private:
     double dDeform;
     QGraphicsRectItem *noRot;
     QGraphicsPolygonItem *noTrans;
+    QGraphicsTextItem *myText;
     QPolygonF noTransShape;
+    QFont font;
     double xmax;
     double xmin;
     double ymax;

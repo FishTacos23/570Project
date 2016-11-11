@@ -24,6 +24,7 @@ public:
     void MemToStructForce();
     void MatVecMinus();
     void MatBackSelf();
+    void CalcReacs();
     std::vector<std::vector<double>> StructToJointDisp();
 
     void clearStructVar();
@@ -38,8 +39,9 @@ public:
     std::vector<std::vector<int>> SDOF;
     std::vector<std::vector<double>> lenRot;
     std::vector<int> jMem;
-    std::vector<int> compMtoS;
+    std::vector<std::vector<int>> compMtoS;
     int nSDOF;
+    std::vector<std::vector<double>> rmem;
 
 private:
 
@@ -47,8 +49,8 @@ private:
     std::vector<double> FStruct;
     std::vector<double> UStruct;
 
-    std::vector<std::vector<double>> kmem;
-    std::vector<double> fmem;
+    std::vector<std::vector<std::vector<double>>> kmem;
+    std::vector<std::vector<double>> fmem;
     std::vector<std::vector<double>> umem;
 
     int njoints;

@@ -16,6 +16,7 @@ QPainter myDrawing;
 QPointF myCenter;
 QPainterPath text;
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -442,6 +443,7 @@ void MainWindow::on_actionClear_triggered()
     // clear the screan
     scene->clear();
 
+
     // clear variables
     myStructure.xstruct.clear();
     myStructure.conn.clear();
@@ -528,9 +530,8 @@ void MainWindow::drawForces()
     QBrush loadBrush(Qt::green);
     QPen loadPen(Qt::green);
     QPen momPen(Qt::yellow);
-    loadPen.setWidth(5);
+    loadPen.setWidth(1);
     momPen.setWidth(3);
-    QFont font;
 
     // loop through constraint matrix
     for(uint i = 0; i < myStructure.loadMat.size(); i++)
@@ -570,6 +571,9 @@ void MainWindow::drawForces()
         double x1 = myStructure.xstruct[m][0]*zoom;
         double y1 = -myStructure.xstruct[m][1]*zoom;
 
+        myText = new QGraphicsTextItem(forceT);
+        myText->setDefaultTextColor(Qt::white);
+
         if(dir==1)
         {
             // draw main line
@@ -584,9 +588,10 @@ void MainWindow::drawForces()
             font.setBold(false);
             font.setFamily("Calibri");
 
-            text.addText(x1-40*zoom,y1-10*zoom,font, forceT);
+            myText->setX(x1-40*zoom);
+            myText->setY(y1-10*zoom);
 
-            scene->addPath(text,loadPen,loadBrush);
+            scene->addItem(myText);
 
         }
         else if(dir==2)
@@ -603,9 +608,10 @@ void MainWindow::drawForces()
             font.setBold(false);
             font.setFamily("Calibri");
 
-            text.addText(x1+15*zoom,y1-40*zoom,font, forceT);
+            myText->setX(x1+5*zoom);
+            myText->setY(y1-10*zoom);
 
-            scene->addPath(text,loadPen,loadBrush);
+            scene->addItem(myText);
 
         }
         else
@@ -621,10 +627,10 @@ void MainWindow::drawForces()
             font.setBold(false);
             font.setFamily("Calibri");
 
-            text.addText(x1*zoom,y1-30*zoom,font, forceT);
+            myText->setX(x1-10*zoom);
+            myText->setY(y1-30*zoom);
 
-            scene->addPath(text,loadPen,loadBrush);
-
+            scene->addItem(myText);
         }
     }
 }

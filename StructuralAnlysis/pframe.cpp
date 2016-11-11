@@ -79,9 +79,9 @@ std::vector<std::vector<double> > PFrame::PFrameStiff(std::vector<double> lenRot
     kh[5][5] = d;
 
     // transformation matrix
-    // make matrix
     std::vector<std::vector<double>> T;
 
+    // make matrix
     for(int i = 0; i < 6; i++)
     {
         std::vector<double> row;
@@ -171,4 +171,81 @@ std::vector<std::vector<double> > PFrame::PFrameDistrib()
 std::vector<std::vector<double> > PFrame::PFrameForce()
 {
 
+}
+
+std::vector<std::vector<double> > PFrame::PFrameReac(std::vector<std::vector<double>> lenRot, std::vector<std::vector<std::vector<double>>> kmem, std::vector<std::vector<double>> umem, std::vector<std::vector<double>> fmem, int nmems)
+{
+    // create rmem vector
+
+    std::vector<std::vector<double>> rmem;
+    std::vector<std::vector<double>> rmemRot;
+
+    for(int i = 0; i < nmems; i++)
+    {
+        std::vector<double> row;
+        for(int j = 0; j < 6; j++)
+        {
+            row.push_back(0);
+        }
+        rmem.push_back(row);
+        rmemRot.push_back(row);
+    }
+
+    // loop through member
+    for(int i = 0; i < nmems; i++)
+    {
+        for(int j = 0; j < 6; j++)
+        {
+            for(int k = 0; k < 6; k++)
+            {
+                rmem[i][j] += kmem[i][j][k]*umem[i][k];
+            }
+        }
+
+        for(int j = 0; j < 6; j++)
+        {
+            rmem[i][j] -= fmem[i][j];
+        }
+    }
+
+    // rotate rmem
+    for(int i = 0; i < nmems; i++)
+    {
+        double R = lenRot[i][1];
+
+        // transformation matrix
+        std::vector<std::vector<double>> T;
+
+        // make matrix
+        for(int i = 0; i < 6; i++)
+        {
+            std::vector<double> row;
+            for(int j = 0; j < 6; j++)
+            {
+                row.push_back(0.0);
+            }
+            T.push_back(row);
+        }
+
+        T[0][0] = cos(R);
+        T[0][1] = sin(R);
+        T[1][0] = -sin(R);
+        T[1][1] = cos(R);
+        T[2][2] = 1;
+        T[3][3] = T[0][0];
+        T[3][4] = T[0][1];
+        T[4][3] = T[1][0];
+        T[4][4] = T[1][1];
+        T[5][5] = 1;
+
+        for(int j = 0; j < 6; j++)
+        {
+            for(int k = 0; k < 6; k++)
+            {
+                rmemRot[i][j] += T[j][k]*rmem[i][k];
+            }
+        }
+    }
+
+    return rmemRot;
 }

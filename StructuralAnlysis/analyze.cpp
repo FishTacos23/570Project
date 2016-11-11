@@ -46,21 +46,26 @@ void Analyze::AssembleStructStiff()
     }
 
 
-    for(int i = 0; i < ndofs*2; i++)
+    for(int i = 0; i < nmems; i++)
     {
-        compMtoS.push_back(0);
+        std::vector<int> row;
+        for(int j = 0; j < ndofs*2; j++)
+        {
+            row.push_back(0);
+        }
+        compMtoS.push_back(row);
     }
 
     // loop through members
     for(int i = 0; i < nmems; i++)
     {
         // PFrameStiff
-        kmem = PFrame::PFrameStiff(lenRot[i],properties);
+        kmem.push_back(PFrame::PFrameStiff(lenRot[i],properties));
 
         // MemtoStructStiff
         for(int j = 0; j < ndofs*2; j++)
         {
-            compMtoS[j]=0;
+            compMtoS[i][j]=0;
         }
 
         // loop
@@ -74,11 +79,11 @@ void Analyze::AssembleStructStiff()
                 {
                     if(j==0)
                     {
-                        compMtoS[k] = SDOF[joint-1][k];
+                        compMtoS[i][k] = SDOF[joint-1][k];
                     }
                     else
                     {
-                        compMtoS[k+3] = SDOF[joint-1][k];
+                        compMtoS[i][k+3] = SDOF[joint-1][k];
                     }
                 }
             }
@@ -87,15 +92,15 @@ void Analyze::AssembleStructStiff()
         // loop through compMtoS
         for(int j=0; j<ndofs*2; j++)
         {
-            if(compMtoS[j] != 0)
+            if(compMtoS[i][j] != 0)
             {
-                int m = compMtoS[j]-1;
+                int m = compMtoS[i][j]-1;
                 for(int k = 0; k<ndofs*2; k++)
                 {
-                    if(compMtoS[k] != 0)
+                    if(compMtoS[i][k] != 0)
                     {
-                        int n = compMtoS[k]-1;
-                        KStruct[m][n] += kmem[j][k];
+                        int n = compMtoS[i][k]-1;
+                        KStruct[m][n] += kmem[i][j][k];
                     }
                 }
             }
@@ -144,6 +149,7 @@ void Analyze::AssembleStructForce()
         // JointToStructLoad
         j = loadMat[i][0];
         dir = loadMat[i][1];
+
 
         int m = SDOF[j-1][dir-1]-1;
 
@@ -198,6 +204,33 @@ void Analyze::postprocessing()
             }
         }
     }
+
+    for(int i = 0; i < nmems; i++)
+    {
+        std::vector<double> row;
+        for(int j = 0; j < ndofs*2; j++)
+        {
+            row.push_back(0);
+        }
+        umem.push_back(row);
+        fmem.push_back(row);
+    }
+
+    // loop through members
+    for(int i = 0; i < nmems; i++)
+    {
+        for(int j = 0; j < ndofs*2; j++)
+        {
+            int m = compMtoS[i][j];
+            if(m!=0)
+            {
+                m-=1;
+                umem[i][j] = UStruct[m];
+            }
+        }
+    }
+
+    CalcReacs();
 }
 
 void Analyze::getDispl()
@@ -335,6 +368,11 @@ void Analyze::MatBackSelf()
             UStruct[num] -= UStruct[j+num]*KStruct[j+num][num];
         }
     }
+}
+
+void Analyze::CalcReacs()
+{
+    rmem = PFrame::PFrameReac(lenRot, kmem, umem, fmem, nmems);
 }
 
 std::vector<std::vector<double> > Analyze::StructToJointDisp()
