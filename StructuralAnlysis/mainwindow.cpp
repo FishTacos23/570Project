@@ -9,6 +9,7 @@
 #include <QPointF>
 #include <QGraphicsView>
 #include <QGraphicsPolygonItem>
+#include <QWheelEvent>
 
 // global variables
 static Analyze myStructure;
@@ -178,6 +179,8 @@ void MainWindow::readFile(std::string fileName)
                 }
         }
     }
+
+   ui->pushButton_solve->setEnabled(true);
 }
 
 void MainWindow::drawStructure()
@@ -288,122 +291,6 @@ void MainWindow::drawDStructure()
     }
 }
 
-void MainWindow::on_pushButton_ZoomIn_clicked()
-{
-    if(zoom >= 1)
-    {   // clear the scene of the lines
-        scene->clear();
-
-        // set new zoom factor
-        zoom++;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-            //drawDStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-        else
-        {
-            drawStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-        myCenter.setX((xmax-xmin)/2);
-        myCenter.setY(-(ymax-ymin)/2);
-        ui->graphicsView->centerOn(myCenter);
-    }
-    else if(zoom < 1)
-    {
-        // clear the scene of the lines
-        scene->clear();
-
-        zoom = zoom + 0.1;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-            //drawDStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-        else
-        {
-            drawStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-
-        myCenter.setX((xmax-xmin)/2);
-        myCenter.setY(-(ymax-ymin)/2);
-        ui->graphicsView->centerOn(myCenter);
-    }
-}
-
-void MainWindow::on_pushButton_ZOut_clicked()
-{
-
-    if(zoom > 1)
-    {
-        // clear the scene of the lines
-        scene->clear();
-
-
-        // set new zoom factor
-        zoom--;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-            //drawDStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-        else
-        {
-            drawStructure();
-            //drawConstraints();
-            //drawForces();
-        }
-
-        myCenter.setX((xmax-xmin)/2);
-        myCenter.setY(-(ymax-ymin)/2);
-        ui->graphicsView->centerOn(myCenter);
-    }
-    else if(zoom <= 1)
-    {
-        if(zoom > .1)
-        {
-            // clear the scene of the lines
-            scene->clear();
-
-            zoom = zoom - 0.1;
-
-            // draw the shapes again
-            if(solved == true)
-            {
-                //drawDStructure();
-                //drawConstraints();
-                //drawForces();
-            }
-            else
-            {
-                drawStructure();
-                //drawConstraints();
-                //drawForces();
-            }
-
-            myCenter.setX((xmax-xmin)/2);
-            myCenter.setY(-(ymax-ymin)/2);
-            ui->graphicsView->centerOn(myCenter);
-        }
-    }
-}
-
 void MainWindow::on_actionClear_triggered()
 {
     // clear the screan
@@ -438,6 +325,11 @@ void MainWindow::on_pushButton_solve_released()
 
         dDeform = 1;
 
+        ui->pushButton_solve->setEnabled(false);
+        ui->pushButton_Disp->setEnabled(true);
+        ui->pushButton_Stress->setEnabled(true);
+        ui->pushButton_joint->setEnabled(false);
+        ui->pushButton_members->setEnabled(false);
         solved = true;
     }
 }
@@ -453,6 +345,16 @@ void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
         if(displace==true)
         {
             drawDStructure();
+
+            if(constraint==true)
+            {
+                drawConstraints();
+            }
+            if(force==true)
+            {
+                drawForces();
+            }
+
         }
     }
 }
@@ -665,13 +567,13 @@ void MainWindow::on_checkBox_const_toggled(bool checked)
         drawStructure();
 
         // redraw other options if there
-        if(force == true)
-        {
-            drawForces();
-        }
         if(displace == true)
         {
             drawDStructure();
+        }
+        if(force == true)
+        {
+            drawForces();
         }
     }
 }
@@ -691,13 +593,127 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
         drawStructure();
 
         // redraw other options if there
+        if(displace == true)
+        {
+            drawDStructure();
+        }
         if(constraint == true)
         {
             drawConstraints();
         }
-        if(displace == true)
+    }
+}
+
+void MainWindow::wheelEvent(QWheelEvent *event)
+{
+    // test
+    std::cout << "You Scrolled the Wheel ";
+
+    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numSteps = numDegrees / 15;
+    QPoint mousePos = event->pos();
+
+    double myZoomY = numSteps.y();
+    double myPosX = mousePos.x();
+    double myPosY = mousePos.y();
+
+    std::cout << "to Position: y = "<< myZoomY << std::endl;
+    std::cout << "The mouse position is: x = " << myPosX << " y = " << myPosY << std::endl;
+
+    myCenter.setX(myPosX);
+    myCenter.setY(myPosY);
+
+    // zoom depending on sign of y
+    if(myZoomY < 0)
+    {
+        zoomOut();
+    }
+    else
+    {
+        zoomIn();
+    }
+
+    ui->graphicsView->centerOn(myCenter);
+
+    event->accept();
+}
+
+void MainWindow::zoomIn()
+{
+    if(zoom >= 1)
+    {   // clear the scene of the lines
+        scene->clear();
+
+        // set new zoom factor
+        zoom++;
+
+        // draw the shapes again
+        if(solved == true)
         {
-            drawDStructure();
+            drawStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+    }
+    else if(zoom < 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
+
+        zoom = zoom + 0.1;
+
+        // draw the shapes again
+        if(solved == true)
+        {
+            drawStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+    }
+}
+
+void MainWindow::zoomOut()
+{
+    if(zoom > 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
+
+        // set new zoom factor
+        zoom--;
+
+        // draw the shapes again
+        if(solved == true)
+        {
+            drawStructure();
+        }
+        else
+        {
+            drawStructure();
+        }
+    }
+    else if(zoom <= 1)
+    {
+        if(zoom > .1)
+        {
+            // clear the scene of the lines
+            scene->clear();
+
+            zoom = zoom - 0.1;
+
+            // draw the shapes again
+            if(solved == true)
+            {
+
+            }
+            else
+            {
+                drawStructure();
+            }
         }
     }
 }

@@ -33,10 +33,6 @@ private slots:
 
     void drawDStructure();
 
-    void on_pushButton_ZoomIn_clicked();
-
-    void on_pushButton_ZOut_clicked();
-
     void on_actionClear_triggered();
 
     void on_pushButton_solve_released();
@@ -54,6 +50,12 @@ private slots:
     void on_checkBox_const_toggled(bool checked);
 
     void on_checkBox_Force_toggled(bool checked);
+
+    void wheelEvent(QWheelEvent *event);
+
+    void zoomIn();
+
+    void zoomOut();
 
 private:
     Ui::MainWindow *ui;
