@@ -438,8 +438,6 @@ void MainWindow::on_pushButton_solve_released()
 
         dDeform = 1;
 
-        drawStructure();
-
         solved = true;
     }
 }
@@ -608,36 +606,43 @@ void MainWindow::drawForces()
 
 void MainWindow::on_pushButton_Disp_released()
 {
-    if(displace == false)
+    if(solved==true)
     {
-        displace = true;
-
-        drawDStructure();
-
-        if(constraint == true)
+        if(displace == false)
         {
-            drawConstraints();
-        }
-        if(force == true)
-        {
-            drawForces();
-        }
-    }
-    if(displace == true)
-    {
-        displace = false;
 
-        scene->clear();
-        drawStructure();
+            drawDStructure();
 
-        if(constraint == true)
-        {
-            drawConstraints();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+            if(force == true)
+            {
+                drawForces();
+            }
         }
-        if(force == true)
+        if(displace == true)
         {
-            drawForces();
+
+            scene->clear();
+            drawStructure();
+
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+            if(force == true)
+            {
+                drawForces();
+            }
         }
+
+        // switch displace
+        if(displace==true)
+            displace=false;
+        else
+            displace=true;
     }
 }
 
