@@ -6,43 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>582</width>
-    <height>411</height>
+    <width>502</width>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Dyno-Sim</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug/10876-200.png</normaloff>../build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug/10876-200.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="6" column="2">
+    <item row="4" column="2">
      <widget class="QCheckBox" name="checkBox_Force">
       <property name="text">
        <string>Forces</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="2">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>54</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="7" column="2">
-     <widget class="QCheckBox" name="checkBox_const">
-      <property name="text">
-       <string>Constraints</string>
-      </property>
-     </widget>
-    </item>
-    <item row="10" column="2">
+    <item row="8" column="2">
      <widget class="QPushButton" name="pushButton_solve">
       <property name="enabled">
        <bool>false</bool>
@@ -55,7 +39,14 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="0" rowspan="11" colspan="2">
+    <item row="5" column="2">
+     <widget class="QCheckBox" name="checkBox_const">
+      <property name="text">
+       <string>Constraints</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="9" colspan="2">
      <widget class="QGraphicsView" name="graphicsView">
       <property name="mouseTracking">
        <bool>true</bool>
@@ -71,7 +62,7 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="2">
+    <item row="2" column="2">
      <spacer name="verticalSpacer_2">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -84,7 +75,30 @@
       </property>
      </spacer>
     </item>
-    <item row="11" column="2">
+    <item row="3" column="2">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>54</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="6" column="2">
+     <widget class="QPushButton" name="pushButton_Disp">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Displacement</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="2">
      <widget class="QLCDNumber" name="lcdNumber">
       <property name="palette">
        <palette>
@@ -512,7 +526,34 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="2">
+    <item row="9" column="0">
+     <widget class="QSlider" name="horizontalSlider_scaleDisp">
+      <property name="sliderPosition">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Scale Factor:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="2">
+     <widget class="QPushButton" name="pushButton_Stress">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Stress</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
      <spacer name="verticalSpacer_3">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -525,57 +566,6 @@
       </property>
      </spacer>
     </item>
-    <item row="8" column="2">
-     <widget class="QPushButton" name="pushButton_Disp">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Displacement</string>
-      </property>
-     </widget>
-    </item>
-    <item row="11" column="1">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Scale Factor:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="11" column="0">
-     <widget class="QSlider" name="horizontalSlider_scaleDisp">
-      <property name="sliderPosition">
-       <number>0</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="2">
-     <widget class="QPushButton" name="pushButton_Stress">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Stress</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="2">
-     <widget class="QPushButton" name="pushButton_joint">
-      <property name="text">
-       <string>Joints</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="pushButton_members">
-      <property name="text">
-       <string>Members</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -583,7 +573,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>582</width>
+     <width>502</width>
      <height>17</height>
     </rect>
    </property>
@@ -595,7 +585,18 @@
     <addaction name="actionSave_Results"/>
     <addaction name="actionClear"/>
    </widget>
+   <widget class="QMenu" name="menuInsert">
+    <property name="title">
+     <string>Insert</string>
+    </property>
+    <addaction name="actionJoints"/>
+    <addaction name="actionMembers"/>
+    <addaction name="actionConstraints"/>
+    <addaction name="actionForces"/>
+    <addaction name="actionProperties"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuInsert"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -619,6 +620,31 @@
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionJoints">
+   <property name="text">
+    <string>Joints</string>
+   </property>
+  </action>
+  <action name="actionMembers">
+   <property name="text">
+    <string>Members</string>
+   </property>
+  </action>
+  <action name="actionProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="actionConstraints">
+   <property name="text">
+    <string>Constraints</string>
+   </property>
+  </action>
+  <action name="actionForces">
+   <property name="text">
+    <string>Forces</string>
    </property>
   </action>
  </widget>

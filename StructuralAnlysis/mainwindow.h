@@ -9,6 +9,9 @@
 #include <QGraphicsPolygonItem>
 #include <QGraphicsTextItem>
 #include <QPolygonF>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QRadioButton>
 
 namespace Ui {
 class MainWindow;
@@ -57,6 +60,34 @@ private slots:
 
     void zoomOut();
 
+    void on_actionJoints_triggered();
+
+    void on_pushButton_addJoint_released();
+
+    void drawJoint();
+
+    void drawMembers();
+
+    void on_actionMembers_triggered();
+
+    void on_pushButton_addmember_released();
+
+    void clearToolbars();
+
+    void on_actionConstraints_triggered();
+
+    void on_pushButton_addconstraint_released();
+
+    void on_pushButton_addforce_released();
+
+    void drawDConstraints();
+
+    void drawDForces();
+
+    void on_actionForces_triggered();
+
+    void on_actionProperties_triggered();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -71,6 +102,15 @@ private:
     QGraphicsTextItem *myText;
     QPolygonF noTransShape;
     QFont font;
+
+    std::vector<QGraphicsEllipseItem*> drawnJoints;
+    std::vector<QGraphicsLineItem*> drawnMembers;
+    std::vector<std::vector<QGraphicsItem*>> drawnConstr;
+
+    QPolygonF noDrawnTransShape;
+    QGraphicsRectItem *noDrawnRot;
+    QGraphicsPolygonItem *noDrawnTrans;
+
     double xmax;
     double xmin;
     double ymax;
@@ -80,6 +120,28 @@ private:
     bool force;
     bool displace;
     bool stress;
+
+    bool jToolBarActive;
+    bool mToolBarActive;
+    bool cToolBarActive;
+    bool fToolBarActive;
+
+    QLineEdit *addXText;
+    QLineEdit *addYText;
+
+    QPushButton *addJoint;
+    QPushButton *addMember;
+    QPushButton *addConstraint;
+    QPushButton *addForce;
+
+    QRadioButton *constX;
+    QRadioButton *constY;
+    QRadioButton *constRz;
+
+    QToolBar *jointToolBar;
+    QToolBar *memberToolBar;
+    QToolBar *constraintToolBar;
+    QToolBar *forceToolBar;
 
 };
 
