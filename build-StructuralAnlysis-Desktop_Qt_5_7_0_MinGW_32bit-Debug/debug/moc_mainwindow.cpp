@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[39];
-    char stringdata0[761];
+    QByteArrayData data[42];
+    char stringdata0[803];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -67,7 +67,10 @@ QT_MOC_LITERAL(34, 644, 31), // "on_pushButton_addforce_released"
 QT_MOC_LITERAL(35, 676, 16), // "drawDConstraints"
 QT_MOC_LITERAL(36, 693, 11), // "drawDForces"
 QT_MOC_LITERAL(37, 705, 25), // "on_actionForces_triggered"
-QT_MOC_LITERAL(38, 731, 29) // "on_actionProperties_triggered"
+QT_MOC_LITERAL(38, 731, 29), // "on_actionProperties_triggered"
+QT_MOC_LITERAL(39, 761, 14), // "setDProperties"
+QT_MOC_LITERAL(40, 776, 10), // "solveReady"
+QT_MOC_LITERAL(41, 787, 15) // "drawnDStructure"
 
     },
     "MainWindow\0on_actionOpen_triggered\0\0"
@@ -92,7 +95,8 @@ QT_MOC_LITERAL(38, 731, 29) // "on_actionProperties_triggered"
     "on_pushButton_addforce_released\0"
     "drawDConstraints\0drawDForces\0"
     "on_actionForces_triggered\0"
-    "on_actionProperties_triggered"
+    "on_actionProperties_triggered\0"
+    "setDProperties\0solveReady\0drawnDStructure"
 };
 #undef QT_MOC_LITERAL
 
@@ -102,7 +106,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      31,   14, // methods
+      34,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -110,37 +114,40 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  169,    2, 0x08 /* Private */,
-       3,    0,  170,    2, 0x08 /* Private */,
-       4,    1,  171,    2, 0x08 /* Private */,
-       7,    0,  174,    2, 0x08 /* Private */,
-       8,    0,  175,    2, 0x08 /* Private */,
-       9,    0,  176,    2, 0x08 /* Private */,
-      10,    0,  177,    2, 0x08 /* Private */,
-      11,    1,  178,    2, 0x08 /* Private */,
-      13,    0,  181,    2, 0x08 /* Private */,
-      14,    0,  182,    2, 0x08 /* Private */,
-      15,    0,  183,    2, 0x08 /* Private */,
-      16,    0,  184,    2, 0x08 /* Private */,
-      17,    1,  185,    2, 0x08 /* Private */,
-      19,    1,  188,    2, 0x08 /* Private */,
-      20,    1,  191,    2, 0x08 /* Private */,
-      23,    0,  194,    2, 0x08 /* Private */,
-      24,    0,  195,    2, 0x08 /* Private */,
-      25,    0,  196,    2, 0x08 /* Private */,
-      26,    0,  197,    2, 0x08 /* Private */,
-      27,    0,  198,    2, 0x08 /* Private */,
-      28,    0,  199,    2, 0x08 /* Private */,
-      29,    0,  200,    2, 0x08 /* Private */,
-      30,    0,  201,    2, 0x08 /* Private */,
-      31,    0,  202,    2, 0x08 /* Private */,
-      32,    0,  203,    2, 0x08 /* Private */,
-      33,    0,  204,    2, 0x08 /* Private */,
-      34,    0,  205,    2, 0x08 /* Private */,
-      35,    0,  206,    2, 0x08 /* Private */,
-      36,    0,  207,    2, 0x08 /* Private */,
-      37,    0,  208,    2, 0x08 /* Private */,
-      38,    0,  209,    2, 0x08 /* Private */,
+       1,    0,  184,    2, 0x08 /* Private */,
+       3,    0,  185,    2, 0x08 /* Private */,
+       4,    1,  186,    2, 0x08 /* Private */,
+       7,    0,  189,    2, 0x08 /* Private */,
+       8,    0,  190,    2, 0x08 /* Private */,
+       9,    0,  191,    2, 0x08 /* Private */,
+      10,    0,  192,    2, 0x08 /* Private */,
+      11,    1,  193,    2, 0x08 /* Private */,
+      13,    0,  196,    2, 0x08 /* Private */,
+      14,    0,  197,    2, 0x08 /* Private */,
+      15,    0,  198,    2, 0x08 /* Private */,
+      16,    0,  199,    2, 0x08 /* Private */,
+      17,    1,  200,    2, 0x08 /* Private */,
+      19,    1,  203,    2, 0x08 /* Private */,
+      20,    1,  206,    2, 0x08 /* Private */,
+      23,    0,  209,    2, 0x08 /* Private */,
+      24,    0,  210,    2, 0x08 /* Private */,
+      25,    0,  211,    2, 0x08 /* Private */,
+      26,    0,  212,    2, 0x08 /* Private */,
+      27,    0,  213,    2, 0x08 /* Private */,
+      28,    0,  214,    2, 0x08 /* Private */,
+      29,    0,  215,    2, 0x08 /* Private */,
+      30,    0,  216,    2, 0x08 /* Private */,
+      31,    0,  217,    2, 0x08 /* Private */,
+      32,    0,  218,    2, 0x08 /* Private */,
+      33,    0,  219,    2, 0x08 /* Private */,
+      34,    0,  220,    2, 0x08 /* Private */,
+      35,    0,  221,    2, 0x08 /* Private */,
+      36,    0,  222,    2, 0x08 /* Private */,
+      37,    0,  223,    2, 0x08 /* Private */,
+      38,    0,  224,    2, 0x08 /* Private */,
+      39,    0,  225,    2, 0x08 /* Private */,
+      40,    0,  226,    2, 0x08 /* Private */,
+      41,    0,  227,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -158,6 +165,9 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void, QMetaType::Bool,   18,
     QMetaType::Void, QMetaType::Bool,   18,
     QMetaType::Void, 0x80000000 | 21,   22,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
@@ -215,6 +225,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 28: _t->drawDForces(); break;
         case 29: _t->on_actionForces_triggered(); break;
         case 30: _t->on_actionProperties_triggered(); break;
+        case 31: _t->setDProperties(); break;
+        case 32: _t->solveReady(); break;
+        case 33: _t->drawnDStructure(); break;
         default: ;
         }
     }
@@ -245,13 +258,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 31)
+        if (_id < 34)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 31;
+        _id -= 34;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 31)
+        if (_id < 34)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 31;
+        _id -= 34;
     }
     return _id;
 }

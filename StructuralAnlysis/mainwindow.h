@@ -12,6 +12,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QWindow>
 
 namespace Ui {
 class MainWindow;
@@ -88,6 +89,12 @@ private slots:
 
     void on_actionProperties_triggered();
 
+    void setDProperties();
+
+    void solveReady();
+
+    void drawnDStructure();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -125,14 +132,21 @@ private:
     bool mToolBarActive;
     bool cToolBarActive;
     bool fToolBarActive;
+    bool pToolBarActive;
 
     QLineEdit *addXText;
     QLineEdit *addYText;
+    QLineEdit *addE;
+    QLineEdit *addI;
+    QLineEdit *addA;
+    QLineEdit *adde1;
+    QLineEdit *adde2;
 
     QPushButton *addJoint;
     QPushButton *addMember;
     QPushButton *addConstraint;
     QPushButton *addForce;
+    QPushButton *setProps;
 
     QRadioButton *constX;
     QRadioButton *constY;
@@ -142,6 +156,7 @@ private:
     QToolBar *memberToolBar;
     QToolBar *constraintToolBar;
     QToolBar *forceToolBar;
+    QToolBar *propToolBar;
 
 };
 

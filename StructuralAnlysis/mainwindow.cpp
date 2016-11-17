@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     jToolBarActive = false;
     mToolBarActive = false;
     cToolBarActive = false;
+    fToolBarActive = false;
+    pToolBarActive = false;
 
     // set up graphics scene
     scene = new QGraphicsScene(this);
@@ -906,6 +908,11 @@ void MainWindow::clearToolbars()
         this->removeToolBar(forceToolBar);
         fToolBarActive = false;
     }
+    if(pToolBarActive == true)
+    {
+        this->removeToolBar(propToolBar);
+        pToolBarActive = false;
+    }
 
 }
 
@@ -1308,5 +1315,124 @@ void MainWindow::on_actionForces_triggered()
 
 void MainWindow::on_actionProperties_triggered()
 {
+    clearToolbars();
 
+    pToolBarActive = true;
+
+    // create toolbar
+    propToolBar = new QToolBar("Set Properties");
+
+    setProps = new QPushButton("SET");
+
+    QWidget *PropWidg = new QWidget;
+
+    QLabel *Title = new QLabel("Structure Properties");
+    QLabel *EText = new QLabel("E:");
+    QLabel *IText = new QLabel("I:");
+    QLabel *AText = new QLabel("A:");
+    QLabel *e1Text = new QLabel("e1:");
+    QLabel *e2Text = new QLabel("e2:");
+
+    addE = new QLineEdit;
+    addA = new QLineEdit;
+    addI = new QLineEdit;
+    adde1 = new QLineEdit;
+    adde2 = new QLineEdit;
+
+    QHBoxLayout *Elay = new QHBoxLayout;
+    Elay->addWidget(EText);
+    Elay->addWidget(addE);
+
+    QHBoxLayout *Alay = new QHBoxLayout;
+    Alay->addWidget(AText);
+    Alay->addWidget(addA);
+
+    QHBoxLayout *Ilay = new QHBoxLayout;
+    Ilay->addWidget(IText);
+    Ilay->addWidget(addI);
+
+    QHBoxLayout *e1lay = new QHBoxLayout;
+    e1lay->addWidget(e1Text);
+    e1lay->addWidget(adde1);
+
+    QHBoxLayout *e2lay  = new QHBoxLayout;
+    e2lay->addWidget(e2Text);
+    e2lay->addWidget(adde2);
+
+    QVBoxLayout *allProps = new QVBoxLayout;
+    allProps->addWidget(Title);
+    allProps->addSpacing(3);
+    allProps->addLayout(Elay);
+    allProps->addLayout(Alay);
+    allProps->addLayout(Ilay);
+    allProps->addLayout(e1lay);
+    allProps->addLayout(e2lay);
+
+    PropWidg->setLayout(allProps);
+
+    propToolBar->addWidget(PropWidg);
+    propToolBar->addWidget(setProps);
+
+    connect(setProps,SIGNAL(clicked()),this,SLOT(setDProperties()));
+
+    this->addToolBar(propToolBar);
+
+}
+
+void MainWindow::setDProperties()
+{
+    myStructure.properties.clear();
+
+    QString Estring = addE->text();
+    QString Istring = addI->text();
+    QString Astring = addA->text();
+    QString e1string = adde1->text();
+    QString e2string = adde2->text();
+
+    myStructure.properties.push_back(Estring.toDouble());
+    myStructure.properties.push_back(Astring.toDouble());
+    myStructure.properties.push_back(Istring.toDouble());
+    myStructure.properties.push_back(e1string.toDouble());
+    myStructure.properties.push_back(e2string.toDouble());
+
+    clearToolbars();
+    solveReady();
+}
+
+void MainWindow::solveReady()
+{
+    if(myStructure.checkReady()==true)
+        ui->pushButton_solve->setEnabled(true);
+}
+
+void MainWindow::drawnDStructure()
+{
+    // clear gview
+    scene->clear();
+
+    drawJoint();
+    drawMembers();
+
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+
+    for(uint i = 0; i < myStructure.conn.size();i++)
+    {
+
+        // draw with delta
+        int m = myStructure.conn[i][0]-1;
+        int n = myStructure.conn[i][1]-1;
+
+        x1 = (myStructure.xstruct[m][0]+myStructure.dxstruct[m][0]*dDeform);
+        y1 = -(myStructure.xstruct[m][1]+myStructure.dxstruct[m][1]*dDeform);
+        x2 = (myStructure.xstruct[n][0]+myStructure.dxstruct[n][0]*dDeform);
+        y2 = -(myStructure.xstruct[n][1]+myStructure.dxstruct[n][1]*dDeform);
+
+        QPen linePen(Qt::red);
+        linePen.setWidth(5);
+
+        myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
+    }
 }

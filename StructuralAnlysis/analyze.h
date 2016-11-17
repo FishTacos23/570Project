@@ -25,6 +25,8 @@ public:
     void clearStructVar();
     std::vector<std::vector<double>> StructToMemCoord(int memNum);
 
+    bool checkReady();
+
     // variables
     std::vector<std::vector<double>> xstruct;
     std::vector<std::vector<double>> dxstruct;

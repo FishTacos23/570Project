@@ -304,6 +304,14 @@ std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
     return memCoord;
 }
 
+bool Analyze::checkReady()
+{
+    bool Ready = false;
+    if(!conn.empty()&&!properties.empty()&&!constMat.empty()&&!loadMat.empty())
+        Ready = true;
+    return Ready;
+}
+
 void Analyze::MatVecMinus()
 {
     // only needed for support displacement
