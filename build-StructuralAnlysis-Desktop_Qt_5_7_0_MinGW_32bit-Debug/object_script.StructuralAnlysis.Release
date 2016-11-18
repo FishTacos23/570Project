@@ -1,0 +1,13 @@
+INPUT(
+./release\main.o
+./release\mainwindow.o
+./release\analyze.o
+./release\pframe.o
+./release\tokenize.o
+./release\structjoint.o
+./release\structmem.o
+./release\structforce.o
+./release\structconst.o
+./release\moc_mainwindow.o
+./release\moc_structjoint.o
+);

@@ -1,0 +1,13 @@
+INPUT(
+./debug\main.o
+./debug\mainwindow.o
+./debug\analyze.o
+./debug\pframe.o
+./debug\tokenize.o
+./debug\structjoint.o
+./debug\structmem.o
+./debug\structforce.o
+./debug\structconst.o
+./debug\moc_mainwindow.o
+./debug\moc_structjoint.o
+);

@@ -14,11 +14,19 @@
 #include <QLineEdit>
 #include <QLayout>
 #include <QRadioButton>
+#include <QPicture>
+
+// to DO
+// error checking
+// why F structure is odd after garage door
+// directions of arrows on forces
+// undo button
+// user select joints
+// zoom and pan
+// stop leaking memory
 
 // global variables
 static Analyze myStructure;
-static Analyze myDrawnStructure;
-QPointF myCenter;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -55,19 +63,12 @@ void MainWindow::on_actionOpen_triggered()
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
 
-//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
-
     readFile(fileName);
 
     zoom = 3;
 
-    // draw structure
-    drawStructure();
-
-    myCenter.setX((xmax-xmin)/2);
-    myCenter.setY((ymax-ymin)/2);
-
-    ui->graphicsView->centerOn(myCenter);
+    drawJoint();
+    drawMembers();
 }
 
 void MainWindow::on_actionSave_Results_triggered()
@@ -75,238 +76,14 @@ void MainWindow::on_actionSave_Results_triggered()
     // write results to file
 }
 
-void MainWindow::readFile(std::string fileName)
-{
-    // read file
-
-    std::string line;
-    std::ifstream infile (fileName);
-    int sections = 0;
-
-    while (std::getline(infile,line, '\n'))
-    {
-        // make sure line isn't blank
-        if(line!="")
-        {
-           // parse the line for the data
-
-                // define vector of strings
-                std::vector<std::string> tokens;
-
-                // define delimiters
-                std::string delimiters(", ;\t");
-
-                // call tokenize
-                tokenize(line, tokens, delimiters);
-
-                // find # of elements in vector
-                int s = tokens.size();
-
-                if(sections == 0)
-                {
-                    if(tokens[0] != "joints")  //make sure you haven't reached the next section
-                    {
-                        // look at what kind of structure is being used
-                        myStructure.StructType = tokens[0];
-                    }
-                }
-
-                if(sections == 1)
-                {
-                    if(tokens[0] != "members")  //make sure you haven't reached the next section
-                    {
-                            // add joint coordinates
-                            std::vector<double> xSingleJoint;
-
-                            xSingleJoint.push_back(stod(tokens[0]));
-                            xSingleJoint.push_back(stod(tokens[1]));
-
-                            myStructure.xstruct.push_back(xSingleJoint);
-                    }
-                }
-                else if(sections == 2)
-                {
-                    if(tokens[0] != "constraints")  //make sure you haven't reached the next section
-                    {
-                        // add members to thier joints
-                        std::vector<int> xSingleMember;
-
-                        xSingleMember.push_back(stoi(tokens[0]));
-                        xSingleMember.push_back(stoi(tokens[1]));
-
-                        myStructure.conn.push_back(xSingleMember);
-                    }
-                }
-                else if(sections == 3)
-                {
-                    if(tokens[0] != "loads")  //make sure you haven't reached the next section
-                    {
-                        std::vector<int> constSingleDOF;
-
-                        constSingleDOF.push_back(stoi(tokens[0]));
-                        constSingleDOF.push_back(stoi(tokens[1]));
-
-                        myStructure.constMat.push_back(constSingleDOF);
-                    }
-                }
-                else if(sections == 4)
-                {
-                    if(tokens[0] != "properties")  //make sure you haven't reached the next section
-                    {
-                        std::vector<double> singleForce;
-
-                        singleForce.push_back(stod(tokens[0]));
-                        singleForce.push_back(stod(tokens[1]));
-                        singleForce.push_back(stod(tokens[2]));
-
-                        myStructure.loadMat.push_back(singleForce);
-                    }
-                }
-                else if(sections == 5)
-                {
-                    myStructure.properties.push_back(stod(tokens[0]));
-                }
-
-                // check what section you are in
-
-                if(tokens[0]=="joints")
-                {
-                    sections++;
-                }
-                else if(tokens[0]=="members") // make sure the next section is members
-                {
-                    sections++;
-                }
-                else if(tokens[0]=="constraints") // make sure the next section is constraints
-                {
-                    sections++;
-                }
-                else if(tokens[0]=="loads") // make sure the next section is loads
-                {
-                    sections++;
-                }
-                else if(tokens[0]=="properties") // make sure the next section is properties
-                {
-                    sections++;
-                }
-        }
-    }
-
-   ui->pushButton_solve->setEnabled(true);
-}
-
-void MainWindow::drawStructure()
-{
-    double x1;
-    double y1;
-    double x2;
-    double y2;
-
-    // draw a line for each member
-    for(uint i = 0; i < myStructure.conn.size();i++)
-    {
-        // get x and y coordinates
-
-        int m = myStructure.conn[i][0]-1;
-        int n = myStructure.conn[i][1]-1;
-
-        x1 = myStructure.xstruct[m][0]*zoom;
-        y1 = -myStructure.xstruct[m][1]*zoom;
-        x2 = myStructure.xstruct[n][0]*zoom;
-        y2 = -myStructure.xstruct[n][1]*zoom;
-
-        if(i == 0)
-        {
-            xmin = x1;
-            xmax = x1;
-            ymin = y1;
-            ymax = y1;
-        }
-        if(x1 > xmax)
-            xmax = x1;
-        if(x2 > xmax)
-            xmax = x2;
-        if(y1 > ymax)
-            ymax = y1;
-        if(y2 > ymax)
-            ymax = y2;
-        if(x1 < xmin)
-            xmin = x1;
-        if(x2 < xmin)
-            xmin = x2;
-        if(y1 < ymin)
-            ymin = y1;
-        if(y2 < ymin)
-            ymin = y2;
-
-
-        QPen linePen(Qt::white);
-        linePen.setWidth(5);
-
-        myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
-
-    }
-}
-
-void MainWindow::drawDStructure()
-{
-    // clear gview
-    scene->clear();
-
-    drawStructure();
-
-    double x1;
-    double y1;
-    double x2;
-    double y2;
-
-    for(uint i = 0; i < myStructure.conn.size();i++)
-    {
-
-        // draw with delta
-        int m = myStructure.conn[i][0]-1;
-        int n = myStructure.conn[i][1]-1;
-
-        x1 = (myStructure.xstruct[m][0]+myStructure.dxstruct[m][0]*dDeform)*zoom;
-        y1 = -(myStructure.xstruct[m][1]+myStructure.dxstruct[m][1]*dDeform)*zoom;
-        x2 = (myStructure.xstruct[n][0]+myStructure.dxstruct[n][0]*dDeform)*zoom;
-        y2 = -(myStructure.xstruct[n][1]+myStructure.dxstruct[n][1]*dDeform)*zoom;
-
-        if(i == 0)
-        {
-            xmin = x1;
-            xmax = x1;
-            ymin = y1;
-            ymax = y1;
-        }
-        if(x1 > xmax)
-            xmax = x1;
-        if(x2 > xmax)
-            xmax = x2;
-        if(y1 > ymax)
-            ymax = y1;
-        if(y2 > ymax)
-            ymax = y2;
-        if(x1 < xmin)
-            xmin = x1;
-        if(x2 < xmin)
-            xmin = x2;
-        if(y1 < ymin)
-            ymin = y1;
-        if(y2 < ymin)
-            ymin = y2;
-
-        QPen linePen(Qt::red);
-        linePen.setWidth(5);
-
-        myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
-    }
-}
-
 void MainWindow::on_actionClear_triggered()
 {
     // clear the screan
     scene->clear();
+
+    clearToolbars();
+    drawnMembers.clear();
+    drawnJoints.clear();
 
     // clear variables
     myStructure.xstruct.clear();
@@ -322,6 +99,386 @@ void MainWindow::on_actionClear_triggered()
     myStructure.rmem.clear();
 
     solved = false;
+    displace = false;
+    constraint = false;
+    force = false;
+    jToolBarActive = false;
+    mToolBarActive = false;
+    cToolBarActive = false;
+    fToolBarActive = false;
+    pToolBarActive = false;
+
+    ui->pushButton_Disp->setEnabled(false);
+    ui->pushButton_Stress->setEnabled(false);
+    ui->pushButton_solve->setEnabled(false);
+}
+
+void MainWindow::on_actionJoints_triggered()
+{
+    clearToolbars();
+
+    jToolBarActive = true;
+
+    // create toolbar
+    jointToolBar = new QToolBar("Place Joints  ");
+    QWidget *jointWidgX = new QWidget;
+    QWidget *jointWidgY = new QWidget;
+
+    // add labels
+    QLabel *Title = new QLabel;
+    QLabel *XText = new QLabel("X:");
+    QLabel *YText = new QLabel("Y:");
+
+    // insert button and text
+    addJoint = new QPushButton("ADD");
+    addXText = new QLineEdit;
+    addYText = new QLineEdit;
+
+    // formatting
+    addJoint->setDefault(true);
+    Title->setTextFormat(Qt::RichText);
+    Title->setText("<b><u> Insert Joints");
+    addXText->setMaximumWidth(60);
+    addYText->setMaximumWidth(60);
+    jointToolBar->setMaximumWidth(500);
+    jointToolBar->isMovable();
+
+    // add layouts
+    QHBoxLayout *xLay = new QHBoxLayout();
+    xLay->addWidget(XText);
+    xLay->addWidget(addXText);
+
+    QHBoxLayout *yLay = new QHBoxLayout();
+    yLay->addWidget(YText);
+    yLay->addWidget(addYText);
+
+    jointWidgX->setLayout(xLay);
+    jointWidgY->setLayout(yLay);
+
+    // add widgets to toolbar
+    jointToolBar->addWidget(Title);
+    jointToolBar->addSeparator();
+    jointToolBar->addWidget(jointWidgX);
+    jointToolBar->addSeparator();
+    jointToolBar->addWidget(jointWidgY);
+    jointToolBar->addSeparator();
+    jointToolBar->addWidget(addJoint);
+
+    // add toolbar
+    this->addToolBar(jointToolBar);
+
+    // set signal and slot
+    connect(addJoint,SIGNAL(clicked()),this,SLOT(pushButton_addJoint()));
+}
+
+void MainWindow::on_actionMembers_triggered()
+{
+    clearToolbars();
+
+    mToolBarActive = true;
+
+    // create toolbar
+    memberToolBar = new QToolBar("Place Members");
+    QWidget *jointWidg1 = new QWidget;
+    QWidget *jointWidg2 = new QWidget;
+
+    // add labels
+    QLabel *Title = new QLabel;
+    QLabel *FText = new QLabel("1st:");
+    QLabel *SText = new QLabel("2nd:");
+
+    // insert button and text
+    addMember = new QPushButton("ADD");
+    addXText = new QLineEdit;
+    addYText = new QLineEdit;
+
+    // formatting
+    addMember->setDefault(true);
+    memberToolBar->isMovable();
+    Title->setTextFormat(Qt::RichText);
+    Title->setText("<b><u> Insert Members  ");
+    addXText->setMaximumWidth(30);
+    addYText->setMaximumWidth(30);
+    FText->setMaximumWidth(30);
+    SText->setMaximumWidth(30);
+    memberToolBar->setMaximumWidth(500);
+
+    // add layouts
+    QHBoxLayout *xLay = new QHBoxLayout();
+    xLay->addWidget(FText);
+    xLay->addWidget(addXText);
+
+    QHBoxLayout *yLay = new QHBoxLayout();
+    yLay->addWidget(SText);
+    yLay->addWidget(addYText);
+
+    jointWidg1->setLayout(xLay);
+    jointWidg2->setLayout(yLay);
+
+    // add widgets to toolbar
+    memberToolBar->addWidget(Title);
+    memberToolBar->addSeparator();
+    memberToolBar->addWidget(jointWidg1);
+    memberToolBar->addWidget(jointWidg2);
+    memberToolBar->addWidget(addMember);
+
+    // add toolbar
+    this->addToolBar(memberToolBar);
+
+    // connect signals and slots
+    connect(addMember,SIGNAL(clicked()),this,SLOT(pushButton_addmember()));
+}
+
+void MainWindow::on_actionConstraints_triggered()
+{
+
+    clearToolbars();
+
+    cToolBarActive = true;
+
+    // create toolbar
+    constraintToolBar = new QToolBar("Place Constraint");
+    QWidget *jointWidg = new QWidget;
+    QWidget *xWidg = new QWidget;
+    QWidget *yWidg = new QWidget;
+    QWidget *rzWidg = new QWidget;
+
+    // add labels
+    QLabel *Title = new QLabel;
+    QLabel *JText = new QLabel("Joint:");
+    QLabel *FText = new QLabel("X:");
+    QLabel *SText = new QLabel("Y:");
+    QLabel *TText = new QLabel("Rz:");
+
+    // insert button and Line
+    addConstraint = new QPushButton("ADD");
+    addXText = new QLineEdit;
+    constX = new QRadioButton;
+    constY = new QRadioButton;
+    constRz = new QRadioButton;
+
+    // formatting
+    constraintToolBar->isMovable();
+    Title->setTextFormat(Qt::RichText);
+    Title->setText("<b><u> Set Constraints  ");
+    addXText->setMaximumWidth(30);
+    JText->setMaximumWidth(45);
+    addConstraint->setDefault(true);
+    constraintToolBar->setMaximumWidth(600);
+
+    // add layouts
+    QHBoxLayout *jLay = new QHBoxLayout();
+    jLay->addWidget(JText);
+    jLay->addWidget(addXText);
+
+    QHBoxLayout *fLay = new QHBoxLayout();
+    fLay->addWidget(FText);
+    fLay->addWidget(constX);
+
+    QHBoxLayout *sLay = new QHBoxLayout();
+    sLay->addWidget(SText);
+    sLay->addWidget(constY);
+
+    QHBoxLayout *tLay = new QHBoxLayout();
+    tLay->addWidget(TText);
+    tLay->addWidget(constRz);
+
+    jointWidg->setLayout(jLay);
+    xWidg->setLayout(fLay);
+    yWidg->setLayout(sLay);
+    rzWidg->setLayout(tLay);
+
+    // add widgets to tool bar
+    constraintToolBar->addWidget(Title);
+    constraintToolBar->addSeparator();
+    constraintToolBar->addWidget(jointWidg);
+    constraintToolBar->addWidget(xWidg);
+    constraintToolBar->addWidget(yWidg);
+    constraintToolBar->addWidget(rzWidg);
+    constraintToolBar->addWidget(addConstraint);
+
+    // add toolbar
+    this->addToolBar(constraintToolBar);
+
+    // connect signals and slot
+    connect(addConstraint,SIGNAL(clicked()),this,SLOT(pushButton_addconstraint()));
+}
+
+void MainWindow::on_actionForces_triggered()
+{
+    clearToolbars();
+
+    fToolBarActive = true;
+
+    // create toolbar
+    forceToolBar = new QToolBar("Place Force");
+    QWidget *jointWidg = new QWidget;
+    QWidget *xWidg = new QWidget;
+    QWidget *yWidg = new QWidget;
+    QWidget *momWidg = new QWidget;
+    QWidget *magWidg = new QWidget;
+
+    // add labels
+    QLabel *Title = new QLabel;
+    QLabel *JText = new QLabel("Joint:");
+    QLabel *MText = new QLabel("Magnitude:");
+    QLabel *FText = new QLabel("X:");
+    QLabel *SText = new QLabel("Y:");
+    QLabel *TText = new QLabel("Rz:");
+
+    // insert button and lines
+    addForce = new QPushButton("ADD");
+    addXText = new QLineEdit;
+    addYText = new QLineEdit;
+    constX = new QRadioButton;
+    constY = new QRadioButton;
+    constRz = new QRadioButton;
+
+    // formatting
+    Title->setTextFormat(Qt::RichText);
+    Title->setText("<b><u> Place Forces  ");
+    forceToolBar->isMovable();
+    addXText->setMaximumWidth(30);
+    addYText->setMaximumWidth(60);
+    JText->setMaximumWidth(40);
+    MText->setMaximumWidth(80);
+    addForce->setDefault(true);
+    forceToolBar->setMaximumWidth(800);
+
+       // add layouts
+    QHBoxLayout *jLay = new QHBoxLayout();
+    jLay->addWidget(JText);
+    jLay->addWidget(addXText);
+
+    QHBoxLayout *mLay = new QHBoxLayout();
+    mLay->addWidget(MText);
+    mLay->addWidget(addYText);
+
+    QHBoxLayout *fLay = new QHBoxLayout();
+    fLay->addWidget(FText);
+    fLay->addWidget(constX);
+
+    QHBoxLayout *sLay = new QHBoxLayout();
+    sLay->addWidget(SText);
+    sLay->addWidget(constY);
+
+    QHBoxLayout *tLay = new QHBoxLayout();
+    tLay->addWidget(TText);
+    tLay->addWidget(constRz);
+
+    jointWidg->setLayout(jLay);
+    xWidg->setLayout(fLay);
+    yWidg->setLayout(sLay);
+    momWidg->setLayout(tLay);
+    magWidg->setLayout(mLay);
+
+    // add widgets to tool bar
+    forceToolBar->addWidget(Title);
+    forceToolBar->addSeparator();
+    forceToolBar->addWidget(jointWidg);
+    forceToolBar->addWidget(magWidg);
+    forceToolBar->addWidget(xWidg);
+    forceToolBar->addWidget(yWidg);
+    forceToolBar->addWidget(momWidg);
+    forceToolBar->addWidget(addForce);
+
+    // add tool bar
+    this->addToolBar(forceToolBar);
+
+    // connect signals and slot
+    connect(addForce,SIGNAL(clicked()),this,SLOT(pushButton_addforce()));
+}
+
+void MainWindow::on_actionProperties_triggered()
+{
+    clearToolbars();
+
+    pToolBarActive = true;
+
+    // create toolbar
+    propToolBar = new QToolBar("Set Properties");
+    QWidget *PropWidg = new QWidget;
+
+    // create buttons and labels
+    setProps = new QPushButton("SET");
+    QLabel *Title = new QLabel;
+    QLabel *EText = new QLabel("E: ");
+    QLabel *IText = new QLabel("I:  ");
+    QLabel *AText = new QLabel("A: ");
+    QLabel *e1Text = new QLabel("e1:");
+    QLabel *e2Text = new QLabel("e2:");
+
+    addE = new QLineEdit;
+    addA = new QLineEdit;
+    addI = new QLineEdit;
+    adde1 = new QLineEdit;
+    adde2 = new QLineEdit;
+
+    // formatting
+    Title->setTextFormat(Qt::RichText);
+    Title->setText("<b><u> Structural Properties");
+    addE->setMaximumWidth(100);
+    addA->setMaximumWidth(100);
+    addI->setMaximumWidth(100);
+    adde1->setMaximumWidth(100);
+    adde2->setMaximumWidth(100);
+    setProps->setDefault(true);
+
+    // add layouts
+    QHBoxLayout *Elay = new QHBoxLayout;
+    Elay->addSpacing(25);
+    Elay->addWidget(EText);
+    Elay->addWidget(addE);
+    Elay->addSpacing(25);
+
+    QHBoxLayout *Alay = new QHBoxLayout;
+    Alay->addSpacing(25);
+    Alay->addWidget(AText);
+    Alay->addWidget(addA);
+    Alay->addSpacing(25);
+
+    QHBoxLayout *Ilay = new QHBoxLayout;
+    Ilay->addSpacing(25);
+    Ilay->addWidget(IText);
+    Ilay->addWidget(addI);
+    Ilay->addSpacing(25);
+
+    QHBoxLayout *e1lay = new QHBoxLayout;
+    e1lay->addSpacing(25);
+    e1lay->addWidget(e1Text);
+    e1lay->addWidget(adde1);
+    e1lay->addSpacing(25);
+
+    QHBoxLayout *e2lay  = new QHBoxLayout;
+    e2lay->addSpacing(25);
+    e2lay->addWidget(e2Text);
+    e2lay->addWidget(adde2);
+    e2lay->addSpacing(25);
+
+    QHBoxLayout *button = new QHBoxLayout;
+    button->addSpacing(15);
+    button->addWidget(setProps);
+    button->addSpacing(15);
+
+    QVBoxLayout *allProps = new QVBoxLayout;
+    allProps->addWidget(Title);
+    allProps->addSpacing(3);
+    allProps->addLayout(Elay);
+    allProps->addLayout(Alay);
+    allProps->addLayout(Ilay);
+    allProps->addLayout(e1lay);
+    allProps->addLayout(e2lay);
+    allProps->addLayout(button);
+    PropWidg->setLayout(allProps);
+
+    // add widgets to toolbar
+    propToolBar->addWidget(PropWidg);
+
+    // add toolbar
+    this->addToolBar(Qt::LeftToolBarArea,propToolBar);
+
+    // add signals and slots
+    connect(setProps,SIGNAL(clicked()),this,SLOT(pushButton_setDProperties()));
 }
 
 void MainWindow::on_pushButton_solve_released()
@@ -340,7 +497,47 @@ void MainWindow::on_pushButton_solve_released()
         ui->pushButton_solve->setEnabled(false);
         ui->pushButton_Disp->setEnabled(true);
         ui->pushButton_Stress->setEnabled(true);
+
         solved = true;
+    }
+}
+
+void MainWindow::on_pushButton_Disp_released()
+{
+    if(solved==true)
+    {
+        if(displace == false)
+        {
+            displace = true;
+
+            drawDStructure();
+
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+            if(force == true)
+            {
+                drawForces();
+            }
+        }
+        else if(displace == true)
+        {
+            displace = false;
+
+            scene->clear();
+            drawJoint();
+            drawMembers();
+
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+            if(force == true)
+            {
+                drawForces();
+            }
+        }
     }
 }
 
@@ -369,195 +566,6 @@ void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
     }
 }
 
-void MainWindow::drawConstraints()
-{
-    QBrush constBrush(Qt::blue);
-    QPen constPen(Qt::black);
-    constPen.setWidth(2);
-
-    // loop through constraint matrix
-    for(uint i = 0; i < myStructure.constMat.size(); i++)
-    {
-        int m = myStructure.constMat[i][0]-1;
-        int dir = myStructure.constMat[i][1];
-
-        double x1 = myStructure.xstruct[m][0]*zoom;
-        double y1 = -myStructure.xstruct[m][1]*zoom;
-
-        if(dir==1)
-        {
-            noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1-5*zoom) << QPointF(x1-10*zoom,y1+5*zoom);
-            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
-        }
-        else if(dir==2)
-        {
-            noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1+10*zoom) << QPointF(x1+5*zoom,y1+10*zoom);
-            noTrans = scene->addPolygon(noTransShape,constPen,constBrush);
-        }
-        else
-        {
-            noRot = scene->addRect(x1-5*zoom,y1-5*zoom,10*zoom,10*zoom,constPen,constBrush);
-        }
-
-    }
-}
-
-void MainWindow::drawForces()
-{
-    QBrush momBrush(Qt::transparent);
-    QBrush momBrush2(Qt::yellow);
-    QBrush loadBrush(Qt::green);
-    QPen loadPen(Qt::green);
-    QPen momPen(Qt::yellow);
-    loadPen.setWidth(1);
-    momPen.setWidth(3);
-
-    // loop through constraint matrix
-    for(uint i = 0; i < myStructure.loadMat.size(); i++)
-    {
-        int m = (int)myStructure.loadMat[i][0]-1;
-        int dir = (int)myStructure.loadMat[i][1];
-        std::string forceMag = std::to_string(myStructure.loadMat[i][2]);
-
-        // get rid of trailing zeros
-        std::string point = ".";
-        int posdot = forceMag.find(point);
-
-        int strSize = forceMag.size();
-
-        bool nonZero = false;
-
-        if(posdot < strSize)
-        {
-            for(int j = strSize; j >= posdot-1; j--)
-            {
-                if(forceMag.substr(j-1,1)=="0" || forceMag.substr(j,1)==".")
-                {
-                    if(nonZero==false)
-                    {
-                        forceMag.erase(j);
-                    }
-                }
-                else
-                {
-                    nonZero = true;
-                }
-            }
-        }
-
-        QString forceT = QString::fromStdString(forceMag);
-
-        double x1 = myStructure.xstruct[m][0]*zoom;
-        double y1 = -myStructure.xstruct[m][1]*zoom;
-
-        myText = new QGraphicsTextItem(forceT);
-        myText->setDefaultTextColor(Qt::white);
-
-        if(dir==1)
-        {
-            // draw main line
-            myStrucLine = scene->addLine(x1,y1,x1-30*zoom,y1,loadPen);
-
-            // draw triangle
-            noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-10*zoom,y1+5*zoom) << QPointF(x1-10*zoom,y1-5*zoom);
-            noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
-
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
-
-            myText->setX(x1-40*zoom);
-            myText->setY(y1-10*zoom);
-
-            scene->addItem(myText);
-
-        }
-        else if(dir==2)
-        {
-            // draw main line
-            myStrucLine = scene->addLine(x1,y1,x1,y1-30*zoom,loadPen);
-
-            // draw triangle
-            noTransShape.clear();
-            noTransShape << QPointF(x1,y1) << QPointF(x1-5*zoom,y1-10*zoom) << QPointF(x1+5*zoom,y1-10*zoom);
-            noTrans = scene->addPolygon(noTransShape,loadPen,loadBrush);
-
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
-
-            myText->setX(x1+5*zoom);
-            myText->setY(y1-10*zoom);
-
-            scene->addItem(myText);
-
-        }
-        else
-        {
-            myStructCirc = scene->addEllipse(x1-10*zoom, y1-10*zoom, 20*zoom, 20*zoom,momPen,momBrush);
-
-            // draw triangle
-            noTransShape.clear();
-            noTransShape << QPointF(x1+2,y1-10*zoom) << QPointF(x1-3*zoom,y1-6*zoom) << QPointF(x1-3*zoom,y1-14*zoom);
-            noTrans = scene->addPolygon(noTransShape,momPen,momBrush2);
-
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
-
-            myText->setX(x1-10*zoom);
-            myText->setY(y1-30*zoom);
-
-            scene->addItem(myText);
-        }
-    }
-}
-
-void MainWindow::on_pushButton_Disp_released()
-{
-    if(solved==true)
-    {
-        if(displace == false)
-        {
-
-            drawDStructure();
-
-            if(constraint == true)
-            {
-                drawConstraints();
-            }
-            if(force == true)
-            {
-                drawForces();
-            }
-        }
-        if(displace == true)
-        {
-
-            scene->clear();
-            drawStructure();
-
-            if(constraint == true)
-            {
-                drawConstraints();
-            }
-            if(force == true)
-            {
-                drawForces();
-            }
-        }
-
-        // switch displace
-        if(displace==true)
-            displace=false;
-        else
-            displace=true;
-    }
-}
-
 void MainWindow::on_pushButton_Stress_released()
 {
 
@@ -574,7 +582,9 @@ void MainWindow::on_checkBox_const_toggled(bool checked)
     {
         constraint = false;
         scene->clear();
-        drawStructure();
+
+        drawJoint();
+        drawMembers();
 
         // redraw other options if there
         if(displace == true)
@@ -600,7 +610,9 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
     {
         force = false;
         scene->clear();
-        drawStructure();
+
+        drawJoint();
+        drawMembers();
 
         // redraw other options if there
         if(displace == true)
@@ -614,210 +626,40 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
     }
 }
 
-void MainWindow::wheelEvent(QWheelEvent *event)
-{
-    // test
-    std::cout << "You Scrolled the Wheel ";
-
-    QPoint numDegrees = event->angleDelta() / 8;
-    QPoint numSteps = numDegrees / 15;
-    QPoint mousePos = event->pos();
-
-    double myZoomY = numSteps.y();
-    double myPosX = mousePos.x();
-    double myPosY = mousePos.y();
-
-    std::cout << "to Position: y = "<< myZoomY << std::endl;
-    std::cout << "The mouse position is: x = " << myPosX << " y = " << myPosY << std::endl;
-
-    myCenter.setX(myPosX);
-    myCenter.setY(myPosY);
-
-    // zoom depending on sign of y
-    if(myZoomY < 0)
-    {
-        zoomOut();
-    }
-    else
-    {
-        zoomIn();
-    }
-
-    ui->graphicsView->centerOn(myCenter);
-
-    event->accept();
-}
-
-void MainWindow::zoomIn()
-{
-    if(zoom >= 1)
-    {   // clear the scene of the lines
-        scene->clear();
-
-        // set new zoom factor
-        zoom++;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-        }
-        else
-        {
-            drawStructure();
-        }
-    }
-    else if(zoom < 1)
-    {
-        // clear the scene of the lines
-        scene->clear();
-
-        zoom = zoom + 0.1;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-        }
-        else
-        {
-            drawStructure();
-        }
-    }
-}
-
-void MainWindow::zoomOut()
-{
-    if(zoom > 1)
-    {
-        // clear the scene of the lines
-        scene->clear();
-
-        // set new zoom factor
-        zoom--;
-
-        // draw the shapes again
-        if(solved == true)
-        {
-            drawStructure();
-        }
-        else
-        {
-            drawStructure();
-        }
-    }
-    else if(zoom <= 1)
-    {
-        if(zoom > .1)
-        {
-            // clear the scene of the lines
-            scene->clear();
-
-            zoom = zoom - 0.1;
-
-            // draw the shapes again
-            if(solved == true)
-            {
-
-            }
-            else
-            {
-                drawStructure();
-            }
-        }
-    }
-}
-
-void MainWindow::on_actionJoints_triggered()
-{
-    clearToolbars();
-
-    jToolBarActive = true;
-
-    // create toolbar
-    jointToolBar = new QToolBar("Place Joints");
-    QWidget *jointWidgX = new QWidget;
-    QWidget *jointWidgY = new QWidget;
-
-    jointToolBar->isMovable();
-
-    // add labels
-    QLabel *Title = new QLabel("Insert Joints");
-    QLabel *XText = new QLabel("X:");
-    QLabel *YText = new QLabel("Y:");
-
-    // insert button
-    addJoint = new QPushButton("ADD");
-
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-
-    // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
-    xLay->addWidget(XText);
-    xLay->addWidget(addXText);
-
-    QHBoxLayout *yLay = new QHBoxLayout();
-    yLay->addWidget(YText);
-    yLay->addWidget(addYText);
-
-    jointToolBar->addWidget(Title);
-    jointToolBar->addSeparator();
-
-    jointWidgX->setLayout(xLay);
-    jointWidgY->setLayout(yLay);
-
-    jointToolBar->addWidget(jointWidgX);
-    jointToolBar->addWidget(jointWidgY);
-
-    jointToolBar->addWidget(addJoint);
-
-    this->addToolBar(jointToolBar);
-
-    connect(addJoint,SIGNAL(clicked()),this,SLOT(on_pushButton_addJoint_released()));
-
-}
-
-void MainWindow::on_pushButton_addJoint_released()
-{
-    std::vector<double> jPoints;
-
-    QString myX = addXText->text();
-    QString myY = addYText->text();
-
-    double x = myX.toDouble();
-    double y = myY.toDouble();
-
-    jPoints.push_back(x);
-    jPoints.push_back(y);
-
-    myStructure.xstruct.push_back(jPoints);
-
-    QGraphicsEllipseItem *newJoint = new QGraphicsEllipseItem;
-
-    drawnJoints.push_back(newJoint);
-
-    drawJoint();
-}
-
 void MainWindow::drawJoint()
 {
     QBrush jgrey(Qt::gray);
     QPen jPen(Qt::white);
 
-    for(int i = 0; i < drawnJoints.size(); i++)
+    for(int i = 0; i < myStructure.xstruct.size(); i++)
     {
+        QGraphicsEllipseItem *newJoint = new QGraphicsEllipseItem;
+        drawnJoints.push_back(newJoint);
         drawnJoints[i] = scene->addEllipse(myStructure.xstruct[i][0]-5,-myStructure.xstruct[i][1]-5,10,10,jPen,jgrey);
     }
 }
 
 void MainWindow::drawMembers()
 {
-    QPen mWhite(Qt::white);
-    mWhite.setWidth(5);
+    QPen mPen;
 
-    for(int i = 0; i < drawnMembers.size(); i++)
+    if(displace==true)
     {
+        mPen.setColor(Qt::gray);
+        mPen.setWidth(3);
+        mPen.setStyle(Qt::DashLine);
+    }
+    else
+    {
+        mPen.setColor(Qt::white);
+        mPen.setWidth(5);
+    }
+
+    for(int i = 0; i < myStructure.conn.size(); i++)
+    {
+        QGraphicsLineItem *newMember = new QGraphicsLineItem;
+        drawnMembers.push_back(newMember);
+
         int One = myStructure.conn[i][0];
         int Two = myStructure.conn[i][1];
 
@@ -826,268 +668,11 @@ void MainWindow::drawMembers()
         double x2 = myStructure.xstruct[Two-1][0];
         double y2 = -myStructure.xstruct[Two-1][1];
 
-        drawnMembers[i] = scene->addLine(x1,y1,x2,y2,mWhite);
+        drawnMembers[i] = scene->addLine(x1,y1,x2,y2,mPen);
     }
 }
 
-
-
-void MainWindow::on_actionMembers_triggered()
-{
-    clearToolbars();
-
-    mToolBarActive = true;
-
-    // create toolbar
-    memberToolBar = new QToolBar("Place Members");
-    QWidget *jointWidg1 = new QWidget;
-    QWidget *jointWidg2 = new QWidget;
-
-    memberToolBar->isMovable();
-
-    // add labels
-    QLabel *Title = new QLabel("Insert Members");
-    QLabel *FText = new QLabel("1st:");
-    QLabel *SText = new QLabel("2nd:");
-
-    // insert button
-    addMember = new QPushButton("ADD");
-
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-
-    addXText->resize(25,addXText->height());
-
-    // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
-    xLay->addWidget(FText);
-    xLay->addWidget(addXText);
-
-    QHBoxLayout *yLay = new QHBoxLayout();
-    yLay->addWidget(SText);
-    yLay->addWidget(addYText);
-
-    memberToolBar->addWidget(Title);
-    memberToolBar->addSeparator();
-
-    jointWidg1->setLayout(xLay);
-    jointWidg2->setLayout(yLay);
-
-    memberToolBar->addWidget(jointWidg1);
-    memberToolBar->addWidget(jointWidg2);
-
-    memberToolBar->addWidget(addMember);
-
-    this->addToolBar(memberToolBar);
-
-    connect(addMember,SIGNAL(clicked()),this,SLOT(on_pushButton_addmember_released()));
-
-
-}
-
-void MainWindow::clearToolbars()
-{
-    // get rid of all tool bars
-    if(jToolBarActive == true)
-    {
-        this->removeToolBar(jointToolBar);
-        jToolBarActive = false;
-    }
-    if(mToolBarActive == true)
-    {
-        this->removeToolBar(memberToolBar);
-        mToolBarActive = false;
-    }
-    if(cToolBarActive == true)
-    {
-        this->removeToolBar(constraintToolBar);
-        cToolBarActive = false;
-    }
-    if(fToolBarActive == true)
-    {
-        this->removeToolBar(forceToolBar);
-        fToolBarActive = false;
-    }
-    if(pToolBarActive == true)
-    {
-        this->removeToolBar(propToolBar);
-        pToolBarActive = false;
-    }
-
-}
-
-void MainWindow::on_pushButton_addmember_released()
-{
-     std::vector<int> mPoints;
-
-    QString myOne = addXText->text();
-    QString myTwo = addYText->text();
-
-    int One = myOne.toInt();
-    int Two = myTwo.toInt();
-
-    mPoints.push_back(One);
-    mPoints.push_back(Two);
-
-    myStructure.conn.push_back(mPoints);
-
-    QGraphicsLineItem *newMember = new QGraphicsLineItem;
-
-    drawnMembers.push_back(newMember);
-
-    drawJoint();
-    drawMembers();
-}
-
-void MainWindow::on_actionConstraints_triggered()
-{
-
-    clearToolbars();
-
-    cToolBarActive = true;
-
-    // create toolbar
-    constraintToolBar = new QToolBar("Place Constraint");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *rzWidg = new QWidget;
-
-    constraintToolBar->isMovable();
-
-    // add labels
-    QLabel *Title = new QLabel("Insert Members");
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Rz:");
-
-    constX = new QRadioButton;
-    constY = new QRadioButton;
-    constRz = new QRadioButton;
-
-    // insert button
-    addConstraint = new QPushButton("ADD");
-
-    addXText = new QLineEdit;
-
-    addXText->resize(25,addXText->height());
-
-    // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
-    jLay->addWidget(JText);
-    jLay->addWidget(addXText);
-
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
-    fLay->addWidget(constX);
-
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
-    sLay->addWidget(constY);
-
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
-    tLay->addWidget(constRz);
-
-
-    constraintToolBar->addWidget(Title);
-    constraintToolBar->addSeparator();
-
-    jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
-    rzWidg->setLayout(tLay);
-
-    constraintToolBar->addWidget(jointWidg);
-    constraintToolBar->addWidget(xWidg);
-    constraintToolBar->addWidget(yWidg);
-    constraintToolBar->addWidget(rzWidg);
-
-    constraintToolBar->addWidget(addConstraint);
-
-    this->addToolBar(constraintToolBar);
-
-    connect(addConstraint,SIGNAL(clicked()),this,SLOT(on_pushButton_addconstraint_released()));
-}
-
-void MainWindow::on_pushButton_addconstraint_released()
-{
-    std::vector<int> constPoint;
-
-    QString constJoint = addXText->text();
-
-    int constJointNum = constJoint.toInt();
-
-    if(constX->isChecked())
-    {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(1);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
-    if(constY->isChecked())
-    {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(2);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
-    if(constRz->isChecked())
-    {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(3);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
-
-    drawDConstraints();
-    drawJoint();
-    drawMembers();
-}
-
-void MainWindow::on_pushButton_addforce_released()
-{
-    std::vector<double> forcePoint;
-
-    QString forceJoint = addXText->text();
-    QString forceMag = addYText->text();
-
-    double forceJointNum = forceJoint.toInt();
-    double forceDoubleMag = forceMag.toDouble();
-
-    if(constX->isChecked())
-    {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(1);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
-    if(constY->isChecked())
-    {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(2);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
-    if(constRz->isChecked())
-    {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(3);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
-
-    drawDConstraints();
-    drawJoint();
-    drawMembers();
-    drawDForces();
-}
-
-void MainWindow::drawDConstraints()
+void MainWindow::drawConstraints()
 {
     QBrush constBrush(Qt::blue);
     QPen constPen(Qt::blue);
@@ -1122,7 +707,7 @@ void MainWindow::drawDConstraints()
     }
 }
 
-void MainWindow::drawDForces()
+void MainWindow::drawForces()
 {
     QBrush momBrush(Qt::transparent);
     QBrush momBrush2(Qt::yellow);
@@ -1234,178 +819,7 @@ void MainWindow::drawDForces()
     }
 }
 
-void MainWindow::on_actionForces_triggered()
-{
-    clearToolbars();
-
-    fToolBarActive = true;
-
-    // create toolbar
-    forceToolBar = new QToolBar("Place Force");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *momWidg = new QWidget;
-    QWidget *magWidg = new QWidget;
-
-    forceToolBar->isMovable();
-
-    // add labels
-    QLabel *Title = new QLabel("Place Forces");
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *MText = new QLabel("Magnitude:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Moment:");
-
-    constX = new QRadioButton;
-    constY = new QRadioButton;
-    constRz = new QRadioButton;
-
-    // insert button
-    addForce = new QPushButton("ADD");
-
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-
-    addXText->resize(25,addXText->height());
-
-    // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
-    jLay->addWidget(JText);
-    jLay->addWidget(addXText);
-
-    QHBoxLayout *mLay = new QHBoxLayout();
-    mLay->addWidget(MText);
-    mLay->addWidget(addYText);
-
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
-    fLay->addWidget(constX);
-
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
-    sLay->addWidget(constY);
-
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
-    tLay->addWidget(constRz);
-
-    forceToolBar->addWidget(Title);
-    forceToolBar->addSeparator();
-
-    jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
-    momWidg->setLayout(tLay);
-    magWidg->setLayout(mLay);
-
-    forceToolBar->addWidget(jointWidg);
-    forceToolBar->addWidget(magWidg);
-    forceToolBar->addWidget(xWidg);
-    forceToolBar->addWidget(yWidg);
-    forceToolBar->addWidget(momWidg);
-
-    forceToolBar->addWidget(addForce);
-
-    this->addToolBar(forceToolBar);
-
-    connect(addForce,SIGNAL(clicked()),this,SLOT(on_pushButton_addforce_released()));
-}
-
-void MainWindow::on_actionProperties_triggered()
-{
-    clearToolbars();
-
-    pToolBarActive = true;
-
-    // create toolbar
-    propToolBar = new QToolBar("Set Properties");
-
-    setProps = new QPushButton("SET");
-
-    QWidget *PropWidg = new QWidget;
-
-    QLabel *Title = new QLabel("Structure Properties");
-    QLabel *EText = new QLabel("E:");
-    QLabel *IText = new QLabel("I:");
-    QLabel *AText = new QLabel("A:");
-    QLabel *e1Text = new QLabel("e1:");
-    QLabel *e2Text = new QLabel("e2:");
-
-    addE = new QLineEdit;
-    addA = new QLineEdit;
-    addI = new QLineEdit;
-    adde1 = new QLineEdit;
-    adde2 = new QLineEdit;
-
-    QHBoxLayout *Elay = new QHBoxLayout;
-    Elay->addWidget(EText);
-    Elay->addWidget(addE);
-
-    QHBoxLayout *Alay = new QHBoxLayout;
-    Alay->addWidget(AText);
-    Alay->addWidget(addA);
-
-    QHBoxLayout *Ilay = new QHBoxLayout;
-    Ilay->addWidget(IText);
-    Ilay->addWidget(addI);
-
-    QHBoxLayout *e1lay = new QHBoxLayout;
-    e1lay->addWidget(e1Text);
-    e1lay->addWidget(adde1);
-
-    QHBoxLayout *e2lay  = new QHBoxLayout;
-    e2lay->addWidget(e2Text);
-    e2lay->addWidget(adde2);
-
-    QVBoxLayout *allProps = new QVBoxLayout;
-    allProps->addWidget(Title);
-    allProps->addSpacing(3);
-    allProps->addLayout(Elay);
-    allProps->addLayout(Alay);
-    allProps->addLayout(Ilay);
-    allProps->addLayout(e1lay);
-    allProps->addLayout(e2lay);
-
-    PropWidg->setLayout(allProps);
-
-    propToolBar->addWidget(PropWidg);
-    propToolBar->addWidget(setProps);
-
-    connect(setProps,SIGNAL(clicked()),this,SLOT(setDProperties()));
-
-    this->addToolBar(propToolBar);
-
-}
-
-void MainWindow::setDProperties()
-{
-    myStructure.properties.clear();
-
-    QString Estring = addE->text();
-    QString Istring = addI->text();
-    QString Astring = addA->text();
-    QString e1string = adde1->text();
-    QString e2string = adde2->text();
-
-    myStructure.properties.push_back(Estring.toDouble());
-    myStructure.properties.push_back(Astring.toDouble());
-    myStructure.properties.push_back(Istring.toDouble());
-    myStructure.properties.push_back(e1string.toDouble());
-    myStructure.properties.push_back(e2string.toDouble());
-
-    clearToolbars();
-    solveReady();
-}
-
-void MainWindow::solveReady()
-{
-    if(myStructure.checkReady()==true)
-        ui->pushButton_solve->setEnabled(true);
-}
-
-void MainWindow::drawnDStructure()
+void MainWindow::drawDStructure()
 {
     // clear gview
     scene->clear();
@@ -1435,4 +849,419 @@ void MainWindow::drawnDStructure()
 
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
     }
+}
+
+void MainWindow::pushButton_addJoint()
+{
+    std::vector<double> jPoints;
+
+    QString myX = addXText->text();
+    QString myY = addYText->text();
+
+    double x = myX.toDouble();
+    double y = myY.toDouble();
+
+    jPoints.push_back(x);
+    jPoints.push_back(y);
+
+    myStructure.xstruct.push_back(jPoints);
+
+    drawJoint();
+}
+
+void MainWindow::pushButton_addmember()
+{
+     std::vector<int> mPoints;
+
+    QString myOne = addXText->text();
+    QString myTwo = addYText->text();
+
+    int One = myOne.toInt();
+    int Two = myTwo.toInt();
+
+    mPoints.push_back(One);
+    mPoints.push_back(Two);
+
+    myStructure.conn.push_back(mPoints);
+
+    drawJoint();
+    drawMembers();
+}
+
+void MainWindow::pushButton_addconstraint()
+{
+    std::vector<int> constPoint;
+
+    QString constJoint = addXText->text();
+
+    int constJointNum = constJoint.toInt();
+
+    if(constX->isChecked())
+    {
+        constPoint.push_back(constJointNum);
+        constPoint.push_back(1);
+        myStructure.constMat.push_back(constPoint);
+        constPoint.clear();
+    }
+    if(constY->isChecked())
+    {
+        constPoint.push_back(constJointNum);
+        constPoint.push_back(2);
+        myStructure.constMat.push_back(constPoint);
+        constPoint.clear();
+    }
+    if(constRz->isChecked())
+    {
+        constPoint.push_back(constJointNum);
+        constPoint.push_back(3);
+        myStructure.constMat.push_back(constPoint);
+        constPoint.clear();
+    }
+
+    drawConstraints();
+    drawJoint();
+    drawMembers();
+}
+
+void MainWindow::pushButton_addforce()
+{
+    std::vector<double> forcePoint;
+
+    QString forceJoint = addXText->text();
+    QString forceMag = addYText->text();
+
+    double forceJointNum = forceJoint.toInt();
+    double forceDoubleMag = forceMag.toDouble();
+
+    if(constX->isChecked())
+    {
+        forcePoint.push_back(forceJointNum);
+        forcePoint.push_back(1);
+        forcePoint.push_back(forceDoubleMag);
+        myStructure.loadMat.push_back(forcePoint);
+        forcePoint.clear();
+    }
+    if(constY->isChecked())
+    {
+        forcePoint.push_back(forceJointNum);
+        forcePoint.push_back(2);
+        forcePoint.push_back(forceDoubleMag);
+        myStructure.loadMat.push_back(forcePoint);
+        forcePoint.clear();
+    }
+    if(constRz->isChecked())
+    {
+        forcePoint.push_back(forceJointNum);
+        forcePoint.push_back(3);
+        forcePoint.push_back(forceDoubleMag);
+        myStructure.loadMat.push_back(forcePoint);
+        forcePoint.clear();
+    }
+
+    drawConstraints();
+    drawJoint();
+    drawMembers();
+    drawForces();
+}
+
+void MainWindow::pushButton_setDProperties()
+{
+    myStructure.properties.clear();
+
+    QString Estring = addE->text();
+    QString Istring = addI->text();
+    QString Astring = addA->text();
+    QString e1string = adde1->text();
+    QString e2string = adde2->text();
+
+    myStructure.properties.push_back(Estring.toDouble());
+    myStructure.properties.push_back(Astring.toDouble());
+    myStructure.properties.push_back(Istring.toDouble());
+    myStructure.properties.push_back(e1string.toDouble());
+    myStructure.properties.push_back(e2string.toDouble());
+
+    clearToolbars();
+    solveReady();
+}
+
+void MainWindow::wheelEvent(QWheelEvent *event)
+{
+    // test
+    std::cout << "You Scrolled the Wheel ";
+
+    QPoint numDegrees = event->angleDelta() / 8;
+    QPoint numSteps = numDegrees / 15;
+    QPoint mousePos = event->pos();
+
+    double myZoomY = numSteps.y();
+    double myPosX = mousePos.x();
+    double myPosY = mousePos.y();
+
+    std::cout << "to Position: y = "<< myZoomY << std::endl;
+    std::cout << "The mouse position is: x = " << myPosX << " y = " << myPosY << std::endl;
+
+    //myCenter.setX(myPosX);
+    //myCenter.setY(myPosY);
+
+    // zoom depending on sign of y
+    if(myZoomY < 0)
+    {
+        zoomOut();
+    }
+    else
+    {
+        zoomIn();
+    }
+
+    //ui->graphicsView->centerOn(myCenter);
+
+    event->accept();
+}
+
+void MainWindow::zoomIn()
+{
+    if(zoom >= 1)
+    {   // clear the scene of the lines
+        scene->clear();
+
+        // set new zoom factor
+        zoom++;
+
+        // draw the shapes again
+        if(solved == true)
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+        else
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+    }
+    else if(zoom < 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
+
+        zoom = zoom + 0.1;
+
+        // draw the shapes again
+        if(solved == true)
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+        else
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+    }
+}
+
+void MainWindow::zoomOut()
+{
+    if(zoom > 1)
+    {
+        // clear the scene of the lines
+        scene->clear();
+
+        // set new zoom factor
+        zoom--;
+
+        // draw the shapes again
+        if(solved == true)
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+        else
+        {
+            //drawStructure();
+            drawJoint();
+            drawMembers();
+        }
+    }
+    else if(zoom <= 1)
+    {
+        if(zoom > .1)
+        {
+            // clear the scene of the lines
+            scene->clear();
+
+            zoom = zoom - 0.1;
+
+            // draw the shapes again
+            if(solved == true)
+            {
+
+            }
+            else
+            {
+                //drawStructure();
+                drawJoint();
+                drawMembers();
+            }
+        }
+    }
+}
+
+void MainWindow::readFile(std::string fileName)
+{
+    // read file
+
+    std::string line;
+    std::ifstream infile (fileName);
+    int sections = 0;
+
+    while (std::getline(infile,line, '\n'))
+    {
+        // make sure line isn't blank
+        if(line!="")
+        {
+           // parse the line for the data
+
+                // define vector of strings
+                std::vector<std::string> tokens;
+
+                // define delimiters
+                std::string delimiters(", ;\t");
+
+                // call tokenize
+                tokenize(line, tokens, delimiters);
+
+                if(sections == 0)
+                {
+                    if(tokens[0] != "joints")  //make sure you haven't reached the next section
+                    {
+                        // look at what kind of structure is being used
+                        myStructure.StructType = tokens[0];
+                    }
+                }
+
+                if(sections == 1)
+                {
+                    if(tokens[0] != "members")  //make sure you haven't reached the next section
+                    {
+                            // add joint coordinates
+                            std::vector<double> xSingleJoint;
+
+                            xSingleJoint.push_back(stod(tokens[0]));
+                            xSingleJoint.push_back(stod(tokens[1]));
+
+                            myStructure.xstruct.push_back(xSingleJoint);
+                    }
+                }
+                else if(sections == 2)
+                {
+                    if(tokens[0] != "constraints")  //make sure you haven't reached the next section
+                    {
+                        // add members to thier joints
+                        std::vector<int> xSingleMember;
+
+                        xSingleMember.push_back(stoi(tokens[0]));
+                        xSingleMember.push_back(stoi(tokens[1]));
+
+                        myStructure.conn.push_back(xSingleMember);
+                    }
+                }
+                else if(sections == 3)
+                {
+                    if(tokens[0] != "loads")  //make sure you haven't reached the next section
+                    {
+                        std::vector<int> constSingleDOF;
+
+                        constSingleDOF.push_back(stoi(tokens[0]));
+                        constSingleDOF.push_back(stoi(tokens[1]));
+
+                        myStructure.constMat.push_back(constSingleDOF);
+                    }
+                }
+                else if(sections == 4)
+                {
+                    if(tokens[0] != "properties")  //make sure you haven't reached the next section
+                    {
+                        std::vector<double> singleForce;
+
+                        singleForce.push_back(stod(tokens[0]));
+                        singleForce.push_back(stod(tokens[1]));
+                        singleForce.push_back(stod(tokens[2]));
+
+                        myStructure.loadMat.push_back(singleForce);
+                    }
+                }
+                else if(sections == 5)
+                {
+                    myStructure.properties.push_back(stod(tokens[0]));
+                }
+
+                // check what section you are in
+
+                if(tokens[0]=="joints")
+                {
+                    sections++;
+                }
+                else if(tokens[0]=="members") // make sure the next section is members
+                {
+                    sections++;
+                }
+                else if(tokens[0]=="constraints") // make sure the next section is constraints
+                {
+                    sections++;
+                }
+                else if(tokens[0]=="loads") // make sure the next section is loads
+                {
+                    sections++;
+                }
+                else if(tokens[0]=="properties") // make sure the next section is properties
+                {
+                    sections++;
+                }
+        }
+    }
+
+   ui->pushButton_solve->setEnabled(true);
+}
+
+void MainWindow::clearToolbars()
+{
+    // get rid of all tool bars
+    if(jToolBarActive == true)
+    {
+        this->removeToolBar(jointToolBar);
+        jToolBarActive = false;
+    }
+    if(mToolBarActive == true)
+    {
+        this->removeToolBar(memberToolBar);
+        mToolBarActive = false;
+    }
+    if(cToolBarActive == true)
+    {
+        this->removeToolBar(constraintToolBar);
+        cToolBarActive = false;
+    }
+    if(fToolBarActive == true)
+    {
+        this->removeToolBar(forceToolBar);
+        fToolBarActive = false;
+    }
+    if(pToolBarActive == true)
+    {
+        this->removeToolBar(propToolBar);
+        pToolBarActive = false;
+    }
+
+}
+
+void MainWindow::solveReady()
+{
+    if(myStructure.checkReady()==true)
+        ui->pushButton_solve->setEnabled(true);
 }

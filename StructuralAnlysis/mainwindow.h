@@ -27,73 +27,49 @@ public:
     ~MainWindow();
 
 private slots:
+    // File Actions
     void on_actionOpen_triggered();
-
     void on_actionSave_Results_triggered();
-
-    void readFile(std::string fileName);
-
-    void drawStructure();
-
-    void drawDStructure();
-
     void on_actionClear_triggered();
 
-    void on_pushButton_solve_released();
-
-    void on_horizontalSlider_scaleDisp_sliderMoved(int position);
-
-    void drawConstraints();
-
-    void drawForces();
-
-    void on_pushButton_Disp_released();
-
-    void on_pushButton_Stress_released();
-
-    void on_checkBox_const_toggled(bool checked);
-
-    void on_checkBox_Force_toggled(bool checked);
-
-    void wheelEvent(QWheelEvent *event);
-
-    void zoomIn();
-
-    void zoomOut();
-
+    // Insert Actions
     void on_actionJoints_triggered();
-
-    void on_pushButton_addJoint_released();
-
-    void drawJoint();
-
-    void drawMembers();
-
     void on_actionMembers_triggered();
-
-    void on_pushButton_addmember_released();
-
-    void clearToolbars();
-
     void on_actionConstraints_triggered();
-
-    void on_pushButton_addconstraint_released();
-
-    void on_pushButton_addforce_released();
-
-    void drawDConstraints();
-
-    void drawDForces();
-
     void on_actionForces_triggered();
-
     void on_actionProperties_triggered();
 
-    void setDProperties();
+    // Buttons and Toggles
+    void on_pushButton_solve_released();
+    void on_pushButton_Disp_released();
+    void on_horizontalSlider_scaleDisp_sliderMoved(int position);
+    void on_pushButton_Stress_released();
+    void on_checkBox_const_toggled(bool checked);
+    void on_checkBox_Force_toggled(bool checked);
 
+    // draw structure
+    void drawJoint();
+    void drawMembers();
+    void drawConstraints();
+    void drawForces();
+    void drawDStructure();
+
+    // tool bar buttons
+    void pushButton_addJoint();
+    void pushButton_addmember();
+    void pushButton_addconstraint();
+    void pushButton_addforce();
+    void pushButton_setDProperties();
+
+    // view methods
+    void wheelEvent(QWheelEvent *event);
+    void zoomIn();
+    void zoomOut();
+
+    // other methods
+    void readFile(std::string fileName);
+    void clearToolbars();
     void solveReady();
-
-    void drawnDStructure();
 
 private:
     Ui::MainWindow *ui;
