@@ -71,6 +71,16 @@ private slots:
     void clearToolbars();
     void solveReady();
 
+    // undo things
+    void on_actionUndo_triggered();
+    void clearJoint();
+    void clearMember();
+    void clearConstraint();
+    void clearForce();
+    void clearFile(int num);
+    void clearDraw();
+
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -86,24 +96,28 @@ private:
     QPolygonF noTransShape;
     QFont font;
 
+    // drawn objects
     std::vector<QGraphicsEllipseItem*> drawnJoints;
     std::vector<QGraphicsLineItem*> drawnMembers;
-    std::vector<std::vector<QGraphicsItem*>> drawnConstr;
 
     QPolygonF noDrawnTransShape;
     QGraphicsRectItem *noDrawnRot;
     QGraphicsPolygonItem *noDrawnTrans;
+
+    // undo and redo
+    std::vector<std::vector<std::string>> undoList;
+    std::vector<std::vector<std::string>> redoList;
 
     double xmax;
     double xmin;
     double ymax;
     double ymin;
 
+    // checks
     bool constraint;
     bool force;
     bool displace;
     bool stress;
-
     bool jToolBarActive;
     bool mToolBarActive;
     bool cToolBarActive;

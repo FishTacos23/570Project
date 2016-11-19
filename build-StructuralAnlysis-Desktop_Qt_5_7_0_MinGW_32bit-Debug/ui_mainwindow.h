@@ -42,6 +42,8 @@ public:
     QAction *actionProperties;
     QAction *actionConstraints;
     QAction *actionForces;
+    QAction *actionUndo;
+    QAction *actionRedo;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QCheckBox *checkBox_Force;
@@ -59,6 +61,7 @@ public:
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuInsert;
+    QMenu *menuEdit;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -86,6 +89,10 @@ public:
         actionConstraints->setObjectName(QStringLiteral("actionConstraints"));
         actionForces = new QAction(MainWindow);
         actionForces->setObjectName(QStringLiteral("actionForces"));
+        actionUndo = new QAction(MainWindow);
+        actionUndo->setObjectName(QStringLiteral("actionUndo"));
+        actionRedo = new QAction(MainWindow);
+        actionRedo->setObjectName(QStringLiteral("actionRedo"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -228,11 +235,13 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 502, 17));
+        menuBar->setGeometry(QRect(0, 0, 502, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuInsert = new QMenu(menuBar);
         menuInsert->setObjectName(QStringLiteral("menuInsert"));
+        menuEdit = new QMenu(menuBar);
+        menuEdit->setObjectName(QStringLiteral("menuEdit"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -243,6 +252,7 @@ public:
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuInsert->menuAction());
+        menuBar->addAction(menuEdit->menuAction());
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave_Results);
         menuFile->addAction(actionClear);
@@ -251,6 +261,8 @@ public:
         menuInsert->addAction(actionConstraints);
         menuInsert->addAction(actionForces);
         menuInsert->addAction(actionProperties);
+        menuEdit->addAction(actionUndo);
+        menuEdit->addAction(actionRedo);
 
         retranslateUi(MainWindow);
         QObject::connect(horizontalSlider_scaleDisp, SIGNAL(sliderMoved(int)), lcdNumber, SLOT(display(int)));
@@ -269,6 +281,8 @@ public:
         actionProperties->setText(QApplication::translate("MainWindow", "Properties", 0));
         actionConstraints->setText(QApplication::translate("MainWindow", "Constraints", 0));
         actionForces->setText(QApplication::translate("MainWindow", "Forces", 0));
+        actionUndo->setText(QApplication::translate("MainWindow", "Undo", 0));
+        actionRedo->setText(QApplication::translate("MainWindow", "Redo", 0));
         checkBox_Force->setText(QApplication::translate("MainWindow", "Forces", 0));
         pushButton_solve->setText(QApplication::translate("MainWindow", "Solve", 0));
         checkBox_const->setText(QApplication::translate("MainWindow", "Constraints", 0));
@@ -277,6 +291,7 @@ public:
         pushButton_Stress->setText(QApplication::translate("MainWindow", "Stress", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuInsert->setTitle(QApplication::translate("MainWindow", "Insert", 0));
+        menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0));
     } // retranslateUi
 
 };

@@ -15,15 +15,15 @@
 #include <QLayout>
 #include <QRadioButton>
 #include <QPicture>
+#include <QMessageBox>
 
-// to DO
+// to DO //////////////
 // error checking
-// why F structure is odd after garage door
-// directions of arrows on forces
-// undo button
 // user select joints
 // zoom and pan
 // stop leaking memory
+// draw order
+// ////////////////////
 
 // global variables
 static Analyze myStructure;
@@ -60,15 +60,34 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-    std::string fileName = fileNameQ.toStdString();
+//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+//    std::string fileName = fileNameQ.toStdString();
 
-    readFile(fileName);
+    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
-    zoom = 3;
+    // check file for errors
 
-    drawJoint();
-    drawMembers();
+    try
+    {
+        readFile(fileName);
+
+        zoom = 1;
+
+        drawJoint();
+        drawMembers();
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("File Formatt is Incorrect");
+        noGood.setInformativeText("please follow example file");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+
+    }
 }
 
 void MainWindow::on_actionSave_Results_triggered()
@@ -78,39 +97,61 @@ void MainWindow::on_actionSave_Results_triggered()
 
 void MainWindow::on_actionClear_triggered()
 {
-    // clear the screan
-    scene->clear();
 
-    clearToolbars();
-    drawnMembers.clear();
-    drawnJoints.clear();
+    QMessageBox sure;
 
-    // clear variables
-    myStructure.xstruct.clear();
-    myStructure.dxstruct.clear();
-    myStructure.conn.clear();
-    myStructure.constMat.clear();
-    myStructure.loadMat.clear();
-    myStructure.properties.clear();
-    myStructure.SDOF.clear();
-    myStructure.lenRot.clear();
-    myStructure.clearStructVar();
-    myStructure.compMtoS.clear();
-    myStructure.rmem.clear();
+    sure.setText("Are you sure you want to clear?");
+    sure.setInformativeText("You may not undo this action.");
+    sure.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+    sure.setDefaultButton(QMessageBox::Cancel);
+    sure.setWindowTitle("WARNING");
+    int ret = sure.exec();
 
-    solved = false;
-    displace = false;
-    constraint = false;
-    force = false;
-    jToolBarActive = false;
-    mToolBarActive = false;
-    cToolBarActive = false;
-    fToolBarActive = false;
-    pToolBarActive = false;
+    switch (ret) {
+    case QMessageBox::Ok:
 
-    ui->pushButton_Disp->setEnabled(false);
-    ui->pushButton_Stress->setEnabled(false);
-    ui->pushButton_solve->setEnabled(false);
+        // clear the screan
+        scene->clear();
+
+        clearToolbars();
+        drawnMembers.clear();
+        drawnJoints.clear();
+
+        // clear variables
+        myStructure.xstruct.clear();
+        myStructure.dxstruct.clear();
+        myStructure.conn.clear();
+        myStructure.constMat.clear();
+        myStructure.loadMat.clear();
+        myStructure.properties.clear();
+        myStructure.SDOF.clear();
+        myStructure.lenRot.clear();
+        myStructure.clearStructVar();
+        myStructure.compMtoS.clear();
+        myStructure.rmem.clear();
+
+        solved = false;
+        displace = false;
+        constraint = false;
+        force = false;
+        jToolBarActive = false;
+        mToolBarActive = false;
+        cToolBarActive = false;
+        fToolBarActive = false;
+        pToolBarActive = false;
+
+        ui->pushButton_Disp->setEnabled(false);
+        ui->pushButton_Stress->setEnabled(false);
+        ui->pushButton_solve->setEnabled(false);
+
+        break;
+    case QMessageBox::Cancel:
+        break;
+
+    default:
+        break;
+    }
+
 }
 
 void MainWindow::on_actionJoints_triggered()
@@ -297,6 +338,9 @@ void MainWindow::on_actionConstraints_triggered()
     constraintToolBar->addWidget(rzWidg);
     constraintToolBar->addWidget(addConstraint);
 
+    // toggle constraints
+    ui->checkBox_const->setChecked(true);
+
     // add toolbar
     this->addToolBar(constraintToolBar);
 
@@ -381,6 +425,9 @@ void MainWindow::on_actionForces_triggered()
     forceToolBar->addWidget(yWidg);
     forceToolBar->addWidget(momWidg);
     forceToolBar->addWidget(addForce);
+
+    // toggle forces
+    ui->checkBox_Force->setChecked(true);
 
     // add tool bar
     this->addToolBar(forceToolBar);
@@ -485,6 +532,8 @@ void MainWindow::on_pushButton_solve_released()
 {
     if(solved == false)
     {
+        undoList.clear();
+
         myStructure.preprocessing();
         myStructure.AssembleStructStiff();
         myStructure.Triangularization();
@@ -716,6 +765,7 @@ void MainWindow::drawForces()
     QPen momPen(Qt::yellow);
     loadPen.setWidth(1);
     momPen.setWidth(3);
+    bool negative = false;
 
     // loop through constraint matrix
     for(uint i = 0; i < myStructure.loadMat.size(); i++)
@@ -751,6 +801,11 @@ void MainWindow::drawForces()
         }
 
         QString forceT = QString::fromStdString(forceMag);
+        if(forceT.at(0)=='-')
+        {
+            forceT.remove(0,1);
+            negative = true;
+        }
 
         double x1 = myStructure.xstruct[m][0];
         double y1 = -myStructure.xstruct[m][1];
@@ -763,17 +818,31 @@ void MainWindow::drawForces()
             // draw main line
             myStrucLine = scene->addLine(x1,y1,x1-50,y1,loadPen);
 
-            // draw triangle
-            noDrawnTransShape.clear();
-            noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-20,y1+5) << QPointF(x1-20,y1-5);
-            noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
             font.setPixelSize(30);
             font.setBold(false);
             font.setFamily("Calibri");
+            noDrawnTransShape.clear();
 
-            myText->setX(x1-80);
-            myText->setY(y1);
+            // draw triangle
+            if(negative==true)
+            {
+                noDrawnTransShape << QPointF(x1-50,y1) << QPointF(x1-30,y1+5) << QPointF(x1-30,y1-5);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+                myText->setX(x1-80);
+                myText->setY(y1);
+
+                // reset negative
+                negative = false;
+            }
+            else
+            {
+                noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-20,y1+5) << QPointF(x1-20,y1-5);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+                myText->setX(x1-80);
+                myText->setY(y1);
+            }
 
             scene->addItem(myText);
 
@@ -783,17 +852,32 @@ void MainWindow::drawForces()
             // draw main line
             myStrucLine = scene->addLine(x1,y1,x1,y1-50,loadPen);
 
-            // draw triangle
-            noDrawnTransShape.clear();
-            noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-5,y1-20) << QPointF(x1+5,y1-20);
-            noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
             font.setPixelSize(30);
             font.setBold(false);
             font.setFamily("Calibri");
+            noDrawnTransShape.clear();
 
-            myText->setX(x1+5);
-            myText->setY(y1-50);
+            if(negative == true)
+            {
+                // draw triangle
+                noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-5,y1-20) << QPointF(x1+5,y1-20);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+                myText->setX(x1+5);
+                myText->setY(y1-50);
+
+                // reset negative
+                negative = false;
+            }
+            else
+            {
+                // draw triangle
+                noDrawnTransShape << QPointF(x1,y1-50) << QPointF(x1-5,y1-30) << QPointF(x1+5,y1-30);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+                myText->setX(x1+5);
+                myText->setY(y1-25);
+            }
 
             scene->addItem(myText);
 
@@ -802,17 +886,32 @@ void MainWindow::drawForces()
         {
             myStructCirc = scene->addEllipse(x1-20, y1-20, 40, 40, momPen, momBrush);
 
-            // draw triangle
-            noDrawnTransShape.clear();
-            noDrawnTransShape << QPointF(x1+10,y1-20) << QPointF(x1-10,y1-10) << QPointF(x1-10,y1-30);
-            noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
-
             font.setPixelSize(30);
             font.setBold(false);
             font.setFamily("Calibri");
+            noDrawnTransShape.clear();
 
-            myText->setX(x1-25);
-            myText->setY(y1-60);
+            if(negative == true)
+            {
+                // draw triangle
+                noDrawnTransShape << QPointF(x1+10,y1-20) << QPointF(x1-10,y1-10) << QPointF(x1-10,y1-30);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+                myText->setX(x1-25);
+                myText->setY(y1-60);
+
+                // reset negative
+                negative = false;
+            }
+            else
+            {
+                // draw triangle
+                noDrawnTransShape << QPointF(x1-10,y1-20) << QPointF(x1+10,y1-10) << QPointF(x1+10,y1-30);
+                noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+                myText->setX(x1-25);
+                myText->setY(y1-60);
+            }
 
             scene->addItem(myText);
         }
@@ -853,135 +952,248 @@ void MainWindow::drawDStructure()
 
 void MainWindow::pushButton_addJoint()
 {
-    std::vector<double> jPoints;
+    try
+    {
+        std::vector<double> jPoints;
 
-    QString myX = addXText->text();
-    QString myY = addYText->text();
+        QString myX = addXText->text();
+        QString myY = addYText->text();
 
-    double x = myX.toDouble();
-    double y = myY.toDouble();
+        double x = myX.toDouble();
+        double y = myY.toDouble();
 
-    jPoints.push_back(x);
-    jPoints.push_back(y);
+        jPoints.push_back(x);
+        jPoints.push_back(y);
 
-    myStructure.xstruct.push_back(jPoints);
+        myStructure.xstruct.push_back(jPoints);
 
-    drawJoint();
+        drawJoint();
+
+        std::vector<std::string> oneLine;
+        oneLine.push_back("joint");
+        oneLine.push_back("1");
+        undoList.push_back(oneLine);
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("Inputs Incorrect");
+        noGood.setInformativeText("please follow example");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::pushButton_addmember()
 {
-     std::vector<int> mPoints;
+    try
+    {
+        std::vector<int> mPoints;
 
-    QString myOne = addXText->text();
-    QString myTwo = addYText->text();
+       QString myOne = addXText->text();
+       QString myTwo = addYText->text();
 
-    int One = myOne.toInt();
-    int Two = myTwo.toInt();
+       int One = myOne.toInt();
+       int Two = myTwo.toInt();
 
-    mPoints.push_back(One);
-    mPoints.push_back(Two);
+       mPoints.push_back(One);
+       mPoints.push_back(Two);
 
-    myStructure.conn.push_back(mPoints);
+       myStructure.conn.push_back(mPoints);
 
-    drawJoint();
-    drawMembers();
+       drawJoint();
+       drawMembers();
+
+       std::vector<std::string> oneLine;
+       oneLine.push_back("member");
+       oneLine.push_back("1");
+       undoList.push_back(oneLine);
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("Inputs Incorrect");
+        noGood.setInformativeText("please follow example");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
+
 }
 
 void MainWindow::pushButton_addconstraint()
 {
-    std::vector<int> constPoint;
 
-    QString constJoint = addXText->text();
-
-    int constJointNum = constJoint.toInt();
-
-    if(constX->isChecked())
+    try
     {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(1);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
-    if(constY->isChecked())
-    {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(2);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
-    if(constRz->isChecked())
-    {
-        constPoint.push_back(constJointNum);
-        constPoint.push_back(3);
-        myStructure.constMat.push_back(constPoint);
-        constPoint.clear();
-    }
+        int numOneClick = 0;
 
-    drawConstraints();
-    drawJoint();
-    drawMembers();
+        std::vector<int> constPoint;
+
+        QString constJoint = addXText->text();
+
+        int constJointNum = constJoint.toInt();
+
+        if(constX->isChecked())
+        {
+            constPoint.push_back(constJointNum);
+            constPoint.push_back(1);
+            myStructure.constMat.push_back(constPoint);
+            constPoint.clear();
+
+            numOneClick++;
+        }
+        if(constY->isChecked())
+        {
+            constPoint.push_back(constJointNum);
+            constPoint.push_back(2);
+            myStructure.constMat.push_back(constPoint);
+            constPoint.clear();
+
+            numOneClick++;
+        }
+        if(constRz->isChecked())
+        {
+            constPoint.push_back(constJointNum);
+            constPoint.push_back(3);
+            myStructure.constMat.push_back(constPoint);
+            constPoint.clear();
+
+            numOneClick++;
+        }
+
+        std::string NumConst;
+        NumConst = std::to_string(numOneClick);
+        std::vector<std::string> oneLine;
+        oneLine.push_back("constraint");
+        oneLine.push_back(NumConst);
+        undoList.push_back(oneLine);
+
+        drawConstraints();
+        drawJoint();
+        drawMembers();
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("Inputs Incorrect");
+        noGood.setInformativeText("please follow example");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::pushButton_addforce()
 {
-    std::vector<double> forcePoint;
 
-    QString forceJoint = addXText->text();
-    QString forceMag = addYText->text();
-
-    double forceJointNum = forceJoint.toInt();
-    double forceDoubleMag = forceMag.toDouble();
-
-    if(constX->isChecked())
+    try
     {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(1);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
-    if(constY->isChecked())
-    {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(2);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
-    if(constRz->isChecked())
-    {
-        forcePoint.push_back(forceJointNum);
-        forcePoint.push_back(3);
-        forcePoint.push_back(forceDoubleMag);
-        myStructure.loadMat.push_back(forcePoint);
-        forcePoint.clear();
-    }
+        int numOneClick = 0;
 
-    drawConstraints();
-    drawJoint();
-    drawMembers();
-    drawForces();
+        std::vector<double> forcePoint;
+
+        QString forceJoint = addXText->text();
+        QString forceMag = addYText->text();
+
+        double forceJointNum = forceJoint.toInt();
+        double forceDoubleMag = forceMag.toDouble();
+
+        if(constX->isChecked())
+        {
+            forcePoint.push_back(forceJointNum);
+            forcePoint.push_back(1);
+            forcePoint.push_back(forceDoubleMag);
+            myStructure.loadMat.push_back(forcePoint);
+            forcePoint.clear();
+
+            numOneClick++;
+        }
+        if(constY->isChecked())
+        {
+            forcePoint.push_back(forceJointNum);
+            forcePoint.push_back(2);
+            forcePoint.push_back(forceDoubleMag);
+            myStructure.loadMat.push_back(forcePoint);
+            forcePoint.clear();
+
+            numOneClick++;
+        }
+        if(constRz->isChecked())
+        {
+            forcePoint.push_back(forceJointNum);
+            forcePoint.push_back(3);
+            forcePoint.push_back(forceDoubleMag);
+            myStructure.loadMat.push_back(forcePoint);
+            forcePoint.clear();
+
+            numOneClick++;
+        }
+
+        std::string NumForce;
+        NumForce = std::to_string(numOneClick);
+        std::vector<std::string> oneLine;
+        oneLine.push_back("force");
+        oneLine.push_back(NumForce);
+        undoList.push_back(oneLine);
+
+        drawConstraints();
+        drawJoint();
+        drawMembers();
+        drawForces();
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("Inputs Incorrect");
+        noGood.setInformativeText("please follow example");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::pushButton_setDProperties()
 {
-    myStructure.properties.clear();
+    try
+    {
+        myStructure.properties.clear();
 
-    QString Estring = addE->text();
-    QString Istring = addI->text();
-    QString Astring = addA->text();
-    QString e1string = adde1->text();
-    QString e2string = adde2->text();
+        QString Estring = addE->text();
+        QString Istring = addI->text();
+        QString Astring = addA->text();
+        QString e1string = adde1->text();
+        QString e2string = adde2->text();
 
-    myStructure.properties.push_back(Estring.toDouble());
-    myStructure.properties.push_back(Astring.toDouble());
-    myStructure.properties.push_back(Istring.toDouble());
-    myStructure.properties.push_back(e1string.toDouble());
-    myStructure.properties.push_back(e2string.toDouble());
+        myStructure.properties.push_back(Estring.toDouble());
+        myStructure.properties.push_back(Astring.toDouble());
+        myStructure.properties.push_back(Istring.toDouble());
+        myStructure.properties.push_back(e1string.toDouble());
+        myStructure.properties.push_back(e2string.toDouble());
 
-    clearToolbars();
-    solveReady();
+        clearToolbars();
+        solveReady();
+    }
+    catch(std::invalid_argument)
+    {
+        QMessageBox noGood;
+
+        noGood.setText("Inputs Incorrect");
+        noGood.setInformativeText("please follow example");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::wheelEvent(QWheelEvent *event)
@@ -1115,6 +1327,7 @@ void MainWindow::zoomOut()
 void MainWindow::readFile(std::string fileName)
 {
     // read file
+    int numTotalObj = 0;
 
     std::string line;
     std::ifstream infile (fileName);
@@ -1156,6 +1369,12 @@ void MainWindow::readFile(std::string fileName)
                             xSingleJoint.push_back(stod(tokens[1]));
 
                             myStructure.xstruct.push_back(xSingleJoint);
+
+                            std::vector<std::string> oneLine;
+                            oneLine.push_back("joint");
+                            oneLine.push_back("1");
+                            undoList.push_back(oneLine);
+                            numTotalObj++;
                     }
                 }
                 else if(sections == 2)
@@ -1169,6 +1388,12 @@ void MainWindow::readFile(std::string fileName)
                         xSingleMember.push_back(stoi(tokens[1]));
 
                         myStructure.conn.push_back(xSingleMember);
+
+                        std::vector<std::string> oneLine;
+                        oneLine.push_back("member");
+                        oneLine.push_back("1");
+                        undoList.push_back(oneLine);
+                        numTotalObj++;
                     }
                 }
                 else if(sections == 3)
@@ -1181,6 +1406,12 @@ void MainWindow::readFile(std::string fileName)
                         constSingleDOF.push_back(stoi(tokens[1]));
 
                         myStructure.constMat.push_back(constSingleDOF);
+
+                        std::vector<std::string> oneLine;
+                        oneLine.push_back("constraint");
+                        oneLine.push_back("1");
+                        undoList.push_back(oneLine);
+                        numTotalObj++;
                     }
                 }
                 else if(sections == 4)
@@ -1194,6 +1425,12 @@ void MainWindow::readFile(std::string fileName)
                         singleForce.push_back(stod(tokens[2]));
 
                         myStructure.loadMat.push_back(singleForce);
+
+                        std::vector<std::string> oneLine;
+                        oneLine.push_back("force");
+                        oneLine.push_back("1");
+                        undoList.push_back(oneLine);
+                        numTotalObj++;
                     }
                 }
                 else if(sections == 5)
@@ -1226,7 +1463,14 @@ void MainWindow::readFile(std::string fileName)
         }
     }
 
-   ui->pushButton_solve->setEnabled(true);
+    std::string NumObj;
+    NumObj = std::to_string(numTotalObj);
+    std::vector<std::string> oneLine;
+    oneLine.push_back("file");
+    oneLine.push_back(NumObj);
+    undoList.push_back(oneLine);
+
+    ui->pushButton_solve->setEnabled(true);
 }
 
 void MainWindow::clearToolbars()
@@ -1265,3 +1509,103 @@ void MainWindow::solveReady()
     if(myStructure.checkReady()==true)
         ui->pushButton_solve->setEnabled(true);
 }
+
+void MainWindow::on_actionUndo_triggered()
+{
+    if(!undoList.empty())
+    {
+        std::vector<std::string> lastAction;
+        std::string stringNumberOfThings;
+        std::string stringTheThing;
+
+        lastAction = undoList.back();
+
+        stringTheThing = lastAction[0];
+        stringNumberOfThings = lastAction[1];
+
+        int intNumberOfThings = stoi(stringNumberOfThings);
+
+        if(stringTheThing=="file")
+        {
+            clearFile(intNumberOfThings);
+        }
+        else
+        {
+            for(int i = 0; i < intNumberOfThings; i++)
+            {
+                if(stringTheThing=="joint")
+                    clearJoint();
+                else if(stringTheThing=="member")
+                    clearMember();
+                else if(stringTheThing=="constraint")
+                    clearConstraint();
+                else if(stringTheThing=="force")
+                    clearForce();
+            }
+
+            undoList.pop_back();
+        }
+
+        clearDraw();
+    }
+}
+
+void MainWindow::clearJoint()
+{
+    myStructure.xstruct.pop_back();
+}
+
+void MainWindow::clearMember()
+{
+    myStructure.conn.pop_back();
+}
+
+void MainWindow::clearConstraint()
+{
+    myStructure.constMat.pop_back();
+}
+
+void MainWindow::clearForce()
+{
+    myStructure.loadMat.pop_back();
+}
+
+void MainWindow::clearFile(int num)
+{
+    undoList.pop_back();
+
+    std::vector<std::string> lastAction;
+    std::string stringTheThing;
+
+    for(int i = 0; i < num; i++)
+    {
+        lastAction = undoList.back();
+        stringTheThing = lastAction[0];
+
+        if(stringTheThing=="joint")
+            clearJoint();
+        else if(stringTheThing=="member")
+            clearMember();
+        else if(stringTheThing=="constraint")
+            clearConstraint();
+        else if(stringTheThing=="force")
+            clearForce();
+
+        undoList.pop_back();
+    }
+}
+
+void MainWindow::clearDraw()
+{
+    scene->clear();
+
+    drawJoint();
+    drawMembers();
+    drawConstraints();
+    drawForces();
+
+    if(displace==true)
+        drawDStructure();
+}
+
+
