@@ -18,11 +18,10 @@
 #include <QMessageBox>
 
 // to DO //////////////
-// error checking
 // user select joints
 // zoom and pan
 // stop leaking memory
-// draw order
+// if already exists
 // ////////////////////
 
 // global variables
@@ -60,10 +59,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-//    std::string fileName = fileNameQ.toStdString();
+    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+    std::string fileName = fileNameQ.toStdString();
 
-    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
+    //std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     // check file for errors
 
@@ -73,8 +72,8 @@ void MainWindow::on_actionOpen_triggered()
 
         zoom = 1;
 
-        drawJoint();
         drawMembers();
+        drawJoint();
     }
     catch(std::invalid_argument)
     {
@@ -86,7 +85,6 @@ void MainWindow::on_actionOpen_triggered()
         noGood.setDefaultButton(QMessageBox::Ok);
         noGood.setWindowTitle("WARNING");
         noGood.exec();
-
     }
 }
 
@@ -559,12 +557,13 @@ void MainWindow::on_pushButton_Disp_released()
         {
             displace = true;
 
-            drawDStructure();
-
             if(constraint == true)
             {
                 drawConstraints();
             }
+
+            drawDStructure();
+
             if(force == true)
             {
                 drawForces();
@@ -574,14 +573,16 @@ void MainWindow::on_pushButton_Disp_released()
         {
             displace = false;
 
-            scene->clear();
-            drawJoint();
-            drawMembers();
+            scene->clear();         
 
             if(constraint == true)
             {
                 drawConstraints();
             }
+
+            drawMembers();
+            drawJoint();
+
             if(force == true)
             {
                 drawForces();
@@ -600,12 +601,11 @@ void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
         //drawStructure();
         if(displace==true)
         {
-            drawDStructure();
-
             if(constraint==true)
             {
                 drawConstraints();
             }
+            drawDStructure();
             if(force==true)
             {
                 drawForces();
@@ -625,20 +625,39 @@ void MainWindow::on_checkBox_const_toggled(bool checked)
     if(checked==true)
     {
         constraint = true;
+
+        scene->clear();
         drawConstraints();
+
+        // redraw other options if there
+        if(displace == true)
+        {
+            drawDStructure();
+        }
+        else
+        {
+           drawMembers();
+           drawJoint();
+        }
+        if(force == true)
+        {
+            drawForces();
+        }
     }
     else
     {
         constraint = false;
         scene->clear();
 
-        drawJoint();
-        drawMembers();
-
         // redraw other options if there
         if(displace == true)
         {
             drawDStructure();
+        }
+        else
+        {
+           drawMembers();
+           drawJoint();
         }
         if(force == true)
         {
@@ -660,17 +679,19 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
         force = false;
         scene->clear();
 
-        drawJoint();
-        drawMembers();
-
         // redraw other options if there
+        if(constraint == true)
+        {
+            drawConstraints();
+        }
         if(displace == true)
         {
             drawDStructure();
         }
-        if(constraint == true)
+        else
         {
-            drawConstraints();
+            drawMembers();
+            drawJoint();
         }
     }
 }
@@ -923,8 +944,13 @@ void MainWindow::drawDStructure()
     // clear gview
     scene->clear();
 
-    drawJoint();
+    if(constraint == true)
+    {
+        drawConstraints();
+    }
+
     drawMembers();
+    drawJoint();
 
     double x1;
     double y1;
@@ -1075,8 +1101,8 @@ void MainWindow::pushButton_addconstraint()
         undoList.push_back(oneLine);
 
         drawConstraints();
-        drawJoint();
         drawMembers();
+        drawJoint();
     }
     catch(std::invalid_argument)
     {
@@ -1145,8 +1171,8 @@ void MainWindow::pushButton_addforce()
         undoList.push_back(oneLine);
 
         drawConstraints();
-        drawJoint();
         drawMembers();
+        drawJoint();
         drawForces();
     }
     catch(std::invalid_argument)
@@ -1212,9 +1238,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     std::cout << "to Position: y = "<< myZoomY << std::endl;
     std::cout << "The mouse position is: x = " << myPosX << " y = " << myPosY << std::endl;
 
-    //myCenter.setX(myPosX);
-    //myCenter.setY(myPosY);
-
     // zoom depending on sign of y
     if(myZoomY < 0)
     {
@@ -1224,8 +1247,6 @@ void MainWindow::wheelEvent(QWheelEvent *event)
     {
         zoomIn();
     }
-
-    //ui->graphicsView->centerOn(myCenter);
 
     event->accept();
 }
@@ -1240,17 +1261,34 @@ void MainWindow::zoomIn()
         zoom++;
 
         // draw the shapes again
-        if(solved == true)
+        if(displace == true)
         {
-            //drawStructure();
-            drawJoint();
-            drawMembers();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
+            drawDStructure();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
         else
         {
-            //drawStructure();
-            drawJoint();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
             drawMembers();
+            drawJoint();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
     }
     else if(zoom < 1)
@@ -1261,17 +1299,34 @@ void MainWindow::zoomIn()
         zoom = zoom + 0.1;
 
         // draw the shapes again
-        if(solved == true)
+        if(displace == true)
         {
-            //drawStructure();
-            drawJoint();
-            drawMembers();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
+            drawDStructure();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
         else
         {
-            //drawStructure();
-            drawJoint();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
             drawMembers();
+            drawJoint();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
     }
 }
@@ -1287,17 +1342,34 @@ void MainWindow::zoomOut()
         zoom--;
 
         // draw the shapes again
-        if(solved == true)
+        if(displace == true)
         {
-            //drawStructure();
-            drawJoint();
-            drawMembers();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
+            drawDStructure();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
         else
         {
-            //drawStructure();
-            drawJoint();
+            if(constraint == true)
+            {
+                drawConstraints();
+            }
+
             drawMembers();
+            drawJoint();
+
+            if(force == true)
+            {
+                drawForces();
+            }
         }
     }
     else if(zoom <= 1)
@@ -1310,15 +1382,34 @@ void MainWindow::zoomOut()
             zoom = zoom - 0.1;
 
             // draw the shapes again
-            if(solved == true)
+            if(displace == true)
             {
+                if(constraint == true)
+                {
+                    drawConstraints();
+                }
 
+                drawDStructure();
+
+                if(force == true)
+                {
+                    drawForces();
+                }
             }
             else
             {
-                //drawStructure();
-                drawJoint();
+                if(constraint == true)
+                {
+                    drawConstraints();
+                }
+
                 drawMembers();
+                drawJoint();
+
+                if(force == true)
+                {
+                    drawForces();
+                }
             }
         }
     }
@@ -1534,14 +1625,27 @@ void MainWindow::on_actionUndo_triggered()
             for(int i = 0; i < intNumberOfThings; i++)
             {
                 if(stringTheThing=="joint")
+                {
                     clearJoint();
+                }
                 else if(stringTheThing=="member")
+                {
                     clearMember();
+                }
                 else if(stringTheThing=="constraint")
+                {
                     clearConstraint();
+                }
                 else if(stringTheThing=="force")
+                {
                     clearForce();
+                }
             }
+
+            std::vector<std::string> row;
+            row.push_back(stringTheThing);
+            row.push_back(stringNumberOfThings);
+            redoList.push_back(row);
 
             undoList.pop_back();
         }
@@ -1552,21 +1656,25 @@ void MainWindow::on_actionUndo_triggered()
 
 void MainWindow::clearJoint()
 {
+    undidXStruct.push_back(myStructure.xstruct.back());
     myStructure.xstruct.pop_back();
 }
 
 void MainWindow::clearMember()
 {
+    undidConn.push_back(myStructure.conn.back());
     myStructure.conn.pop_back();
 }
 
 void MainWindow::clearConstraint()
 {
+    undidConst.push_back(myStructure.constMat.back());
     myStructure.constMat.pop_back();
 }
 
 void MainWindow::clearForce()
 {
+    undidLoad.push_back(myStructure.loadMat.back());
     myStructure.loadMat.pop_back();
 }
 
@@ -1599,13 +1707,89 @@ void MainWindow::clearDraw()
 {
     scene->clear();
 
-    drawJoint();
+    if(constraint == true)
+    {
+        drawConstraints();
+    }
+
     drawMembers();
-    drawConstraints();
-    drawForces();
+    drawJoint();
+
+    if(force == true)
+    {
+        drawForces();
+    }
 
     if(displace==true)
         drawDStructure();
 }
 
+void MainWindow::on_actionRedo_triggered()
+{
+    if(!redoList.empty())
+    {
+        std::vector<std::string> lastUndidAction;
+        std::string stringNumberOfThings;
+        std::string stringTheThing;
 
+        lastUndidAction = redoList.back();
+
+        stringTheThing = lastUndidAction[0];
+        stringNumberOfThings = lastUndidAction[1];
+
+        int intNumberOfThings = stoi(stringNumberOfThings);
+
+        for(int i = 0; i < intNumberOfThings; i++)
+        {
+            if(stringTheThing=="joint")
+            {
+                redoJoint();
+            }
+            else if(stringTheThing=="member")
+            {
+                redoMember();
+            }
+            else if(stringTheThing=="constraint")
+            {
+                redoConstraint();
+            }
+            else if(stringTheThing=="force")
+            {
+                redoForce();
+            }
+        }
+
+        std::vector<std::string> row;
+        row.push_back(stringTheThing);
+        row.push_back(stringNumberOfThings);
+        undoList.push_back(row);
+
+        redoList.pop_back();
+    }
+
+    clearDraw();
+}
+
+void MainWindow::redoJoint()
+{
+    myStructure.xstruct.push_back(undidXStruct.back());
+    undidXStruct.pop_back();
+}
+
+void MainWindow::redoMember()
+{
+    myStructure.conn.push_back(undidConn.back());
+    undidConn.pop_back();
+}
+
+void MainWindow::redoConstraint()
+{
+    myStructure.constMat.push_back(undidConst.back());
+    undidConst.pop_back();
+}
+
+void MainWindow::redoForce()
+{
+    myStructure.loadMat.push_back(undidLoad.back());
+    undidLoad.pop_back();
+}

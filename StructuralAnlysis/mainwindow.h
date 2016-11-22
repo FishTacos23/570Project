@@ -80,6 +80,12 @@ private slots:
     void clearFile(int num);
     void clearDraw();
 
+    // redo things
+    void on_actionRedo_triggered();
+    void redoJoint();
+    void redoMember();
+    void redoConstraint();
+    void redoForce();
 
 private:
     Ui::MainWindow *ui;
@@ -107,6 +113,10 @@ private:
     // undo and redo
     std::vector<std::vector<std::string>> undoList;
     std::vector<std::vector<std::string>> redoList;
+    std::vector<std::vector<double>> undidXStruct;
+    std::vector<std::vector<int>> undidConn;
+    std::vector<std::vector<double>> undidLoad;
+    std::vector<std::vector<int>> undidConst;
 
     double xmax;
     double xmin;
