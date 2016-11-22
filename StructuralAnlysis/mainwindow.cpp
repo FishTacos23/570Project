@@ -21,7 +21,10 @@
 // user select joints
 // zoom and pan
 // stop leaking memory
+// property numbers
 // if already exists
+// when you go back to a previous section it no longer shows the toolbar
+// move text for positive y and rz text right
 // ////////////////////
 
 // global variables
@@ -61,8 +64,6 @@ void MainWindow::on_actionOpen_triggered()
     // get file name
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
-
-    //std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     // check file for errors
 
@@ -158,56 +159,40 @@ void MainWindow::on_actionJoints_triggered()
 
     jToolBarActive = true;
 
-    // create toolbar
-    jointToolBar = new QToolBar("Place Joints  ");
-    QWidget *jointWidgX = new QWidget;
-    QWidget *jointWidgY = new QWidget;
-
-    // add labels
-    QLabel *Title = new QLabel;
-    QLabel *XText = new QLabel("X:");
-    QLabel *YText = new QLabel("Y:");
-
-    // insert button and text
-    addJoint = new QPushButton("ADD");
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-
     // formatting
-    addJoint->setDefault(true);
-    Title->setTextFormat(Qt::RichText);
-    Title->setText("<b><u> Insert Joints");
-    addXText->setMaximumWidth(60);
-    addYText->setMaximumWidth(60);
-    jointToolBar->setMaximumWidth(500);
-    jointToolBar->isMovable();
+    addJoint.setText("ADD");
+    addJoint.setDefault(true);
+    Title.setTextFormat(Qt::RichText);
+    Title.setText("<b><u> Insert Joints");
+    XText.setText("X:");
+    YText.setText("Y:");
+    addXText.setMaximumWidth(60);
+    addYText.setMaximumWidth(60);
+    jointToolBar.setMaximumWidth(500);
+    jointToolBar.isMovable();
 
-    // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
-    xLay->addWidget(XText);
-    xLay->addWidget(addXText);
-
-    QHBoxLayout *yLay = new QHBoxLayout();
-    yLay->addWidget(YText);
-    yLay->addWidget(addYText);
-
-    jointWidgX->setLayout(xLay);
-    jointWidgY->setLayout(yLay);
+    // set layouts
+    xLay.addWidget(&XText);
+    xLay.addWidget(&addXText);
+    yLay.addWidget(&YText);
+    yLay.addWidget(&addYText);
+    jointWidgX.setLayout(&xLay);
+    jointWidgY.setLayout(&yLay);
 
     // add widgets to toolbar
-    jointToolBar->addWidget(Title);
-    jointToolBar->addSeparator();
-    jointToolBar->addWidget(jointWidgX);
-    jointToolBar->addSeparator();
-    jointToolBar->addWidget(jointWidgY);
-    jointToolBar->addSeparator();
-    jointToolBar->addWidget(addJoint);
+    jointToolBar.addWidget(&Title);
+    jointToolBar.addSeparator();
+    jointToolBar.addWidget(&jointWidgX);
+    jointToolBar.addSeparator();
+    jointToolBar.addWidget(&jointWidgY);
+    jointToolBar.addSeparator();
+    jointToolBar.addWidget(&addJoint);
 
     // add toolbar
-    this->addToolBar(jointToolBar);
+    this->addToolBar(&jointToolBar);
 
     // set signal and slot
-    connect(addJoint,SIGNAL(clicked()),this,SLOT(pushButton_addJoint()));
+    connect(&addJoint,SIGNAL(clicked()),this,SLOT(pushButton_addJoint()));
 }
 
 void MainWindow::on_actionMembers_triggered()
@@ -216,56 +201,40 @@ void MainWindow::on_actionMembers_triggered()
 
     mToolBarActive = true;
 
-    // create toolbar
-    memberToolBar = new QToolBar("Place Members");
-    QWidget *jointWidg1 = new QWidget;
-    QWidget *jointWidg2 = new QWidget;
-
-    // add labels
-    QLabel *Title = new QLabel;
-    QLabel *FText = new QLabel("1st:");
-    QLabel *SText = new QLabel("2nd:");
-
-    // insert button and text
-    addMember = new QPushButton("ADD");
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-
     // formatting
-    addMember->setDefault(true);
-    memberToolBar->isMovable();
-    Title->setTextFormat(Qt::RichText);
-    Title->setText("<b><u> Insert Members  ");
-    addXText->setMaximumWidth(30);
-    addYText->setMaximumWidth(30);
-    FText->setMaximumWidth(30);
-    SText->setMaximumWidth(30);
-    memberToolBar->setMaximumWidth(500);
+    addMember.setText("ADD");
+    addMember.setDefault(true);
+    memberToolBar.isMovable();
+    Title.setTextFormat(Qt::RichText);
+    Title.setText("<b><u> Insert Members  ");
+    XText.setText("1st:");
+    YText.setText("2nd:");
+    addXText.setMaximumWidth(30);
+    addYText.setMaximumWidth(30);
+    XText.setMaximumWidth(30);
+    YText.setMaximumWidth(30);
+    memberToolBar.setMaximumWidth(500);
 
     // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
-    xLay->addWidget(FText);
-    xLay->addWidget(addXText);
-
-    QHBoxLayout *yLay = new QHBoxLayout();
-    yLay->addWidget(SText);
-    yLay->addWidget(addYText);
-
-    jointWidg1->setLayout(xLay);
-    jointWidg2->setLayout(yLay);
+    xLay.addWidget(&XText);
+    xLay.addWidget(&addXText);
+    yLay.addWidget(&YText);
+    yLay.addWidget(&addYText);
+    jointWidgX.setLayout(&xLay);
+    jointWidgY.setLayout(&yLay);
 
     // add widgets to toolbar
-    memberToolBar->addWidget(Title);
-    memberToolBar->addSeparator();
-    memberToolBar->addWidget(jointWidg1);
-    memberToolBar->addWidget(jointWidg2);
-    memberToolBar->addWidget(addMember);
+    memberToolBar.addWidget(&Title);
+    memberToolBar.addSeparator();
+    memberToolBar.addWidget(&jointWidgX);
+    memberToolBar.addWidget(&jointWidgY);
+    memberToolBar.addWidget(&addMember);
 
     // add toolbar
-    this->addToolBar(memberToolBar);
+    this->addToolBar(&memberToolBar);
 
     // connect signals and slots
-    connect(addMember,SIGNAL(clicked()),this,SLOT(pushButton_addmember()));
+    connect(&addMember,SIGNAL(clicked()),this,SLOT(pushButton_addmember()));
 }
 
 void MainWindow::on_actionConstraints_triggered()
@@ -275,75 +244,52 @@ void MainWindow::on_actionConstraints_triggered()
 
     cToolBarActive = true;
 
-    // create toolbar
-    constraintToolBar = new QToolBar("Place Constraint");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *rzWidg = new QWidget;
-
-    // add labels
-    QLabel *Title = new QLabel;
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Rz:");
-
-    // insert button and Line
-    addConstraint = new QPushButton("ADD");
-    addXText = new QLineEdit;
-    constX = new QRadioButton;
-    constY = new QRadioButton;
-    constRz = new QRadioButton;
-
     // formatting
-    constraintToolBar->isMovable();
-    Title->setTextFormat(Qt::RichText);
-    Title->setText("<b><u> Set Constraints  ");
-    addXText->setMaximumWidth(30);
-    JText->setMaximumWidth(45);
-    addConstraint->setDefault(true);
-    constraintToolBar->setMaximumWidth(600);
+    addConstraint.setText("ADD");
+    constraintToolBar.isMovable();
+    Title.setTextFormat(Qt::RichText);
+    Title.setText("<b><u> Set Constraints  ");
+    addXText.setMaximumWidth(30);
+    JText.setText("Joint:");
+    XText.setText("X:");
+    YText.setText("Y:");
+    RzText.setText("Rz:");
+    JText.setMaximumWidth(45);
+    addConstraint.setDefault(true);
+    constraintToolBar.setMaximumWidth(600);
 
     // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
-    jLay->addWidget(JText);
-    jLay->addWidget(addXText);
-
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
-    fLay->addWidget(constX);
-
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
-    sLay->addWidget(constY);
-
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
-    tLay->addWidget(constRz);
-
-    jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
-    rzWidg->setLayout(tLay);
+    jLay.
+    jLay.addWidget(&JText);
+    jLay.addWidget(&addXText);
+    xLay.addWidget(&XText);
+    xLay.addWidget(&constX);
+    yLay.addWidget(&YText);
+    yLay.addWidget(&constY);
+    zLay.addWidget(&RzText);
+    zLay.addWidget(&constRz);
+    jointWidgJ.setLayout(&jLay);
+    jointWidgX.setLayout(&xLay);
+    jointWidgY.setLayout(&yLay);
+    jointWidgRz.setLayout(&zLay);
 
     // add widgets to tool bar
-    constraintToolBar->addWidget(Title);
-    constraintToolBar->addSeparator();
-    constraintToolBar->addWidget(jointWidg);
-    constraintToolBar->addWidget(xWidg);
-    constraintToolBar->addWidget(yWidg);
-    constraintToolBar->addWidget(rzWidg);
-    constraintToolBar->addWidget(addConstraint);
+    constraintToolBar.addWidget(&Title);
+    constraintToolBar.addSeparator();
+    constraintToolBar.addWidget(&jointWidgJ);
+    constraintToolBar.addWidget(&jointWidgX);
+    constraintToolBar.addWidget(&jointWidgY);
+    constraintToolBar.addWidget(&jointWidgRz);
+    constraintToolBar.addWidget(&addConstraint);
 
     // toggle constraints
     ui->checkBox_const->setChecked(true);
 
     // add toolbar
-    this->addToolBar(constraintToolBar);
+    this->addToolBar(&constraintToolBar);
 
     // connect signals and slot
-    connect(addConstraint,SIGNAL(clicked()),this,SLOT(pushButton_addconstraint()));
+    connect(&addConstraint,SIGNAL(clicked()),this,SLOT(pushButton_addconstraint()));
 }
 
 void MainWindow::on_actionForces_triggered()
@@ -352,86 +298,58 @@ void MainWindow::on_actionForces_triggered()
 
     fToolBarActive = true;
 
-    // create toolbar
-    forceToolBar = new QToolBar("Place Force");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *momWidg = new QWidget;
-    QWidget *magWidg = new QWidget;
-
-    // add labels
-    QLabel *Title = new QLabel;
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *MText = new QLabel("Magnitude:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Rz:");
-
-    // insert button and lines
-    addForce = new QPushButton("ADD");
-    addXText = new QLineEdit;
-    addYText = new QLineEdit;
-    constX = new QRadioButton;
-    constY = new QRadioButton;
-    constRz = new QRadioButton;
-
     // formatting
-    Title->setTextFormat(Qt::RichText);
-    Title->setText("<b><u> Place Forces  ");
-    forceToolBar->isMovable();
-    addXText->setMaximumWidth(30);
-    addYText->setMaximumWidth(60);
-    JText->setMaximumWidth(40);
-    MText->setMaximumWidth(80);
-    addForce->setDefault(true);
-    forceToolBar->setMaximumWidth(800);
+    addForce.setText("ADD");
+    Title.setTextFormat(Qt::RichText);
+    Title.setText("<b><u> Place Forces  ");
+    JText.setText("Joint:");
+    MText.setText("Magnitude:");
+    XText.setText("X:");
+    YText.setText("Y:");
+    RzText.setText("Rz:");
+    forceToolBar.isMovable();
+    addXText.setMaximumWidth(30);
+    addYText.setMaximumWidth(60);
+    JText.setMaximumWidth(40);
+    MText.setMaximumWidth(80);
+    addForce.setDefault(true);
+    forceToolBar.setMaximumWidth(800);
 
-       // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
-    jLay->addWidget(JText);
-    jLay->addWidget(addXText);
-
-    QHBoxLayout *mLay = new QHBoxLayout();
-    mLay->addWidget(MText);
-    mLay->addWidget(addYText);
-
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
-    fLay->addWidget(constX);
-
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
-    sLay->addWidget(constY);
-
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
-    tLay->addWidget(constRz);
-
-    jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
-    momWidg->setLayout(tLay);
-    magWidg->setLayout(mLay);
+    // add layouts
+    jLay.addWidget(&JText);
+    jLay.addWidget(&addXText);
+    mLay.addWidget(&MText);
+    mLay.addWidget(&addYText);
+    xLay.addWidget(&XText);
+    xLay.addWidget(&constX);
+    yLay.addWidget(&YText);
+    yLay.addWidget(&constY);
+    zLay.addWidget(&MText);
+    zLay.addWidget(&constRz);
+    jointWidgJ.setLayout(&jLay);
+    jointWidgMag.setLayout(&mLay);
+    jointWidgX.setLayout(&xLay);
+    jointWidgY.setLayout(&yLay);
+    jointWidgRz.setLayout(&zLay);
 
     // add widgets to tool bar
-    forceToolBar->addWidget(Title);
-    forceToolBar->addSeparator();
-    forceToolBar->addWidget(jointWidg);
-    forceToolBar->addWidget(magWidg);
-    forceToolBar->addWidget(xWidg);
-    forceToolBar->addWidget(yWidg);
-    forceToolBar->addWidget(momWidg);
-    forceToolBar->addWidget(addForce);
+    forceToolBar.addWidget(&Title);
+    forceToolBar.addSeparator();
+    forceToolBar.addWidget(&jointWidgJ);
+    forceToolBar.addWidget(&jointWidgMag);
+    forceToolBar.addWidget(&jointWidgX);
+    forceToolBar.addWidget(&jointWidgY);
+    forceToolBar.addWidget(&jointWidgRz);
+    forceToolBar.addWidget(&addForce);
 
     // toggle forces
     ui->checkBox_Force->setChecked(true);
 
     // add tool bar
-    this->addToolBar(forceToolBar);
+    this->addToolBar(&forceToolBar);
 
     // connect signals and slot
-    connect(addForce,SIGNAL(clicked()),this,SLOT(pushButton_addforce()));
+    connect(&addForce,SIGNAL(clicked()),this,SLOT(pushButton_addforce()));
 }
 
 void MainWindow::on_actionProperties_triggered()
@@ -440,90 +358,66 @@ void MainWindow::on_actionProperties_triggered()
 
     pToolBarActive = true;
 
-    // create toolbar
-    propToolBar = new QToolBar("Set Properties");
-    QWidget *PropWidg = new QWidget;
-
-    // create buttons and labels
-    setProps = new QPushButton("SET");
-    QLabel *Title = new QLabel;
-    QLabel *EText = new QLabel("E: ");
-    QLabel *IText = new QLabel("I:  ");
-    QLabel *AText = new QLabel("A: ");
-    QLabel *e1Text = new QLabel("e1:");
-    QLabel *e2Text = new QLabel("e2:");
-
-    addE = new QLineEdit;
-    addA = new QLineEdit;
-    addI = new QLineEdit;
-    adde1 = new QLineEdit;
-    adde2 = new QLineEdit;
-
     // formatting
-    Title->setTextFormat(Qt::RichText);
-    Title->setText("<b><u> Structural Properties");
-    addE->setMaximumWidth(100);
-    addA->setMaximumWidth(100);
-    addI->setMaximumWidth(100);
-    adde1->setMaximumWidth(100);
-    adde2->setMaximumWidth(100);
-    setProps->setDefault(true);
+    setProps.setText("SET");
+    Title.setTextFormat(Qt::RichText);
+    Title.setText("<b><u> Structural Properties");
+    XText.setText("E: ");
+    YText.setText("I:  ");
+    JText.setText("A ");
+    MText.setText("e1:");
+    RzText.setText("e2:");
+
+    addE.setMaximumWidth(100);
+    addA.setMaximumWidth(100);
+    addI.setMaximumWidth(100);
+    adde1.setMaximumWidth(100);
+    adde2.setMaximumWidth(100);
+    setProps.setDefault(true);
 
     // add layouts
-    QHBoxLayout *Elay = new QHBoxLayout;
-    Elay->addSpacing(25);
-    Elay->addWidget(EText);
-    Elay->addWidget(addE);
-    Elay->addSpacing(25);
+    xLay.addSpacing(25);
+    xLay.addWidget(&XText);
+    xLay.addWidget(&addE);
+    xLay.addSpacing(25);
+    yLay.addSpacing(25);
+    yLay.addWidget(&JText);
+    yLay.addWidget(&addA);
+    yLay.addSpacing(25);
+    zLay.addSpacing(25);
+    zLay.addWidget(&YText);
+    zLay.addWidget(&addI);
+    zLay.addSpacing(25);
+    mLay.addSpacing(25);
+    mLay.addWidget(&MText);
+    mLay.addWidget(&adde1);
+    mLay.addSpacing(25);
+    jLay.addSpacing(25);
+    jLay.addWidget(&RzText);
+    jLay.addWidget(&adde2);
+    jLay.addSpacing(25);
+    pLay.addSpacing(15);
+    pLay.addWidget(&setProps);
+    pLay.addSpacing(15);
+    propLay.addWidget(&Title);
+    propLay.addSpacing(3);
+    propLay.addLayout(&xLay);
+    propLay.addLayout(&yLay);
+    propLay.addLayout(&zLay);
+    propLay.addLayout(&mLay);
+    propLay.addLayout(&jLay);
+    propLay.addLayout(&pLay);
 
-    QHBoxLayout *Alay = new QHBoxLayout;
-    Alay->addSpacing(25);
-    Alay->addWidget(AText);
-    Alay->addWidget(addA);
-    Alay->addSpacing(25);
-
-    QHBoxLayout *Ilay = new QHBoxLayout;
-    Ilay->addSpacing(25);
-    Ilay->addWidget(IText);
-    Ilay->addWidget(addI);
-    Ilay->addSpacing(25);
-
-    QHBoxLayout *e1lay = new QHBoxLayout;
-    e1lay->addSpacing(25);
-    e1lay->addWidget(e1Text);
-    e1lay->addWidget(adde1);
-    e1lay->addSpacing(25);
-
-    QHBoxLayout *e2lay  = new QHBoxLayout;
-    e2lay->addSpacing(25);
-    e2lay->addWidget(e2Text);
-    e2lay->addWidget(adde2);
-    e2lay->addSpacing(25);
-
-    QHBoxLayout *button = new QHBoxLayout;
-    button->addSpacing(15);
-    button->addWidget(setProps);
-    button->addSpacing(15);
-
-    QVBoxLayout *allProps = new QVBoxLayout;
-    allProps->addWidget(Title);
-    allProps->addSpacing(3);
-    allProps->addLayout(Elay);
-    allProps->addLayout(Alay);
-    allProps->addLayout(Ilay);
-    allProps->addLayout(e1lay);
-    allProps->addLayout(e2lay);
-    allProps->addLayout(button);
-    PropWidg->setLayout(allProps);
+    propWidg.setLayout(&propLay);
 
     // add widgets to toolbar
-    propToolBar->addWidget(PropWidg);
+    propToolBar.addWidget(&propWidg);
 
     // add toolbar
-    this->addToolBar(Qt::LeftToolBarArea,propToolBar);
+    this->addToolBar(Qt::LeftToolBarArea,&propToolBar);
 
     // add signals and slots
-    connect(setProps,SIGNAL(clicked()),this,SLOT(pushButton_setDProperties()));
+    connect(&setProps,SIGNAL(clicked()),this,SLOT(pushButton_setDProperties()));
 }
 
 void MainWindow::on_pushButton_solve_released()
@@ -982,8 +876,8 @@ void MainWindow::pushButton_addJoint()
     {
         std::vector<double> jPoints;
 
-        QString myX = addXText->text();
-        QString myY = addYText->text();
+        QString myX = addXText.text();
+        QString myY = addYText.text();
 
         double x = myX.toDouble();
         double y = myY.toDouble();
@@ -1019,8 +913,8 @@ void MainWindow::pushButton_addmember()
     {
         std::vector<int> mPoints;
 
-       QString myOne = addXText->text();
-       QString myTwo = addYText->text();
+       QString myOne = addXText.text();
+       QString myTwo = addYText.text();
 
        int One = myOne.toInt();
        int Two = myTwo.toInt();
@@ -1061,11 +955,11 @@ void MainWindow::pushButton_addconstraint()
 
         std::vector<int> constPoint;
 
-        QString constJoint = addXText->text();
+        QString constJoint = addXText.text();
 
         int constJointNum = constJoint.toInt();
 
-        if(constX->isChecked())
+        if(constX.isChecked())
         {
             constPoint.push_back(constJointNum);
             constPoint.push_back(1);
@@ -1074,7 +968,7 @@ void MainWindow::pushButton_addconstraint()
 
             numOneClick++;
         }
-        if(constY->isChecked())
+        if(constY.isChecked())
         {
             constPoint.push_back(constJointNum);
             constPoint.push_back(2);
@@ -1083,7 +977,7 @@ void MainWindow::pushButton_addconstraint()
 
             numOneClick++;
         }
-        if(constRz->isChecked())
+        if(constRz.isChecked())
         {
             constPoint.push_back(constJointNum);
             constPoint.push_back(3);
@@ -1126,13 +1020,13 @@ void MainWindow::pushButton_addforce()
 
         std::vector<double> forcePoint;
 
-        QString forceJoint = addXText->text();
-        QString forceMag = addYText->text();
+        QString forceJoint = addXText.text();
+        QString forceMag = addYText.text();
 
         double forceJointNum = forceJoint.toInt();
         double forceDoubleMag = forceMag.toDouble();
 
-        if(constX->isChecked())
+        if(constX.isChecked())
         {
             forcePoint.push_back(forceJointNum);
             forcePoint.push_back(1);
@@ -1142,7 +1036,7 @@ void MainWindow::pushButton_addforce()
 
             numOneClick++;
         }
-        if(constY->isChecked())
+        if(constY.isChecked())
         {
             forcePoint.push_back(forceJointNum);
             forcePoint.push_back(2);
@@ -1152,7 +1046,7 @@ void MainWindow::pushButton_addforce()
 
             numOneClick++;
         }
-        if(constRz->isChecked())
+        if(constRz.isChecked())
         {
             forcePoint.push_back(forceJointNum);
             forcePoint.push_back(3);
@@ -1194,11 +1088,11 @@ void MainWindow::pushButton_setDProperties()
     {
         myStructure.properties.clear();
 
-        QString Estring = addE->text();
-        QString Istring = addI->text();
-        QString Astring = addA->text();
-        QString e1string = adde1->text();
-        QString e2string = adde2->text();
+        QString Estring = addE.text();
+        QString Istring = addI.text();
+        QString Astring = addA.text();
+        QString e1string = adde1.text();
+        QString e2string = adde2.text();
 
         myStructure.properties.push_back(Estring.toDouble());
         myStructure.properties.push_back(Astring.toDouble());
@@ -1569,27 +1463,27 @@ void MainWindow::clearToolbars()
     // get rid of all tool bars
     if(jToolBarActive == true)
     {
-        this->removeToolBar(jointToolBar);
+        this->removeToolBar(&jointToolBar);
         jToolBarActive = false;
     }
     if(mToolBarActive == true)
     {
-        this->removeToolBar(memberToolBar);
+        this->removeToolBar(&memberToolBar);
         mToolBarActive = false;
     }
     if(cToolBarActive == true)
     {
-        this->removeToolBar(constraintToolBar);
+        this->removeToolBar(&constraintToolBar);
         cToolBarActive = false;
     }
     if(fToolBarActive == true)
     {
-        this->removeToolBar(forceToolBar);
+        this->removeToolBar(&forceToolBar);
         fToolBarActive = false;
     }
     if(pToolBarActive == true)
     {
-        this->removeToolBar(propToolBar);
+        this->removeToolBar(&propToolBar);
         pToolBarActive = false;
     }
 

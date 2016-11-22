@@ -13,6 +13,9 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QWindow>
+#include <QToolBar>
+#include <QLabel>
+#include <QLayout>
 
 namespace Ui {
 class MainWindow;
@@ -134,29 +137,59 @@ private:
     bool fToolBarActive;
     bool pToolBarActive;
 
-    QLineEdit *addXText;
-    QLineEdit *addYText;
-    QLineEdit *addE;
-    QLineEdit *addI;
-    QLineEdit *addA;
-    QLineEdit *adde1;
-    QLineEdit *adde2;
+    // Line Edits
+    QLineEdit addXText;
+    QLineEdit addYText;
+    QLineEdit addE;
+    QLineEdit addI;
+    QLineEdit addA;
+    QLineEdit adde1;
+    QLineEdit adde2;
 
-    QPushButton *addJoint;
-    QPushButton *addMember;
-    QPushButton *addConstraint;
-    QPushButton *addForce;
-    QPushButton *setProps;
+    // Labels
+    QLabel Title;
+    QLabel XText;
+    QLabel YText;
+    QLabel RzText;
+    QLabel JText;
+    QLabel MText;
 
-    QRadioButton *constX;
-    QRadioButton *constY;
-    QRadioButton *constRz;
+    // add buttons
+    QPushButton addJoint;
+    QPushButton addMember;
+    QPushButton addConstraint;
+    QPushButton addForce;
+    QPushButton setProps;
 
-    QToolBar *jointToolBar;
-    QToolBar *memberToolBar;
-    QToolBar *constraintToolBar;
-    QToolBar *forceToolBar;
-    QToolBar *propToolBar;
+    // force and constraint buttons
+    QRadioButton constX;
+    QRadioButton constY;
+    QRadioButton constRz;
+
+    // tool bars
+    QToolBar jointToolBar;
+    QToolBar memberToolBar;
+    QToolBar constraintToolBar;
+    QToolBar forceToolBar;
+    QToolBar propToolBar;
+
+    // widgets
+    QWidget jointWidgX;
+    QWidget jointWidgY;
+    QWidget jointWidgJ;
+    QWidget jointWidgRz;
+    QWidget jointWidgMag;
+    QWidget propWidg;
+
+    // layouts
+    QHBoxLayout yLay;
+    QHBoxLayout xLay;
+    QHBoxLayout zLay;
+    QHBoxLayout jLay;
+    QHBoxLayout mLay;
+    QHBoxLayout pLay;
+    QVBoxLayout propLay;
+
 
 };
 
