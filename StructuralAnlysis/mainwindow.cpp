@@ -16,6 +16,7 @@
 #include <QRadioButton>
 #include <QPicture>
 #include <QMessageBox>
+#include <QGraphicsTextItem>
 
 // to DO //////////////
 // user select joints
@@ -23,6 +24,11 @@
 // stop leaking memory
 // if already exists
 // list nodes
+// order of drawing
+// toggling force breaks
+// output
+// heads out on forces
+// when you click to add something else revert to needing to solve
 // ////////////////////
 
 // global variables
@@ -60,10 +66,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-    std::string fileName = fileNameQ.toStdString();
+//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+//    std::string fileName = fileNameQ.toStdString();
 
-    //std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
+    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     // check file for errors
 
@@ -161,13 +167,13 @@ void MainWindow::on_actionJoints_triggered()
 
     // create toolbar
     jointToolBar = new QToolBar("Place Joints  ");
-    QWidget *jointWidgX = new QWidget;
-    QWidget *jointWidgY = new QWidget;
+    jointWidgX = new QWidget;
+    jointWidgY = new QWidget;
 
     // add labels
-    QLabel *Title = new QLabel;
-    QLabel *XText = new QLabel("X:");
-    QLabel *YText = new QLabel("Y:");
+    Title = new QLabel;
+    XText = new QLabel("X:");
+    YText = new QLabel("Y:");
 
     // insert button and text
     addJoint = new QPushButton("ADD");
@@ -184,11 +190,11 @@ void MainWindow::on_actionJoints_triggered()
     jointToolBar->isMovable();
 
     // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
+    xLay = new QHBoxLayout();
     xLay->addWidget(XText);
     xLay->addWidget(addXText);
 
-    QHBoxLayout *yLay = new QHBoxLayout();
+    yLay = new QHBoxLayout();
     yLay->addWidget(YText);
     yLay->addWidget(addYText);
 
@@ -219,13 +225,13 @@ void MainWindow::on_actionMembers_triggered()
 
     // create toolbar
     memberToolBar = new QToolBar("Place Members");
-    QWidget *jointWidg1 = new QWidget;
-    QWidget *jointWidg2 = new QWidget;
+    jointWidg1 = new QWidget;
+    jointWidg2 = new QWidget;
 
     // add labels
-    QLabel *Title = new QLabel;
-    QLabel *FText = new QLabel("1st:");
-    QLabel *SText = new QLabel("2nd:");
+    Title = new QLabel;
+    FText = new QLabel("1st:");
+    SText = new QLabel("2nd:");
 
     // insert button and text
     addMember = new QPushButton("ADD");
@@ -244,11 +250,11 @@ void MainWindow::on_actionMembers_triggered()
     memberToolBar->setMaximumWidth(500);
 
     // add layouts
-    QHBoxLayout *xLay = new QHBoxLayout();
+    xLay = new QHBoxLayout();
     xLay->addWidget(FText);
     xLay->addWidget(addXText);
 
-    QHBoxLayout *yLay = new QHBoxLayout();
+    yLay = new QHBoxLayout();
     yLay->addWidget(SText);
     yLay->addWidget(addYText);
 
@@ -278,17 +284,17 @@ void MainWindow::on_actionConstraints_triggered()
 
     // create toolbar
     constraintToolBar = new QToolBar("Place Constraint");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *rzWidg = new QWidget;
+    jointWidg = new QWidget;
+    jointWidgX = new QWidget;
+    jointWidgY = new QWidget;
+    jointWidgZ = new QWidget;
 
     // add labels
-    QLabel *Title = new QLabel;
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Rz:");
+    Title = new QLabel;
+    JText = new QLabel("Joint:");
+    XText = new QLabel("X:");
+    YText = new QLabel("Y:");
+    ZText = new QLabel("Rz:");
 
     // insert button and Line
     addConstraint = new QPushButton("ADD");
@@ -307,34 +313,34 @@ void MainWindow::on_actionConstraints_triggered()
     constraintToolBar->setMaximumWidth(600);
 
     // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
+    jLay = new QHBoxLayout();
     jLay->addWidget(JText);
     jLay->addWidget(addXText);
 
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
+    fLay = new QHBoxLayout();
+    fLay->addWidget(XText);
     fLay->addWidget(constX);
 
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
+    sLay = new QHBoxLayout();
+    sLay->addWidget(YText);
     sLay->addWidget(constY);
 
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
+    tLay = new QHBoxLayout();
+    tLay->addWidget(ZText);
     tLay->addWidget(constRz);
 
     jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
-    rzWidg->setLayout(tLay);
+    jointWidgX->setLayout(fLay);
+    jointWidgY->setLayout(sLay);
+    jointWidgZ->setLayout(tLay);
 
     // add widgets to tool bar
     constraintToolBar->addWidget(Title);
     constraintToolBar->addSeparator();
     constraintToolBar->addWidget(jointWidg);
-    constraintToolBar->addWidget(xWidg);
-    constraintToolBar->addWidget(yWidg);
-    constraintToolBar->addWidget(rzWidg);
+    constraintToolBar->addWidget(jointWidgX);
+    constraintToolBar->addWidget(jointWidgY);
+    constraintToolBar->addWidget(jointWidgZ);
     constraintToolBar->addWidget(addConstraint);
 
     // toggle constraints
@@ -355,19 +361,19 @@ void MainWindow::on_actionForces_triggered()
 
     // create toolbar
     forceToolBar = new QToolBar("Place Force");
-    QWidget *jointWidg = new QWidget;
-    QWidget *xWidg = new QWidget;
-    QWidget *yWidg = new QWidget;
-    QWidget *momWidg = new QWidget;
-    QWidget *magWidg = new QWidget;
+    jointWidg = new QWidget;
+    jointWidgX = new QWidget;
+    jointWidgY = new QWidget;
+    momWidg = new QWidget;
+    magWidg = new QWidget;
 
     // add labels
-    QLabel *Title = new QLabel;
-    QLabel *JText = new QLabel("Joint:");
-    QLabel *MText = new QLabel("Magnitude:");
-    QLabel *FText = new QLabel("X:");
-    QLabel *SText = new QLabel("Y:");
-    QLabel *TText = new QLabel("Rz:");
+    Title = new QLabel;
+    JText = new QLabel("Joint:");
+    MText = new QLabel("Magnitude:");
+    XText = new QLabel("X:");
+    YText = new QLabel("Y:");
+    ZText = new QLabel("Rz:");
 
     // insert button and lines
     addForce = new QPushButton("ADD");
@@ -389,29 +395,29 @@ void MainWindow::on_actionForces_triggered()
     forceToolBar->setMaximumWidth(800);
 
        // add layouts
-    QHBoxLayout *jLay = new QHBoxLayout();
+    jLay = new QHBoxLayout();
     jLay->addWidget(JText);
     jLay->addWidget(addXText);
 
-    QHBoxLayout *mLay = new QHBoxLayout();
+    mLay = new QHBoxLayout();
     mLay->addWidget(MText);
     mLay->addWidget(addYText);
 
-    QHBoxLayout *fLay = new QHBoxLayout();
-    fLay->addWidget(FText);
+    fLay = new QHBoxLayout();
+    fLay->addWidget(XText);
     fLay->addWidget(constX);
 
-    QHBoxLayout *sLay = new QHBoxLayout();
-    sLay->addWidget(SText);
+    sLay = new QHBoxLayout();
+    sLay->addWidget(YText);
     sLay->addWidget(constY);
 
-    QHBoxLayout *tLay = new QHBoxLayout();
-    tLay->addWidget(TText);
+    tLay = new QHBoxLayout();
+    tLay->addWidget(ZText);
     tLay->addWidget(constRz);
 
     jointWidg->setLayout(jLay);
-    xWidg->setLayout(fLay);
-    yWidg->setLayout(sLay);
+    jointWidgX->setLayout(fLay);
+    jointWidgY->setLayout(sLay);
     momWidg->setLayout(tLay);
     magWidg->setLayout(mLay);
 
@@ -420,8 +426,8 @@ void MainWindow::on_actionForces_triggered()
     forceToolBar->addSeparator();
     forceToolBar->addWidget(jointWidg);
     forceToolBar->addWidget(magWidg);
-    forceToolBar->addWidget(xWidg);
-    forceToolBar->addWidget(yWidg);
+    forceToolBar->addWidget(jointWidgX);
+    forceToolBar->addWidget(jointWidgY);
     forceToolBar->addWidget(momWidg);
     forceToolBar->addWidget(addForce);
 
@@ -443,16 +449,16 @@ void MainWindow::on_actionProperties_triggered()
 
     // create toolbar
     propToolBar = new QToolBar("Set Properties");
-    QWidget *PropWidg = new QWidget;
+    PropWidg = new QWidget;
 
     // create buttons and labels
     setProps = new QPushButton("SET");
-    QLabel *Title = new QLabel;
-    QLabel *EText = new QLabel("E: ");
-    QLabel *IText = new QLabel("I:  ");
-    QLabel *AText = new QLabel("A: ");
-    QLabel *e1Text = new QLabel("e1:");
-    QLabel *e2Text = new QLabel("e2:");
+    Title = new QLabel;
+    EText = new QLabel("E: ");
+    IText = new QLabel("I:  ");
+    AText = new QLabel("A: ");
+    e1Text = new QLabel("e1:");
+    e2Text = new QLabel("e2:");
 
     addE = new QLineEdit;
     addA = new QLineEdit;
@@ -471,42 +477,42 @@ void MainWindow::on_actionProperties_triggered()
     setProps->setDefault(true);
 
     // add layouts
-    QHBoxLayout *Elay = new QHBoxLayout;
+    Elay = new QHBoxLayout;
     Elay->addSpacing(25);
     Elay->addWidget(EText);
     Elay->addWidget(addE);
     Elay->addSpacing(25);
 
-    QHBoxLayout *Alay = new QHBoxLayout;
+    Alay = new QHBoxLayout;
     Alay->addSpacing(25);
     Alay->addWidget(AText);
     Alay->addWidget(addA);
     Alay->addSpacing(25);
 
-    QHBoxLayout *Ilay = new QHBoxLayout;
+    Ilay = new QHBoxLayout;
     Ilay->addSpacing(25);
     Ilay->addWidget(IText);
     Ilay->addWidget(addI);
     Ilay->addSpacing(25);
 
-    QHBoxLayout *e1lay = new QHBoxLayout;
+    e1lay = new QHBoxLayout;
     e1lay->addSpacing(25);
     e1lay->addWidget(e1Text);
     e1lay->addWidget(adde1);
     e1lay->addSpacing(25);
 
-    QHBoxLayout *e2lay  = new QHBoxLayout;
+    e2lay  = new QHBoxLayout;
     e2lay->addSpacing(25);
     e2lay->addWidget(e2Text);
     e2lay->addWidget(adde2);
     e2lay->addSpacing(25);
 
-    QHBoxLayout *button = new QHBoxLayout;
+    button = new QHBoxLayout;
     button->addSpacing(15);
     button->addWidget(setProps);
     button->addSpacing(15);
 
-    QVBoxLayout *allProps = new QVBoxLayout;
+    allProps = new QVBoxLayout;
     allProps->addWidget(Title);
     allProps->addSpacing(3);
     allProps->addLayout(Elay);
@@ -665,6 +671,8 @@ void MainWindow::on_checkBox_const_toggled(bool checked)
             drawForces();
         }
     }
+
+
 }
 
 void MainWindow::on_checkBox_Force_toggled(bool checked)
@@ -832,8 +840,8 @@ void MainWindow::drawForces()
         double x1 = myStructure.xstruct[m][0];
         double y1 = -myStructure.xstruct[m][1];
 
-        myText = new QGraphicsTextItem(forceT);
-        myText->setDefaultTextColor(Qt::white);
+        QGraphicsTextItem myText(forceT);
+        myText.setDefaultTextColor(Qt::white);
 
         if(dir==1)
         {
@@ -851,8 +859,8 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1-50,y1) << QPointF(x1-30,y1+5) << QPointF(x1-30,y1-5);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText->setX(x1-80);
-                myText->setY(y1);
+                myText.setX(x1-80);
+                myText.setY(y1);
 
                 // reset negative
                 negative = false;
@@ -862,12 +870,9 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-20,y1+5) << QPointF(x1-20,y1-5);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText->setX(x1-80);
-                myText->setY(y1);
+                myText.setX(x1-80);
+                myText.setY(y1);
             }
-
-            scene->addItem(myText);
-
         }
         else if(dir==2)
         {
@@ -885,8 +890,8 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-5,y1-20) << QPointF(x1+5,y1-20);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText->setX(x1+5);
-                myText->setY(y1-50);
+                myText.setX(x1+5);
+                myText.setY(y1-50);
 
                 // reset negative
                 negative = false;
@@ -897,12 +902,9 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1-50) << QPointF(x1-5,y1-30) << QPointF(x1+5,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText->setX(x1+5);
-                myText->setY(y1-25);
+                myText.setX(x1+5);
+                myText.setY(y1-25);
             }
-
-            scene->addItem(myText);
-
         }
         else
         {
@@ -919,8 +921,8 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1+10,y1-20) << QPointF(x1-10,y1-10) << QPointF(x1-10,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
-                myText->setX(x1-25);
-                myText->setY(y1-60);
+                myText.setX(x1-25);
+                myText.setY(y1-60);
 
                 // reset negative
                 negative = false;
@@ -931,13 +933,15 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1-10,y1-20) << QPointF(x1+10,y1-10) << QPointF(x1+10,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
-                myText->setX(x1-25);
-                myText->setY(y1-60);
+                myText.setX(x1-25);
+                myText.setY(y1-60);
             }
-
-            scene->addItem(myText);
         }
+
+        scene->addItem(&myText);
     }
+
+
 }
 
 void MainWindow::drawDStructure()
@@ -1572,26 +1576,109 @@ void MainWindow::clearToolbars()
     {
         this->removeToolBar(jointToolBar);
         jToolBarActive = false;
+        delete Title;
+        delete XText;
+        delete YText;
+        delete addJoint;
+        delete addXText;
+        delete addYText;
+        delete jointWidgX;
+        delete jointWidgY;
+        delete jointToolBar;
     }
     if(mToolBarActive == true)
     {
         this->removeToolBar(memberToolBar);
         mToolBarActive = false;
+        delete Title;
+        delete FText;
+        delete SText;
+        delete addMember;
+        delete addXText;
+        delete addYText;
+        delete xLay;
+        delete yLay;
+        delete jointWidg1;
+        delete jointWidg2;
+        delete memberToolBar;
     }
     if(cToolBarActive == true)
     {
         this->removeToolBar(constraintToolBar);
         cToolBarActive = false;
+        delete Title;
+        delete JText;
+        delete XText;
+        delete YText;
+        delete ZText;
+        delete addConstraint;
+        delete addXText;
+        delete constX;
+        delete constY;
+        delete constRz;
+        delete jLay;
+        delete fLay;
+        delete sLay;
+        delete tLay;
+        delete jointWidg;
+        delete jointWidgX;
+        delete jointWidgY;
+        delete jointWidgZ;
+        delete constraintToolBar;
     }
     if(fToolBarActive == true)
     {
         this->removeToolBar(forceToolBar);
         fToolBarActive = false;
+        delete Title;
+        delete JText;
+        delete MText;
+        delete XText;
+        delete YText;
+        delete ZText;
+        delete addForce;
+        delete addXText;
+        delete addYText;
+        delete constX;
+        delete constY;
+        delete constRz;
+        delete jLay;
+        delete mLay;
+        delete fLay;
+        delete sLay;
+        delete tLay;
+        delete jointWidg;
+        delete jointWidgX;
+        delete jointWidgY;
+        delete momWidg;
+        delete magWidg;
+        delete forceToolBar;
     }
     if(pToolBarActive == true)
     {
         this->removeToolBar(propToolBar);
         pToolBarActive = false;
+        delete setProps;
+        delete Title;
+        delete EText;
+        delete IText;
+        delete AText;
+        delete e1Text;
+        delete e2Text;
+        delete addE;
+        delete addA;
+        delete addI;
+        delete adde1;
+        delete adde2;
+        delete Elay;
+        delete Alay;
+        delete Ilay;
+        delete e1lay;
+        delete e2lay;
+        delete button;
+        delete allProps;
+        delete PropWidg;
+        delete propToolBar;
     }
 
 }

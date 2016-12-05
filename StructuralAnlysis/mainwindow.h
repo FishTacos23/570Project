@@ -13,6 +13,9 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QWindow>
+#include <QLabel>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 namespace Ui {
 class MainWindow;
@@ -98,7 +101,7 @@ private:
     double dDeform;
     QGraphicsRectItem *noRot;
     QGraphicsPolygonItem *noTrans;
-    QGraphicsTextItem *myText;
+    //QGraphicsTextItem myText;
     QPolygonF noTransShape;
     QFont font;
 
@@ -134,6 +137,7 @@ private:
     bool fToolBarActive;
     bool pToolBarActive;
 
+    // Line Edits
     QLineEdit *addXText;
     QLineEdit *addYText;
     QLineEdit *addE;
@@ -142,16 +146,62 @@ private:
     QLineEdit *adde1;
     QLineEdit *adde2;
 
+    // Widgets
+    QWidget *jointWidgX;
+    QWidget *jointWidgY;
+    QWidget *jointWidgZ;
+    QWidget *jointWidg1;
+    QWidget *jointWidg2;
+    QWidget *jointWidg;
+    QWidget *momWidg;
+    QWidget *magWidg;
+    QWidget *PropWidg;
+
+    // Labels
+    QLabel *Title;
+    QLabel *JText;
+    QLabel *XText;
+    QLabel *YText;
+    QLabel *ZText;
+    QLabel *FText;
+    QLabel *MText;
+    QLabel *SText;
+    QLabel *EText;
+    QLabel *IText;
+    QLabel *AText;
+    QLabel *e1Text;
+    QLabel *e2Text;
+
+
+    // Layouts
+    QHBoxLayout *xLay;
+    QHBoxLayout *yLay;
+    QHBoxLayout *jLay;
+    QHBoxLayout *fLay;
+    QHBoxLayout *sLay;
+    QHBoxLayout *tLay;
+    QHBoxLayout *mLay;
+    QHBoxLayout *Elay;
+    QHBoxLayout *Alay;
+    QHBoxLayout *Ilay;
+    QHBoxLayout *e1lay;
+    QHBoxLayout *e2lay;
+    QHBoxLayout *button;
+    QVBoxLayout *allProps;
+
+    // Push Buttons
     QPushButton *addJoint;
     QPushButton *addMember;
     QPushButton *addConstraint;
     QPushButton *addForce;
     QPushButton *setProps;
 
+    // Radio Buttons
     QRadioButton *constX;
     QRadioButton *constY;
     QRadioButton *constRz;
 
+    // Tool Bars
     QToolBar *jointToolBar;
     QToolBar *memberToolBar;
     QToolBar *constraintToolBar;
