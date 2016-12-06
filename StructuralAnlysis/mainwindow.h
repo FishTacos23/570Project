@@ -90,6 +90,9 @@ private slots:
     void redoConstraint();
     void redoForce();
 
+    // draw joint nums
+    void drawJNums();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
@@ -100,6 +103,7 @@ private:
     double zoom;
     double dDeform;
     std::vector<QGraphicsTextItem*> myText;
+    std::vector<QGraphicsTextItem*> jText;
     QPolygonF noTransShape;
     QFont font;
 
@@ -130,6 +134,7 @@ private:
     bool cToolBarActive;
     bool fToolBarActive;
     bool pToolBarActive;
+    bool opening;
 
     // Line Edits
     QLineEdit *addXText;

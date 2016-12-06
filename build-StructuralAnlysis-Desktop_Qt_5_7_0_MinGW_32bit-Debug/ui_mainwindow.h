@@ -77,6 +77,7 @@ public:
         actionOpen->setObjectName(QStringLiteral("actionOpen"));
         actionSave_Results = new QAction(MainWindow);
         actionSave_Results->setObjectName(QStringLiteral("actionSave_Results"));
+        actionSave_Results->setEnabled(false);
         actionClear = new QAction(MainWindow);
         actionClear->setObjectName(QStringLiteral("actionClear"));
         actionJoints = new QAction(MainWindow);
@@ -235,7 +236,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 502, 21));
+        menuBar->setGeometry(QRect(0, 0, 502, 17));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuInsert = new QMenu(menuBar);

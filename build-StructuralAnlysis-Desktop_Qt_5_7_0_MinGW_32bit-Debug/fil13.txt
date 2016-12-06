@@ -1,0 +1,13 @@
+Joint 1	dX = 0.000000	dY = 0.000000
+Joint 2	dX = -0.136699	dY = -0.001642
+Joint 3	dX = 0.000000	dY = 0.000000
+Joint 4	dX = -0.145037	dY = -0.000015
+Joint 5	dX = 0.000000	dY = 0.000000
+Joint 6	dX = -0.150980	dY = 0.001657
+Joint 7	dX = -1.220979	dY = -0.001642
+Member 1	Axial 1 = 4.105827	Shear 1 = 7.577876	Moment 1 = 246.157130	Axial 2 = -4.105827	Shear 2 = -7.577876	Moment 2 = 663.187951
+Member 2	Axial 1 = 10.422124	Shear 1 = 4.105827	Moment 1 = 536.812049	Axial 2 = -10.422124	Shear 2 = -4.105827	Moment 2 = 448.586456
+Member 3	Axial 1 = 0.037103	Shear 1 = 2.992894	Moment 1 = 59.283821	Axial 2 = -0.037103	Shear 2 = -2.992894	Moment 2 = 299.863457
+Member 4	Axial 1 = 7.429230	Shear 1 = 4.142930	Moment 1 = 451.550087	Axial 2 = -7.429230	Shear 2 = -4.142930	Moment 2 = 542.753224
+Member 5	Axial 1 = -4.142930	Shear 1 = 7.429230	Moment 1 = 234.260865	Axial 2 = 4.142930	Shear 2 = -7.429230	Moment 2 = 657.246776
+Member 6	Axial 1 = -0.000000	Shear 1 = 0.000000	Moment 1 = 0.000000	Axial 2 = 0.000000	Shear 2 = -0.000000	Moment 2 = 0.000000

@@ -8,6 +8,7 @@ Analyze::Analyze()
 
 void Analyze::preprocessing()
 {
+    lenRot.clear();
 
     njoints = xstruct.size();
     ndofs = PFrame().ndofs;
@@ -33,6 +34,7 @@ void Analyze::preprocessing()
 
 void Analyze::AssembleStructStiff()
 {
+    KStruct.clear();
 
     // initialize Struct Stiff Mat
     for(int i = 0; i < nSDOF-1; i++)
@@ -45,6 +47,7 @@ void Analyze::AssembleStructStiff()
         KStruct.push_back(row);
     }
 
+    compMtoS.clear();
 
     for(int i = 0; i < nmems; i++)
     {
@@ -55,6 +58,8 @@ void Analyze::AssembleStructStiff()
         }
         compMtoS.push_back(row);
     }
+
+    kmem.clear();
 
     // loop through members
     for(int i = 0; i < nmems; i++)
@@ -135,6 +140,8 @@ void Analyze::Triangularization()
 
 void Analyze::AssembleStructForce()
 {
+    FStruct.clear();
+
     for(int i = 0; i < nSDOF-1; i++)
     {
         FStruct.push_back(0);
@@ -155,30 +162,17 @@ void Analyze::AssembleStructForce()
 
         FStruct[m] = loadMat[i][2];
     }
-
-//    // loop through members - this part will only be needed with distributed loads
-//    for(int i = 0; i < nmems; i++)
-//    {
-//        // PFrameDistr
-
-//        // PFrameForce
-
-//        // MemToStructForce
-
-//    }
 }
 
 void Analyze::BackSub()
 {
-    // MatVecMinus - only needed with suppport displacements
-
-    // MatBackSelf
     MatBackSelf();
-
 }
 
 void Analyze::postprocessing()
 {
+    dxstruct.clear();
+
     int s = SDOF.size();
 
     for(int i = 0; i < s; i++)
@@ -204,6 +198,9 @@ void Analyze::postprocessing()
             }
         }
     }
+
+    umem.clear();
+    fmem.clear();
 
     for(int i = 0; i < nmems; i++)
     {
@@ -235,6 +232,8 @@ void Analyze::postprocessing()
 
 void Analyze::StructDOF()
 {
+    SDOF.clear();
+
     int num = 1;
     int s = constMat.size();
     int m;
@@ -307,8 +306,38 @@ std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
 bool Analyze::checkReady()
 {
     bool Ready = false;
-    if(!conn.empty()&&!properties.empty()&&!constMat.empty()&&!loadMat.empty())
-        Ready = true;
+    if(!conn.empty()&&!properties.empty()&&!constMat.empty()&&!loadMat.empty()) // make nothing is empty
+    {
+        // check that all joints are connected to something
+        int k = 0;
+        for(int i = 0; i < xstruct.size(); i++)
+        {
+            bool foundI = false;
+
+            for(int m = 0; m < conn.size(); m++)
+            {
+                for(int j = 0; j < 2; j++)
+                {
+                    if(conn[m][j] == i+1)
+                    {
+                        k++;
+                        foundI = true;
+                        break;
+                    }
+
+                    if(foundI==true)
+                        break;
+                }
+
+                if(foundI==true)
+                    break;
+
+            }
+        }
+
+        if(k == xstruct.size())
+            Ready = true;
+    }
     return Ready;
 }
 
