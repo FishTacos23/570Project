@@ -91,6 +91,7 @@ private slots:
     void redoMember();
     void redoConstraint();
     void redoForce();
+    void redoFile(int num);
 
     // draw joint nums
     void drawJNums();

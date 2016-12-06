@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     cToolBarActive = false;
     fToolBarActive = false;
     pToolBarActive = false;
+    sToolBarActive = false;
 
     // set up graphics scene
     scene = new QGraphicsScene(this);
@@ -62,8 +63,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-    std::string fileName = fileNameQ.toStdString();
+//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+//    std::string fileName = fileNameQ.toStdString();
+
+    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
 
     // check file for errors
     try
@@ -1180,7 +1183,7 @@ void MainWindow::drawForces()
         // create new text item
         QGraphicsTextItem *newText = new QGraphicsTextItem;
 
-        newText->setDefaultTextColor(Qt::darkMagenta);
+        newText->setDefaultTextColor(Qt::white);
         newText->setPlainText(forceT);
 
         double x1 = myStructure.xstruct[m][0];
@@ -2222,6 +2225,16 @@ void MainWindow::clearToolbars()
         delete PropWidg;
         delete propToolBar;
     }
+    if(sToolBarActive == true)
+    {
+        this->removeToolBar(stressToolBar);
+        sToolBarActive = false;
+        delete JText;
+        delete sSelect;
+        delete jLay;
+        delete jointWidg;
+        delete stressToolBar;
+    }
 
 }
 
@@ -2315,11 +2328,13 @@ void MainWindow::clearFile(int num)
 
     std::vector<std::string> lastAction;
     std::string stringTheThing;
+    std::string stringNumberOfThings;
 
     for(int i = 0; i < num; i++)
     {
         lastAction = undoList.back();
         stringTheThing = lastAction[0];
+        stringNumberOfThings = lastAction[1];
 
         if(stringTheThing=="joint")
             clearJoint();
@@ -2330,8 +2345,17 @@ void MainWindow::clearFile(int num)
         else if(stringTheThing=="force")
             clearForce();
 
+        std::vector<std::string> row;
+        row.push_back(stringTheThing);
+        row.push_back(stringNumberOfThings);
+        redoList.push_back(row);
+
         undoList.pop_back();
     }
+    std::vector<std::string> oneLine;
+    oneLine.push_back("file");
+    oneLine.push_back(std::to_string(num));
+    redoList.push_back(oneLine);
 }
 
 void MainWindow::clearDraw()
@@ -2370,32 +2394,39 @@ void MainWindow::on_actionRedo_triggered()
 
         int intNumberOfThings = stoi(stringNumberOfThings);
 
-        for(int i = 0; i < intNumberOfThings; i++)
+        if(stringTheThing=="file")
         {
-            if(stringTheThing=="joint")
-            {
-                redoJoint();
-            }
-            else if(stringTheThing=="member")
-            {
-                redoMember();
-            }
-            else if(stringTheThing=="constraint")
-            {
-                redoConstraint();
-            }
-            else if(stringTheThing=="force")
-            {
-                redoForce();
-            }
+            redoFile(intNumberOfThings);
         }
+        else
+        {
+            for(int i = 0; i < intNumberOfThings; i++)
+            {
+                if(stringTheThing=="joint")
+                {
+                    redoJoint();
+                }
+                else if(stringTheThing=="member")
+                {
+                    redoMember();
+                }
+                else if(stringTheThing=="constraint")
+                {
+                    redoConstraint();
+                }
+                else if(stringTheThing=="force")
+                {
+                    redoForce();
+                }
+            }
 
-        std::vector<std::string> row;
-        row.push_back(stringTheThing);
-        row.push_back(stringNumberOfThings);
-        undoList.push_back(row);
+            std::vector<std::string> row;
+            row.push_back(stringTheThing);
+            row.push_back(stringNumberOfThings);
+            undoList.push_back(row);
 
-        redoList.pop_back();
+            redoList.pop_back();
+        }
     }
 
     clearDraw();
@@ -2423,6 +2454,42 @@ void MainWindow::redoForce()
 {
     myStructure.loadMat.push_back(undidLoad.back());
     undidLoad.pop_back();
+}
+
+void MainWindow::redoFile(int num)
+{
+    redoList.pop_back();
+
+    std::vector<std::string> lastAction;
+    std::string stringTheThing;
+    std::string stringNumberOfThings;
+
+    for(int i = 0; i < num; i++)
+    {
+        lastAction = redoList.back();
+        stringTheThing = lastAction[0];
+        stringNumberOfThings = lastAction[1];
+
+        if(stringTheThing=="joint")
+            redoJoint();
+        else if(stringTheThing=="member")
+            redoMember();
+        else if(stringTheThing=="constraint")
+            redoConstraint();
+        else if(stringTheThing=="force")
+            redoForce();
+
+        std::vector<std::string> row;
+        row.push_back(stringTheThing);
+        row.push_back(stringNumberOfThings);
+        undoList.push_back(row);
+
+        redoList.pop_back();
+    }
+    std::vector<std::string> oneLine;
+    oneLine.push_back("file");
+    oneLine.push_back(std::to_string(num));
+    undoList.push_back(oneLine);
 }
 
 void MainWindow::drawJNums()
