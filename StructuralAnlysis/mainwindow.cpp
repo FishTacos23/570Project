@@ -24,6 +24,8 @@
 // zoom and pan
 // stop leaking text memory
 // crashes on redrawing j numbs
+// forces disappear when click redo after a solve
+// jnumbs dissapear after click add constraint tool bar 1st time
 // ////////////////////
 
 // global variables
@@ -63,10 +65,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-//    std::string fileName = fileNameQ.toStdString();
+    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+    std::string fileName = fileNameQ.toStdString();
 
-    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
+//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
 
     // check file for errors
     try
@@ -91,6 +93,8 @@ void MainWindow::on_actionOpen_triggered()
 
         if(force==true)
             drawForces();
+
+        opening = false;
     }
     catch(std::invalid_argument)
     {
@@ -342,8 +346,6 @@ void MainWindow::on_actionMembers_triggered()
 
     // connect signals and slots
     connect(addMember,SIGNAL(clicked()),this,SLOT(pushButton_addmember()));
-
-    drawJNums();
 }
 
 void MainWindow::on_actionConstraints_triggered()
@@ -720,7 +722,9 @@ void MainWindow::on_pushButton_Stress_released()
 
     this->addToolBar(stressToolBar);
 
-    connect(sSelect,SIGNAL(changed()),this,SLOT(selectS()));
+    connect(sSelect,SIGNAL(valueChanged(int)),this,SLOT(selectS()));
+
+    selectS();
 }
 
 void MainWindow::on_checkBox_const_toggled(bool checked)
@@ -809,14 +813,15 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
 
 void MainWindow::selectS()
 {
+    scene->clear();
     rText.clear();
 
     int s = sSelect->value()-1;
 
     double length = myStructure.lenRot[s][0];
 
-    QPen sPen(Qt::magenta);
-    sPen.setWidth(3);
+    QPen sPen(Qt::white);
+    sPen.setWidth(4);
     QBrush momBrush(Qt::transparent);
     QBrush momBrush2(Qt::yellow);
     QBrush loadBrush(Qt::green);
@@ -844,7 +849,7 @@ void MainWindow::selectS()
     QString mos1 = QString::fromStdString(mo1);
     QString axs2 = QString::fromStdString(ax2);
     QString shs2 = QString::fromStdString(sh2);
-    QString mos2 = QString::fromStdString(mo1);
+    QString mos2 = QString::fromStdString(mo2);
 
     if(axs1.at(0)=='-')
     {
@@ -882,21 +887,21 @@ void MainWindow::selectS()
 
     // draw forces
     myStrucLine = scene->addLine(0,0,-50,0,loadPen);
-    myStrucLine = scene->addLine(0,0,length+50,0,loadPen);
+    myStrucLine = scene->addLine(length,0,length+50,0,loadPen);
 
     QGraphicsTextItem *newTextax1 = new QGraphicsTextItem;
     newTextax1->setDefaultTextColor(Qt::darkMagenta);
     newTextax1->setPlainText(axs1);
     newTextax1->setX(-80);
-    newTextax1->setY(0);
+    newTextax1->setY(5);
 
     rText.push_back(newTextax1);
 
     QGraphicsTextItem *newTextax2 = new QGraphicsTextItem;
     newTextax2->setDefaultTextColor(Qt::darkMagenta);
     newTextax2->setPlainText(axs2);
-    newTextax2->setX(length+60);
-    newTextax2->setY(0);
+    newTextax2->setX(length+40);
+    newTextax2->setY(5);
 
     rText.push_back(newTextax2);
 
@@ -952,7 +957,7 @@ void MainWindow::selectS()
     else
     {
         newTextsh1->setX(-10);
-        newTextsh1->setY(-50);
+        newTextsh1->setY(-70);
         myStrucLine = scene->addLine(0,0,0,-50,loadPen);
 
         noDrawnTransShape << QPointF(0,-50) << QPointF(5,-30) << QPointF(-5,-30);
@@ -965,7 +970,7 @@ void MainWindow::selectS()
 
     if(negativeSh2)
     {
-        newTextsh2->setX(length+10);
+        newTextsh2->setX(length);
         newTextsh2->setY(50);
         myStrucLine = scene->addLine(length,0,length,50,loadPen);
 
@@ -1001,20 +1006,20 @@ void MainWindow::selectS()
     // moments
     if(negativeMo1)
     {
-        newTextmo1->setX(25);
-        newTextmo1->setY(-60);
+        newTextmo1->setX(20);
+        newTextmo1->setY(-30);
 
-        noDrawnTransShape << QPointF(10,-20) << QPointF(-10,-10) << QPointF(-10,-20);
+        noDrawnTransShape << QPointF(10,-20) << QPointF(-10,-15) << QPointF(-10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
         noDrawnTransShape.clear();
     }
     else
     {
-        newTextmo1->setX(length-25);
-        newTextmo1->setY(-60);
+        newTextmo1->setX(20);
+        newTextmo1->setY(-30);
 
-        noDrawnTransShape << QPointF(-10,-20) << QPointF(10,-10) << QPointF(10,-20);
+        noDrawnTransShape << QPointF(-10,-20) << QPointF(10,-15) << QPointF(10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
         noDrawnTransShape.clear();
@@ -1024,20 +1029,20 @@ void MainWindow::selectS()
 
     if(negativeMo2)
     {
-        newTextmo2->setX(length-25);
-        newTextmo2->setY(-60);
+        newTextmo2->setX(length+20);
+        newTextmo2->setY(-30);
 
-        noDrawnTransShape << QPointF(length+10,-20) << QPointF(length-10,-10) << QPointF(length-10,-20);
+        noDrawnTransShape << QPointF(length+10,-20) << QPointF(length-10,-15) << QPointF(length-10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
         noDrawnTransShape.clear();
     }
     else
     {
-        newTextmo1->setX(length+25);
-        newTextmo1->setY(-60);
+        newTextmo2->setX(length+20);
+        newTextmo2->setY(-30);
 
-        noDrawnTransShape << QPointF(length-10,-20) << QPointF(length+10,-10) << QPointF(length+10,-20);
+        noDrawnTransShape << QPointF(length-10,-20) << QPointF(length+10,-15) << QPointF(length+10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
         noDrawnTransShape.clear();
@@ -1183,7 +1188,7 @@ void MainWindow::drawForces()
         // create new text item
         QGraphicsTextItem *newText = new QGraphicsTextItem;
 
-        newText->setDefaultTextColor(Qt::white);
+        newText->setDefaultTextColor(Qt::gray);
         newText->setPlainText(forceT);
 
         double x1 = myStructure.xstruct[m][0];
@@ -1359,13 +1364,13 @@ void MainWindow::pushButton_addJoint()
 
             scene->clear();
 
-            QString jointNumb = QString::fromStdString(std::to_string(myStructure.xstruct.size()));
+//            QString jointNumb = QString::fromStdString(std::to_string(myStructure.xstruct.size()));
 
-            QGraphicsTextItem *newText = new QGraphicsTextItem;
-            newText->setDefaultTextColor(Qt::white);
-            newText->setPos(x,-y);
-            newText->setPlainText(jointNumb);
-            jText.push_back(newText);
+//            QGraphicsTextItem *newText = new QGraphicsTextItem;
+//            newText->setDefaultTextColor(Qt::white);
+//            newText->setPos(x,-y);
+//            newText->setPlainText(jointNumb);
+//            jText.push_back(newText);
 
             if(constraint==true)
                 drawConstraints();
@@ -1373,6 +1378,8 @@ void MainWindow::pushButton_addJoint()
             drawJoint();
             if(force==true)
                 drawForces();
+
+            drawJNums();
 
             solveReady();
 
@@ -1406,44 +1413,61 @@ void MainWindow::pushButton_addmember()
        int One = myOne.toInt();
        int Two = myTwo.toInt();
 
-       // make sure points aren't already there
-       for(int i = 0; i < myStructure.conn.size(); i++)
+       // make sure they are points that exits
+       if(One <= myStructure.xstruct.size() && Two <= myStructure.xstruct.size())
        {
-           if(One==myStructure.conn[i][0] && Two==myStructure.conn[i][1])
-               repeat = true;
+           // make sure members aren't already there
+           for(int i = 0; i < myStructure.conn.size(); i++)
+           {
+               if(One==myStructure.conn[i][0] && Two==myStructure.conn[i][1])
+                   repeat = true;
+           }
+
+           if(repeat == false)
+           {
+               mPoints.push_back(One);
+               mPoints.push_back(Two);
+
+               myStructure.conn.push_back(mPoints);
+
+               std::vector<std::string> oneLine;
+               oneLine.push_back("member");
+               oneLine.push_back("1");
+               undoList.push_back(oneLine);
+
+               // set buttons back
+               ui->pushButton_Disp->setEnabled(false);
+               ui->pushButton_Stress->setEnabled(false);
+
+               solved = false;
+               displace = false;
+
+               scene->clear();
+
+               if(constraint==true)
+                   drawConstraints();
+               drawMembers();
+               drawJoint();
+               if(force==true)
+                   drawForces();
+
+               drawJNums();
+
+               redoList.clear();
+
+               solveReady();
+           }
        }
-
-       if(repeat == false)
+       else
        {
-           mPoints.push_back(One);
-           mPoints.push_back(Two);
+           QMessageBox noGood;
 
-           myStructure.conn.push_back(mPoints);
-
-           std::vector<std::string> oneLine;
-           oneLine.push_back("member");
-           oneLine.push_back("1");
-           undoList.push_back(oneLine);
-
-           // set buttons back
-           ui->pushButton_Disp->setEnabled(false);
-           ui->pushButton_Stress->setEnabled(false);
-
-           solved = false;
-           displace = false;
-
-           scene->clear();
-
-           if(constraint==true)
-               drawConstraints();
-           drawMembers();
-           drawJoint();
-           if(force==true)
-               drawForces();
-
-           redoList.clear();
-
-           solveReady();
+           noGood.setText("Inputs Incorrect");
+           noGood.setInformativeText("please select existing joint");
+           noGood.setStandardButtons(QMessageBox::Ok);
+           noGood.setDefaultButton(QMessageBox::Ok);
+           noGood.setWindowTitle("WARNING");
+           noGood.exec();
        }
     }
     catch(std::invalid_argument)
@@ -2494,6 +2518,21 @@ void MainWindow::redoFile(int num)
 
 void MainWindow::drawJNums()
 {
+    // clear old jTexts
+    jText.clear();
+
+    // repop list
+    for(int i = 0; i < myStructure.xstruct.size(); i++)
+    {
+        QString jointNumb = QString::fromStdString(std::to_string(i+1));
+
+        QGraphicsTextItem *newText = new QGraphicsTextItem;
+        newText->setDefaultTextColor(Qt::cyan);
+        newText->setPos(myStructure.xstruct[i][0],-myStructure.xstruct[i][1]);
+        newText->setPlainText(jointNumb);
+        jText.push_back(newText);
+    }
+
     // draw joint numbers
     for(int i = 0; i < jText.size(); i++)
         scene->addItem(jText[i]);
