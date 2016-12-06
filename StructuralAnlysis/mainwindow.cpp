@@ -1053,6 +1053,96 @@ void MainWindow::selectS()
     for(int i = 0; i < rText.size(); i++)
         scene->addItem(rText[i]);
 
+    drawMemMap();
+
+}
+
+void MainWindow::drawMemMap()
+{
+    // loop through all members
+    QPen noSelectPen(Qt::gray);
+    QPen SelectPen(Qt::red);
+
+    noSelectPen.setWidth(2);
+    SelectPen.setWidth(3);
+
+    int s = sSelect->value();
+    double xMax = 0;
+    double yMin = 0;
+    double x;
+    double y;
+
+    // find max x and min y
+    for(int i = 0; i < myStructure.xstruct.size(); i++)
+    {
+        x = myStructure.xstruct[i][0];
+        y = myStructure.xstruct[i][1];
+
+        if(i==0)
+        {
+            xMax = x;
+            yMin = y;
+        }
+        else
+        {
+            if(x>xMax)
+                xMax=x;
+            if(y<yMin)
+                yMin = y;
+        }
+    }
+
+    int J1;
+    int J2;
+    double x1;
+    double x2;
+    double y1;
+    double y2;
+    double midx;
+    double midy;
+    double tempy1;
+    double tempy2;
+    double tempx1;
+    double tempx2;
+    double scale = 3;
+
+    // draw members
+    for(int i = 0; i < myStructure.conn.size(); i++)
+    {
+        J1 = myStructure.conn[i][0]-1;
+        J2 = myStructure.conn[i][1]-1;
+
+        x1 = myStructure.xstruct[J1][0];
+        y1 = myStructure.xstruct[J1][1];
+        x2 = myStructure.xstruct[J2][0];
+        y2 = myStructure.xstruct[J2][1];
+
+        // scale values
+            // first translate center to origin
+        midx = (x1 + x2)/2;
+        tempx1 = x1 - midx;
+        tempx2 = x2 - midx;
+        midy = (y1 + y2)/2;
+        tempy1 = y1 - midx;
+        tempy2 = y2 - midx;
+
+            // scale
+        tempx1 /= scale;
+        tempx2 /= scale;
+        tempy1 /= scale;
+        tempy2 /= scale;
+
+            // move
+        tempx1 -= xMax-midx;
+        tempx2 -= xMax-midx;
+        tempy1 += yMin-midy;
+        tempy2 += yMin-midy;
+
+        if(s==i+1)
+            scene->addLine(tempx1,tempy1,tempx2,tempy2,SelectPen);
+        else
+            scene->addLine(tempx1,tempy1,tempx2,tempy2,noSelectPen);
+    }
 }
 
 void MainWindow::drawJoint()

@@ -51,6 +51,7 @@ private slots:
     void on_checkBox_const_toggled(bool checked);
     void on_checkBox_Force_toggled(bool checked);
     void selectS();
+    void drawMemMap();
 
     // draw structure
     void drawJoint();

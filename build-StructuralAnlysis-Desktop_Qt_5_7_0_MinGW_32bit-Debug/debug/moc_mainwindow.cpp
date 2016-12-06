@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_MainWindow_t {
-    QByteArrayData data[54];
-    char stringdata0[902];
+    QByteArrayData data[55];
+    char stringdata0[913];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -48,41 +48,42 @@ QT_MOC_LITERAL(15, 371, 25), // "on_checkBox_const_toggled"
 QT_MOC_LITERAL(16, 397, 7), // "checked"
 QT_MOC_LITERAL(17, 405, 25), // "on_checkBox_Force_toggled"
 QT_MOC_LITERAL(18, 431, 7), // "selectS"
-QT_MOC_LITERAL(19, 439, 9), // "drawJoint"
-QT_MOC_LITERAL(20, 449, 11), // "drawMembers"
-QT_MOC_LITERAL(21, 461, 15), // "drawConstraints"
-QT_MOC_LITERAL(22, 477, 10), // "drawForces"
-QT_MOC_LITERAL(23, 488, 14), // "drawDStructure"
-QT_MOC_LITERAL(24, 503, 19), // "pushButton_addJoint"
-QT_MOC_LITERAL(25, 523, 20), // "pushButton_addmember"
-QT_MOC_LITERAL(26, 544, 24), // "pushButton_addconstraint"
-QT_MOC_LITERAL(27, 569, 19), // "pushButton_addforce"
-QT_MOC_LITERAL(28, 589, 25), // "pushButton_setDProperties"
-QT_MOC_LITERAL(29, 615, 10), // "wheelEvent"
-QT_MOC_LITERAL(30, 626, 12), // "QWheelEvent*"
-QT_MOC_LITERAL(31, 639, 5), // "event"
-QT_MOC_LITERAL(32, 645, 6), // "zoomIn"
-QT_MOC_LITERAL(33, 652, 7), // "zoomOut"
-QT_MOC_LITERAL(34, 660, 8), // "readFile"
-QT_MOC_LITERAL(35, 669, 11), // "std::string"
-QT_MOC_LITERAL(36, 681, 8), // "fileName"
-QT_MOC_LITERAL(37, 690, 13), // "clearToolbars"
-QT_MOC_LITERAL(38, 704, 10), // "solveReady"
-QT_MOC_LITERAL(39, 715, 23), // "on_actionUndo_triggered"
-QT_MOC_LITERAL(40, 739, 10), // "clearJoint"
-QT_MOC_LITERAL(41, 750, 11), // "clearMember"
-QT_MOC_LITERAL(42, 762, 15), // "clearConstraint"
-QT_MOC_LITERAL(43, 778, 10), // "clearForce"
-QT_MOC_LITERAL(44, 789, 9), // "clearFile"
-QT_MOC_LITERAL(45, 799, 3), // "num"
-QT_MOC_LITERAL(46, 803, 9), // "clearDraw"
-QT_MOC_LITERAL(47, 813, 23), // "on_actionRedo_triggered"
-QT_MOC_LITERAL(48, 837, 9), // "redoJoint"
-QT_MOC_LITERAL(49, 847, 10), // "redoMember"
-QT_MOC_LITERAL(50, 858, 14), // "redoConstraint"
-QT_MOC_LITERAL(51, 873, 9), // "redoForce"
-QT_MOC_LITERAL(52, 883, 8), // "redoFile"
-QT_MOC_LITERAL(53, 892, 9) // "drawJNums"
+QT_MOC_LITERAL(19, 439, 10), // "drawMemMap"
+QT_MOC_LITERAL(20, 450, 9), // "drawJoint"
+QT_MOC_LITERAL(21, 460, 11), // "drawMembers"
+QT_MOC_LITERAL(22, 472, 15), // "drawConstraints"
+QT_MOC_LITERAL(23, 488, 10), // "drawForces"
+QT_MOC_LITERAL(24, 499, 14), // "drawDStructure"
+QT_MOC_LITERAL(25, 514, 19), // "pushButton_addJoint"
+QT_MOC_LITERAL(26, 534, 20), // "pushButton_addmember"
+QT_MOC_LITERAL(27, 555, 24), // "pushButton_addconstraint"
+QT_MOC_LITERAL(28, 580, 19), // "pushButton_addforce"
+QT_MOC_LITERAL(29, 600, 25), // "pushButton_setDProperties"
+QT_MOC_LITERAL(30, 626, 10), // "wheelEvent"
+QT_MOC_LITERAL(31, 637, 12), // "QWheelEvent*"
+QT_MOC_LITERAL(32, 650, 5), // "event"
+QT_MOC_LITERAL(33, 656, 6), // "zoomIn"
+QT_MOC_LITERAL(34, 663, 7), // "zoomOut"
+QT_MOC_LITERAL(35, 671, 8), // "readFile"
+QT_MOC_LITERAL(36, 680, 11), // "std::string"
+QT_MOC_LITERAL(37, 692, 8), // "fileName"
+QT_MOC_LITERAL(38, 701, 13), // "clearToolbars"
+QT_MOC_LITERAL(39, 715, 10), // "solveReady"
+QT_MOC_LITERAL(40, 726, 23), // "on_actionUndo_triggered"
+QT_MOC_LITERAL(41, 750, 10), // "clearJoint"
+QT_MOC_LITERAL(42, 761, 11), // "clearMember"
+QT_MOC_LITERAL(43, 773, 15), // "clearConstraint"
+QT_MOC_LITERAL(44, 789, 10), // "clearForce"
+QT_MOC_LITERAL(45, 800, 9), // "clearFile"
+QT_MOC_LITERAL(46, 810, 3), // "num"
+QT_MOC_LITERAL(47, 814, 9), // "clearDraw"
+QT_MOC_LITERAL(48, 824, 23), // "on_actionRedo_triggered"
+QT_MOC_LITERAL(49, 848, 9), // "redoJoint"
+QT_MOC_LITERAL(50, 858, 10), // "redoMember"
+QT_MOC_LITERAL(51, 869, 14), // "redoConstraint"
+QT_MOC_LITERAL(52, 884, 9), // "redoForce"
+QT_MOC_LITERAL(53, 894, 8), // "redoFile"
+QT_MOC_LITERAL(54, 903, 9) // "drawJNums"
 
     },
     "MainWindow\0on_actionOpen_triggered\0\0"
@@ -99,12 +100,13 @@ QT_MOC_LITERAL(53, 892, 9) // "drawJNums"
     "position\0on_pushButton_Stress_released\0"
     "on_checkBox_const_toggled\0checked\0"
     "on_checkBox_Force_toggled\0selectS\0"
-    "drawJoint\0drawMembers\0drawConstraints\0"
-    "drawForces\0drawDStructure\0pushButton_addJoint\0"
-    "pushButton_addmember\0pushButton_addconstraint\0"
-    "pushButton_addforce\0pushButton_setDProperties\0"
-    "wheelEvent\0QWheelEvent*\0event\0zoomIn\0"
-    "zoomOut\0readFile\0std::string\0fileName\0"
+    "drawMemMap\0drawJoint\0drawMembers\0"
+    "drawConstraints\0drawForces\0drawDStructure\0"
+    "pushButton_addJoint\0pushButton_addmember\0"
+    "pushButton_addconstraint\0pushButton_addforce\0"
+    "pushButton_setDProperties\0wheelEvent\0"
+    "QWheelEvent*\0event\0zoomIn\0zoomOut\0"
+    "readFile\0std::string\0fileName\0"
     "clearToolbars\0solveReady\0"
     "on_actionUndo_triggered\0clearJoint\0"
     "clearMember\0clearConstraint\0clearForce\0"
@@ -120,7 +122,7 @@ static const uint qt_meta_data_MainWindow[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      45,   14, // methods
+      46,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -128,51 +130,52 @@ static const uint qt_meta_data_MainWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  239,    2, 0x08 /* Private */,
-       3,    0,  240,    2, 0x08 /* Private */,
-       4,    0,  241,    2, 0x08 /* Private */,
-       5,    0,  242,    2, 0x08 /* Private */,
-       6,    0,  243,    2, 0x08 /* Private */,
-       7,    0,  244,    2, 0x08 /* Private */,
-       8,    0,  245,    2, 0x08 /* Private */,
-       9,    0,  246,    2, 0x08 /* Private */,
-      10,    0,  247,    2, 0x08 /* Private */,
-      11,    0,  248,    2, 0x08 /* Private */,
-      12,    1,  249,    2, 0x08 /* Private */,
-      14,    0,  252,    2, 0x08 /* Private */,
-      15,    1,  253,    2, 0x08 /* Private */,
-      17,    1,  256,    2, 0x08 /* Private */,
-      18,    0,  259,    2, 0x08 /* Private */,
-      19,    0,  260,    2, 0x08 /* Private */,
-      20,    0,  261,    2, 0x08 /* Private */,
-      21,    0,  262,    2, 0x08 /* Private */,
-      22,    0,  263,    2, 0x08 /* Private */,
-      23,    0,  264,    2, 0x08 /* Private */,
-      24,    0,  265,    2, 0x08 /* Private */,
-      25,    0,  266,    2, 0x08 /* Private */,
-      26,    0,  267,    2, 0x08 /* Private */,
-      27,    0,  268,    2, 0x08 /* Private */,
-      28,    0,  269,    2, 0x08 /* Private */,
-      29,    1,  270,    2, 0x08 /* Private */,
-      32,    0,  273,    2, 0x08 /* Private */,
-      33,    0,  274,    2, 0x08 /* Private */,
-      34,    1,  275,    2, 0x08 /* Private */,
-      37,    0,  278,    2, 0x08 /* Private */,
-      38,    0,  279,    2, 0x08 /* Private */,
-      39,    0,  280,    2, 0x08 /* Private */,
-      40,    0,  281,    2, 0x08 /* Private */,
-      41,    0,  282,    2, 0x08 /* Private */,
-      42,    0,  283,    2, 0x08 /* Private */,
-      43,    0,  284,    2, 0x08 /* Private */,
-      44,    1,  285,    2, 0x08 /* Private */,
-      46,    0,  288,    2, 0x08 /* Private */,
-      47,    0,  289,    2, 0x08 /* Private */,
-      48,    0,  290,    2, 0x08 /* Private */,
-      49,    0,  291,    2, 0x08 /* Private */,
-      50,    0,  292,    2, 0x08 /* Private */,
-      51,    0,  293,    2, 0x08 /* Private */,
-      52,    1,  294,    2, 0x08 /* Private */,
-      53,    0,  297,    2, 0x08 /* Private */,
+       1,    0,  244,    2, 0x08 /* Private */,
+       3,    0,  245,    2, 0x08 /* Private */,
+       4,    0,  246,    2, 0x08 /* Private */,
+       5,    0,  247,    2, 0x08 /* Private */,
+       6,    0,  248,    2, 0x08 /* Private */,
+       7,    0,  249,    2, 0x08 /* Private */,
+       8,    0,  250,    2, 0x08 /* Private */,
+       9,    0,  251,    2, 0x08 /* Private */,
+      10,    0,  252,    2, 0x08 /* Private */,
+      11,    0,  253,    2, 0x08 /* Private */,
+      12,    1,  254,    2, 0x08 /* Private */,
+      14,    0,  257,    2, 0x08 /* Private */,
+      15,    1,  258,    2, 0x08 /* Private */,
+      17,    1,  261,    2, 0x08 /* Private */,
+      18,    0,  264,    2, 0x08 /* Private */,
+      19,    0,  265,    2, 0x08 /* Private */,
+      20,    0,  266,    2, 0x08 /* Private */,
+      21,    0,  267,    2, 0x08 /* Private */,
+      22,    0,  268,    2, 0x08 /* Private */,
+      23,    0,  269,    2, 0x08 /* Private */,
+      24,    0,  270,    2, 0x08 /* Private */,
+      25,    0,  271,    2, 0x08 /* Private */,
+      26,    0,  272,    2, 0x08 /* Private */,
+      27,    0,  273,    2, 0x08 /* Private */,
+      28,    0,  274,    2, 0x08 /* Private */,
+      29,    0,  275,    2, 0x08 /* Private */,
+      30,    1,  276,    2, 0x08 /* Private */,
+      33,    0,  279,    2, 0x08 /* Private */,
+      34,    0,  280,    2, 0x08 /* Private */,
+      35,    1,  281,    2, 0x08 /* Private */,
+      38,    0,  284,    2, 0x08 /* Private */,
+      39,    0,  285,    2, 0x08 /* Private */,
+      40,    0,  286,    2, 0x08 /* Private */,
+      41,    0,  287,    2, 0x08 /* Private */,
+      42,    0,  288,    2, 0x08 /* Private */,
+      43,    0,  289,    2, 0x08 /* Private */,
+      44,    0,  290,    2, 0x08 /* Private */,
+      45,    1,  291,    2, 0x08 /* Private */,
+      47,    0,  294,    2, 0x08 /* Private */,
+      48,    0,  295,    2, 0x08 /* Private */,
+      49,    0,  296,    2, 0x08 /* Private */,
+      50,    0,  297,    2, 0x08 /* Private */,
+      51,    0,  298,    2, 0x08 /* Private */,
+      52,    0,  299,    2, 0x08 /* Private */,
+      53,    1,  300,    2, 0x08 /* Private */,
+      54,    0,  303,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -200,25 +203,26 @@ static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 30,   31,
+    QMetaType::Void,
+    QMetaType::Void, 0x80000000 | 31,   32,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 35,   36,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   45,
+    QMetaType::Void, 0x80000000 | 36,   37,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Int,   45,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   46,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   46,
     QMetaType::Void,
 
        0        // eod
@@ -245,36 +249,37 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 12: _t->on_checkBox_const_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 13: _t->on_checkBox_Force_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 14: _t->selectS(); break;
-        case 15: _t->drawJoint(); break;
-        case 16: _t->drawMembers(); break;
-        case 17: _t->drawConstraints(); break;
-        case 18: _t->drawForces(); break;
-        case 19: _t->drawDStructure(); break;
-        case 20: _t->pushButton_addJoint(); break;
-        case 21: _t->pushButton_addmember(); break;
-        case 22: _t->pushButton_addconstraint(); break;
-        case 23: _t->pushButton_addforce(); break;
-        case 24: _t->pushButton_setDProperties(); break;
-        case 25: _t->wheelEvent((*reinterpret_cast< QWheelEvent*(*)>(_a[1]))); break;
-        case 26: _t->zoomIn(); break;
-        case 27: _t->zoomOut(); break;
-        case 28: _t->readFile((*reinterpret_cast< std::string(*)>(_a[1]))); break;
-        case 29: _t->clearToolbars(); break;
-        case 30: _t->solveReady(); break;
-        case 31: _t->on_actionUndo_triggered(); break;
-        case 32: _t->clearJoint(); break;
-        case 33: _t->clearMember(); break;
-        case 34: _t->clearConstraint(); break;
-        case 35: _t->clearForce(); break;
-        case 36: _t->clearFile((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 37: _t->clearDraw(); break;
-        case 38: _t->on_actionRedo_triggered(); break;
-        case 39: _t->redoJoint(); break;
-        case 40: _t->redoMember(); break;
-        case 41: _t->redoConstraint(); break;
-        case 42: _t->redoForce(); break;
-        case 43: _t->redoFile((*reinterpret_cast< int(*)>(_a[1]))); break;
-        case 44: _t->drawJNums(); break;
+        case 15: _t->drawMemMap(); break;
+        case 16: _t->drawJoint(); break;
+        case 17: _t->drawMembers(); break;
+        case 18: _t->drawConstraints(); break;
+        case 19: _t->drawForces(); break;
+        case 20: _t->drawDStructure(); break;
+        case 21: _t->pushButton_addJoint(); break;
+        case 22: _t->pushButton_addmember(); break;
+        case 23: _t->pushButton_addconstraint(); break;
+        case 24: _t->pushButton_addforce(); break;
+        case 25: _t->pushButton_setDProperties(); break;
+        case 26: _t->wheelEvent((*reinterpret_cast< QWheelEvent*(*)>(_a[1]))); break;
+        case 27: _t->zoomIn(); break;
+        case 28: _t->zoomOut(); break;
+        case 29: _t->readFile((*reinterpret_cast< std::string(*)>(_a[1]))); break;
+        case 30: _t->clearToolbars(); break;
+        case 31: _t->solveReady(); break;
+        case 32: _t->on_actionUndo_triggered(); break;
+        case 33: _t->clearJoint(); break;
+        case 34: _t->clearMember(); break;
+        case 35: _t->clearConstraint(); break;
+        case 36: _t->clearForce(); break;
+        case 37: _t->clearFile((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 38: _t->clearDraw(); break;
+        case 39: _t->on_actionRedo_triggered(); break;
+        case 40: _t->redoJoint(); break;
+        case 41: _t->redoMember(); break;
+        case 42: _t->redoConstraint(); break;
+        case 43: _t->redoForce(); break;
+        case 44: _t->redoFile((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 45: _t->drawJNums(); break;
         default: ;
         }
     }
@@ -305,13 +310,13 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 45)
+        if (_id < 46)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 45;
+        _id -= 46;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 45)
+        if (_id < 46)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 45;
+        _id -= 46;
     }
     return _id;
 }
