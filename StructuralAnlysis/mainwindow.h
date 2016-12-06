@@ -99,8 +99,6 @@ private:
     bool solved;
     double zoom;
     double dDeform;
-//    QGraphicsTextItem *myText;
-//    QGraphicsTextItem myText;
     std::vector<QGraphicsTextItem*> myText;
     QPolygonF noTransShape;
     QFont font;

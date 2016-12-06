@@ -17,6 +17,7 @@
 #include <QPicture>
 #include <QMessageBox>
 #include <QGraphicsTextItem>
+#include <fstream>
 
 // to DO //////////////
 // user select joints
@@ -24,8 +25,6 @@
 // stop leaking text memory
 // if already exists
 // list nodes
-// toggling force breaks
-// output
 // heads out on forces
 // when you click to add something else revert to needing to solve
 // ////////////////////
@@ -65,10 +64,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-//    std::string fileName = fileNameQ.toStdString();
+    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+    std::string fileName = fileNameQ.toStdString();
 
-    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
+//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
 
     // check file for errors
 
@@ -97,6 +96,49 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionSave_Results_triggered()
 {
     // write results to file
+    int i = 0;
+    std::string outPutFile = "ResultsFile0.txt";
+    bool fileExists = true;
+
+    // find next file name available
+    while(fileExists)
+    {
+        i++;
+        outPutFile = outPutFile.substr(0,outPutFile.size()-5);
+        outPutFile.append(std::to_string(i));
+        outPutFile.append(".txt");
+
+        std::ifstream testFile(outPutFile);
+
+        if(!testFile)
+            fileExists = false;
+    }
+
+    std::ofstream solOutPut;
+    solOutPut.open(outPutFile);
+
+    // loop through displacements
+    for(int i = 0; i < myStructure.dxstruct.size(); i++)
+    {
+        solOutPut << "Joint " << std::to_string(i+1) << "\t"
+                  << "dX = " << std::to_string(myStructure.dxstruct[i][0]) << "\t"
+                  << "dY = " << std::to_string(myStructure.dxstruct[i][1]) << std::endl;
+    }
+
+    // loop through member reactions
+    for(int i = 0; i < myStructure.rmem.size(); i++)
+    {
+        solOutPut << "Member " << std::to_string(i+1) << "\t"
+                  << "Axial 1 = " << std::to_string(myStructure.rmem[i][0]) << "\t"
+                  << "Shear 1 = " << std::to_string(myStructure.rmem[i][1]) << "\t"
+                  << "Moment 1 = " << std::to_string(myStructure.rmem[i][2]) << "\t"
+                  << "Axial 2 = " << std::to_string(myStructure.rmem[i][3]) << "\t"
+                  << "Shear 2 = " << std::to_string(myStructure.rmem[i][4]) << "\t"
+                  << "Moment 2 = " << std::to_string(myStructure.rmem[i][5]) << std::endl;
+    }
+
+    solOutPut.close();
+
 }
 
 void MainWindow::on_actionClear_triggered()
@@ -561,11 +603,6 @@ void MainWindow::on_pushButton_Disp_released()
         {
             displace = true;
 
-            if(constraint == true)
-            {
-                drawConstraints();
-            }
-
             drawDStructure();
 
             if(force == true)
@@ -781,8 +818,8 @@ void MainWindow::drawConstraints()
 void MainWindow::drawForces()
 {
     for(int i = myText.size()-1; i >= 0; i--)
-        delete [] myText[i];
-    //myText.clear();
+    //    delete myText[i];
+    myText.clear();
 
     QBrush momBrush(Qt::transparent);
     QBrush momBrush2(Qt::yellow);
@@ -832,14 +869,11 @@ void MainWindow::drawForces()
             negative = true;
         }
 
-        // it is failing here
+        // create new text item
         QGraphicsTextItem *newText = new QGraphicsTextItem;
 
         newText->setDefaultTextColor(Qt::white);
         newText->setPlainText(forceT);
-
-//        myText.setPlainText(forceT);
-//        myText.setDefaultTextColor(Qt::white);
 
         double x1 = myStructure.xstruct[m][0];
         double y1 = -myStructure.xstruct[m][1];
@@ -858,8 +892,6 @@ void MainWindow::drawForces()
 
                 newText->setX(x1-80);
                 newText->setY(y1);
-//                myText.setX(x1-80);
-//                myText.setY(y1);
 
                 // reset negative
                 negative = false;
@@ -871,17 +903,12 @@ void MainWindow::drawForces()
 
                 newText->setX(x1-80);
                 newText->setY(y1);
-//                myText.setX(x1-80);
-//                myText.setY(y1);
             }
-
-            //scene->addItem(&myText);
         }
         else if(dir==2)
         {
             // draw main line
             myStrucLine = scene->addLine(x1,y1,x1,y1-50,loadPen);
-
             noDrawnTransShape.clear();
 
             if(negative == true)
@@ -892,8 +919,6 @@ void MainWindow::drawForces()
 
                 newText->setX(x1+5);
                 newText->setY(y1-50);
-//                myText.setX(x1+5);
-//                myText.setY(y1-50);
 
                 // reset negative
                 negative = false;
@@ -906,12 +931,7 @@ void MainWindow::drawForces()
 
                 newText->setX(x1+5);
                 newText->setY(y1-25);
-//                myText.setX(x1+5);
-//                myText.setY(y1-25);
-
             }
-
-//            scene->addItem(&myText);
         }
         else
         {
@@ -926,8 +946,6 @@ void MainWindow::drawForces()
 
                 newText->setX(x1-25);
                 newText->setY(y1-60);
-//                myText.setX(x1-25);
-//                myText.setY(y1-60);
 
                 // reset negative
                 negative = false;
@@ -940,11 +958,7 @@ void MainWindow::drawForces()
 
                 newText->setX(x1-25);
                 newText->setY(y1-60);
-//                myText.setX(x1-25);
-//                myText.setY(y1-60);
             }
-
-//            scene->addItem(&myText);
         }
 
         myText.push_back(newText);
@@ -959,6 +973,11 @@ void MainWindow::drawDStructure()
 {
     // clear gview
     scene->clear();
+
+    if(constraint == true)
+    {
+        drawConstraints();
+    }
 
     drawMembers();
     drawJoint();
