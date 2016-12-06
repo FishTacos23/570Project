@@ -99,15 +99,11 @@ private:
     bool solved;
     double zoom;
     double dDeform;
-    QGraphicsRectItem *noRot;
-    QGraphicsPolygonItem *noTrans;
-    //QGraphicsTextItem myText;
+//    QGraphicsTextItem *myText;
+//    QGraphicsTextItem myText;
+    std::vector<QGraphicsTextItem*> myText;
     QPolygonF noTransShape;
     QFont font;
-
-    // drawn objects
-    std::vector<QGraphicsEllipseItem*> drawnJoints;
-    std::vector<QGraphicsLineItem*> drawnMembers;
 
     QPolygonF noDrawnTransShape;
     QGraphicsRectItem *noDrawnRot;

@@ -21,10 +21,9 @@
 // to DO //////////////
 // user select joints
 // zoom and pan
-// stop leaking memory
+// stop leaking text memory
 // if already exists
 // list nodes
-// order of drawing
 // toggling force breaks
 // output
 // heads out on forces
@@ -119,8 +118,6 @@ void MainWindow::on_actionClear_triggered()
         scene->clear();
 
         clearToolbars();
-        drawnMembers.clear();
-        drawnJoints.clear();
 
         // clear variables
         myStructure.xstruct.clear();
@@ -712,9 +709,7 @@ void MainWindow::drawJoint()
 
     for(int i = 0; i < myStructure.xstruct.size(); i++)
     {
-        QGraphicsEllipseItem *newJoint = new QGraphicsEllipseItem;
-        drawnJoints.push_back(newJoint);
-        drawnJoints[i] = scene->addEllipse(myStructure.xstruct[i][0]-5,-myStructure.xstruct[i][1]-5,10,10,jPen,jgrey);
+        scene->addEllipse(myStructure.xstruct[i][0]-5,-myStructure.xstruct[i][1]-5,10,10,jPen,jgrey);
     }
 }
 
@@ -734,11 +729,8 @@ void MainWindow::drawMembers()
         mPen.setWidth(5);
     }
 
-    for(int i = 0; i < myStructure.conn.size(); i++)
+    for(uint i = 0; i < myStructure.conn.size(); i++)
     {
-        QGraphicsLineItem *newMember = new QGraphicsLineItem;
-        drawnMembers.push_back(newMember);
-
         int One = myStructure.conn[i][0];
         int Two = myStructure.conn[i][1];
 
@@ -747,7 +739,7 @@ void MainWindow::drawMembers()
         double x2 = myStructure.xstruct[Two-1][0];
         double y2 = -myStructure.xstruct[Two-1][1];
 
-        drawnMembers[i] = scene->addLine(x1,y1,x2,y2,mPen);
+        scene->addLine(x1,y1,x2,y2,mPen);
     }
 }
 
@@ -788,6 +780,10 @@ void MainWindow::drawConstraints()
 
 void MainWindow::drawForces()
 {
+    for(int i = myText.size()-1; i >= 0; i--)
+        delete [] myText[i];
+    //myText.clear();
+
     QBrush momBrush(Qt::transparent);
     QBrush momBrush2(Qt::yellow);
     QBrush loadBrush(Qt::green);
@@ -807,7 +803,6 @@ void MainWindow::drawForces()
         // get rid of trailing zeros
         std::string point = ".";
         int posdot = forceMag.find(point);
-
         int strSize = forceMag.size();
 
         bool nonZero = false;
@@ -837,20 +832,22 @@ void MainWindow::drawForces()
             negative = true;
         }
 
+        // it is failing here
+        QGraphicsTextItem *newText = new QGraphicsTextItem;
+
+        newText->setDefaultTextColor(Qt::white);
+        newText->setPlainText(forceT);
+
+//        myText.setPlainText(forceT);
+//        myText.setDefaultTextColor(Qt::white);
+
         double x1 = myStructure.xstruct[m][0];
         double y1 = -myStructure.xstruct[m][1];
-
-        QGraphicsTextItem myText(forceT);
-        myText.setDefaultTextColor(Qt::white);
 
         if(dir==1)
         {
             // draw main line
             myStrucLine = scene->addLine(x1,y1,x1-50,y1,loadPen);
-
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
             noDrawnTransShape.clear();
 
             // draw triangle
@@ -859,8 +856,10 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1-50,y1) << QPointF(x1-30,y1+5) << QPointF(x1-30,y1-5);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText.setX(x1-80);
-                myText.setY(y1);
+                newText->setX(x1-80);
+                newText->setY(y1);
+//                myText.setX(x1-80);
+//                myText.setY(y1);
 
                 // reset negative
                 negative = false;
@@ -870,18 +869,19 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-20,y1+5) << QPointF(x1-20,y1-5);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText.setX(x1-80);
-                myText.setY(y1);
+                newText->setX(x1-80);
+                newText->setY(y1);
+//                myText.setX(x1-80);
+//                myText.setY(y1);
             }
+
+            //scene->addItem(&myText);
         }
         else if(dir==2)
         {
             // draw main line
             myStrucLine = scene->addLine(x1,y1,x1,y1-50,loadPen);
 
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
             noDrawnTransShape.clear();
 
             if(negative == true)
@@ -890,8 +890,10 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1) << QPointF(x1-5,y1-20) << QPointF(x1+5,y1-20);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText.setX(x1+5);
-                myText.setY(y1-50);
+                newText->setX(x1+5);
+                newText->setY(y1-50);
+//                myText.setX(x1+5);
+//                myText.setY(y1-50);
 
                 // reset negative
                 negative = false;
@@ -902,17 +904,18 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1,y1-50) << QPointF(x1-5,y1-30) << QPointF(x1+5,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
 
-                myText.setX(x1+5);
-                myText.setY(y1-25);
+                newText->setX(x1+5);
+                newText->setY(y1-25);
+//                myText.setX(x1+5);
+//                myText.setY(y1-25);
+
             }
+
+//            scene->addItem(&myText);
         }
         else
         {
             myStructCirc = scene->addEllipse(x1-20, y1-20, 40, 40, momPen, momBrush);
-
-            font.setPixelSize(30);
-            font.setBold(false);
-            font.setFamily("Calibri");
             noDrawnTransShape.clear();
 
             if(negative == true)
@@ -921,8 +924,10 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1+10,y1-20) << QPointF(x1-10,y1-10) << QPointF(x1-10,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
-                myText.setX(x1-25);
-                myText.setY(y1-60);
+                newText->setX(x1-25);
+                newText->setY(y1-60);
+//                myText.setX(x1-25);
+//                myText.setY(y1-60);
 
                 // reset negative
                 negative = false;
@@ -933,26 +938,27 @@ void MainWindow::drawForces()
                 noDrawnTransShape << QPointF(x1-10,y1-20) << QPointF(x1+10,y1-10) << QPointF(x1+10,y1-30);
                 noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
 
-                myText.setX(x1-25);
-                myText.setY(y1-60);
+                newText->setX(x1-25);
+                newText->setY(y1-60);
+//                myText.setX(x1-25);
+//                myText.setY(y1-60);
             }
+
+//            scene->addItem(&myText);
         }
 
-        scene->addItem(&myText);
+        myText.push_back(newText);
     }
 
-
+    // loop through my Text
+    for(int i = 0; i < myText.size(); i++)
+        scene->addItem(myText[i]);
 }
 
 void MainWindow::drawDStructure()
 {
     // clear gview
     scene->clear();
-
-    if(constraint == true)
-    {
-        drawConstraints();
-    }
 
     drawMembers();
     drawJoint();
@@ -1035,8 +1041,8 @@ void MainWindow::pushButton_addmember()
 
        myStructure.conn.push_back(mPoints);
 
-       drawJoint();
        drawMembers();
+       drawJoint();
 
        std::vector<std::string> oneLine;
        oneLine.push_back("member");
