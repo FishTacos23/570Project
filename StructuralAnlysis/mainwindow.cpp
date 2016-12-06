@@ -18,6 +18,7 @@
 #include <QMessageBox>
 #include <QGraphicsTextItem>
 #include <fstream>
+#include <QSpinBox>
 
 // to DO //////////////
 // zoom and pan
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     QMainWindow::showMaximized();
 
+    // initialize checks
     solved = false;
     displace = false;
     constraint = false;
@@ -63,10 +65,7 @@ void MainWindow::on_actionOpen_triggered()
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
 
-//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput.txt";
-
     // check file for errors
-
     try
     {
         opening = true;
@@ -697,6 +696,28 @@ void MainWindow::on_pushButton_Stress_released()
     displace = false;
     ui->pushButton_Disp->setEnabled(true);
     ui->pushButton_Stress->setEnabled(false);
+
+    sToolBarActive = true;
+
+    stressToolBar = new QToolBar("Select Joint  ");
+    JText = new QLabel;
+    sSelect = new QSpinBox;
+    jLay = new QHBoxLayout;
+    jointWidg = new QWidget;
+
+    JText->setTextFormat(Qt::RichText);
+    JText->setText("<b><u> Member ");
+    sSelect->setMaximum(myStructure.conn.size());
+    sSelect->setMinimum(1);
+    jLay->addWidget(JText);
+    jLay->addWidget(sSelect);
+    jointWidg->setLayout(jLay);
+
+    stressToolBar->addWidget(jointWidg);
+
+    this->addToolBar(stressToolBar);
+
+    connect(sSelect,SIGNAL(changed()),this,SLOT(selectS()));
 }
 
 void MainWindow::on_checkBox_const_toggled(bool checked)
@@ -781,6 +802,249 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
         if(mToolBarActive)
             drawJNums();
     }
+}
+
+void MainWindow::selectS()
+{
+    rText.clear();
+
+    int s = sSelect->value()-1;
+
+    double length = myStructure.lenRot[s][0];
+
+    QPen sPen(Qt::magenta);
+    sPen.setWidth(3);
+    QBrush momBrush(Qt::transparent);
+    QBrush momBrush2(Qt::yellow);
+    QBrush loadBrush(Qt::green);
+    QPen loadPen(Qt::green);
+    QPen momPen(Qt::yellow);
+    loadPen.setWidth(2);
+    momPen.setWidth(2);
+
+    bool negativeAx1 = false;
+    bool negativeSh1 = false;
+    bool negativeMo1 = false;
+    bool negativeAx2 = false;
+    bool negativeSh2 = false;
+    bool negativeMo2 = false;
+
+    std::string ax1 = std::to_string(myStructure.rmem[s][0]);
+    std::string ax2 = std::to_string(myStructure.rmem[s][3]);
+    std::string sh1 = std::to_string(myStructure.rmem[s][1]);
+    std::string sh2 = std::to_string(myStructure.rmem[s][4]);
+    std::string mo1 = std::to_string(myStructure.rmem[s][2]);
+    std::string mo2 = std::to_string(myStructure.rmem[s][5]);
+
+    QString axs1 = QString::fromStdString(ax1);
+    QString shs1 = QString::fromStdString(sh1);
+    QString mos1 = QString::fromStdString(mo1);
+    QString axs2 = QString::fromStdString(ax2);
+    QString shs2 = QString::fromStdString(sh2);
+    QString mos2 = QString::fromStdString(mo1);
+
+    if(axs1.at(0)=='-')
+    {
+        axs1.remove(0,1);
+        negativeAx1 = true;
+    }
+    if(shs1.at(0)=='-')
+    {
+        shs1.remove(0,1);
+        negativeSh1 = true;
+    }
+    if(mos1.at(0)=='-')
+    {
+        mos1.remove(0,1);
+        negativeMo1 = true;
+    }
+    if(axs2.at(0)=='-')
+    {
+        axs2.remove(0,1);
+        negativeAx2 = true;
+    }
+    if(shs2.at(0)=='-')
+    {
+        shs2.remove(0,1);
+        negativeSh2 = true;
+    }
+    if(mos2.at(0)=='-')
+    {
+        mos2.remove(0,1);
+        negativeMo2 = true;
+    }
+
+    // axial forces
+    scene->addLine(0,0,length,0,sPen);
+
+    // draw forces
+    myStrucLine = scene->addLine(0,0,-50,0,loadPen);
+    myStrucLine = scene->addLine(0,0,length+50,0,loadPen);
+
+    QGraphicsTextItem *newTextax1 = new QGraphicsTextItem;
+    newTextax1->setDefaultTextColor(Qt::darkMagenta);
+    newTextax1->setPlainText(axs1);
+    newTextax1->setX(-80);
+    newTextax1->setY(0);
+
+    rText.push_back(newTextax1);
+
+    QGraphicsTextItem *newTextax2 = new QGraphicsTextItem;
+    newTextax2->setDefaultTextColor(Qt::darkMagenta);
+    newTextax2->setPlainText(axs2);
+    newTextax2->setX(length+60);
+    newTextax2->setY(0);
+
+    rText.push_back(newTextax2);
+
+    // Axial
+    if(negativeAx1)
+    {
+        noDrawnTransShape << QPointF(-50,0) << QPointF(-30,5) << QPointF(-30,-5);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        noDrawnTransShape << QPointF(0,0) << QPointF(-20,5) << QPointF(-20,-5);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+    if(negativeAx2)
+    {
+        noDrawnTransShape << QPointF(length,0) << QPointF(length+20,5) << QPointF(length+20,-5);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        noDrawnTransShape << QPointF(length+50,0) << QPointF(length+30,5) << QPointF(length+30,-5);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+
+    QGraphicsTextItem *newTextsh1 = new QGraphicsTextItem;
+    newTextsh1->setDefaultTextColor(Qt::darkMagenta);
+    newTextsh1->setPlainText(shs1);
+    QGraphicsTextItem *newTextsh2 = new QGraphicsTextItem;
+    newTextsh2->setDefaultTextColor(Qt::darkMagenta);
+    newTextsh2->setPlainText(shs2);
+
+    // shear
+    if(negativeSh1)
+    {
+        newTextsh1->setX(-10);
+        newTextsh1->setY(50);
+        myStrucLine = scene->addLine(0,0,0,50,loadPen);
+
+        noDrawnTransShape << QPointF(0,50) << QPointF(5,30) << QPointF(-5,30);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        newTextsh1->setX(-10);
+        newTextsh1->setY(-50);
+        myStrucLine = scene->addLine(0,0,0,-50,loadPen);
+
+        noDrawnTransShape << QPointF(0,-50) << QPointF(5,-30) << QPointF(-5,-30);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+
+    rText.push_back(newTextsh1);
+
+    if(negativeSh2)
+    {
+        newTextsh2->setX(length+10);
+        newTextsh2->setY(50);
+        myStrucLine = scene->addLine(length,0,length,50,loadPen);
+
+        noDrawnTransShape << QPointF(length,50) << QPointF(5+length,30) << QPointF(length-5,30);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        newTextsh2->setX(length+10);
+        newTextsh2->setY(-50);
+        myStrucLine = scene->addLine(length,0,length,-50,loadPen);
+
+        noDrawnTransShape << QPointF(length,-50) << QPointF(5+length,-30) << QPointF(length-5,-30);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
+
+        noDrawnTransShape.clear();
+    }
+
+    rText.push_back(newTextsh2);
+
+    QGraphicsTextItem *newTextmo1 = new QGraphicsTextItem;
+    newTextmo1->setDefaultTextColor(Qt::darkMagenta);
+    newTextmo1->setPlainText(mos1);
+    QGraphicsTextItem *newTextmo2 = new QGraphicsTextItem;
+    newTextmo2->setDefaultTextColor(Qt::darkMagenta);
+    newTextmo2->setPlainText(mos2);
+
+    myStructCirc = scene->addEllipse(-20, -20, 40, 40, momPen, momBrush);
+    myStructCirc = scene->addEllipse(length-20, -20, 40, 40, momPen, momBrush);
+
+    // moments
+    if(negativeMo1)
+    {
+        newTextmo1->setX(25);
+        newTextmo1->setY(-60);
+
+        noDrawnTransShape << QPointF(10,-20) << QPointF(-10,-10) << QPointF(-10,-20);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        newTextmo1->setX(length-25);
+        newTextmo1->setY(-60);
+
+        noDrawnTransShape << QPointF(-10,-20) << QPointF(10,-10) << QPointF(10,-20);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+        noDrawnTransShape.clear();
+    }
+
+    rText.push_back(newTextmo1);
+
+    if(negativeMo2)
+    {
+        newTextmo2->setX(length-25);
+        newTextmo2->setY(-60);
+
+        noDrawnTransShape << QPointF(length+10,-20) << QPointF(length-10,-10) << QPointF(length-10,-20);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+        noDrawnTransShape.clear();
+    }
+    else
+    {
+        newTextmo1->setX(length+25);
+        newTextmo1->setY(-60);
+
+        noDrawnTransShape << QPointF(length-10,-20) << QPointF(length+10,-10) << QPointF(length+10,-20);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
+
+        noDrawnTransShape.clear();
+    }
+
+    rText.push_back(newTextmo2);
+
+    for(int i = 0; i < rText.size(); i++)
+        scene->addItem(rText[i]);
+
 }
 
 void MainWindow::drawJoint()

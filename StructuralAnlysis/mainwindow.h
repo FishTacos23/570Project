@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QSpinBox>
 
 namespace Ui {
 class MainWindow;
@@ -49,6 +50,7 @@ private slots:
     void on_pushButton_Stress_released();
     void on_checkBox_const_toggled(bool checked);
     void on_checkBox_Force_toggled(bool checked);
+    void selectS();
 
     // draw structure
     void drawJoint();
@@ -104,6 +106,7 @@ private:
     double dDeform;
     std::vector<QGraphicsTextItem*> myText;
     std::vector<QGraphicsTextItem*> jText;
+    std::vector<QGraphicsTextItem*> rText;
     QPolygonF noTransShape;
     QFont font;
 
@@ -124,6 +127,8 @@ private:
     double ymax;
     double ymin;
 
+    int smem;
+
     // checks
     bool constraint;
     bool force;
@@ -134,6 +139,7 @@ private:
     bool cToolBarActive;
     bool fToolBarActive;
     bool pToolBarActive;
+    bool sToolBarActive;
     bool opening;
 
     // Line Edits
@@ -171,7 +177,6 @@ private:
     QLabel *e1Text;
     QLabel *e2Text;
 
-
     // Layouts
     QHBoxLayout *xLay;
     QHBoxLayout *yLay;
@@ -200,12 +205,15 @@ private:
     QRadioButton *constY;
     QRadioButton *constRz;
 
+    QSpinBox *sSelect;
+
     // Tool Bars
     QToolBar *jointToolBar;
     QToolBar *memberToolBar;
     QToolBar *constraintToolBar;
     QToolBar *forceToolBar;
     QToolBar *propToolBar;
+    QToolBar *stressToolBar;
 
 };
 
