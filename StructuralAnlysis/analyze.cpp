@@ -30,6 +30,9 @@ void Analyze::preprocessing()
 
         lenRot.push_back(oneLenRot);
     }
+
+
+
 }
 
 void Analyze::AssembleStructStiff()
@@ -151,7 +154,7 @@ void Analyze::AssembleStructForce()
     int j;
     int dir;
 
-    for(int i = 0; i < loadMat.size(); i++)
+    for(uint i = 0; i < loadMat.size(); i++)
     {
         // JointToStructLoad
         j = loadMat[i][0];
@@ -309,12 +312,12 @@ bool Analyze::checkReady()
     if(!conn.empty()&&!properties.empty()&&!constMat.empty()&&!loadMat.empty()) // make nothing is empty
     {
         // check that all joints are connected to something
-        int k = 0;
-        for(int i = 0; i < xstruct.size(); i++)
+        uint k = 0;
+        for(uint i = 0; i < xstruct.size(); i++)
         {
             bool foundI = false;
 
-            for(int m = 0; m < conn.size(); m++)
+            for(uint m = 0; m < conn.size(); m++)
             {
                 for(int j = 0; j < 2; j++)
                 {

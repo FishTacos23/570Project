@@ -54,6 +54,7 @@ private slots:
     void drawMemMap();
 
     // draw structure
+    void drawThings();
     void drawJoint();
     void drawMembers();
     void drawConstraints();

@@ -26,6 +26,7 @@
 // crashes on redrawing j numbs
 // forces disappear when click redo after a solve
 // jnumbs dissapear after click add constraint tool bar 1st time
+// prevent member from one joint to same joint
 // ////////////////////
 
 // global variables
@@ -85,14 +86,7 @@ void MainWindow::on_actionOpen_triggered()
         ui->pushButton_Disp->setEnabled(false);
         ui->pushButton_Stress->setEnabled(false);
 
-        if(constraint==true)
-            drawConstraints();
-
-        drawMembers();
-        drawJoint();
-
-        if(force==true)
-            drawForces();
+        drawThings();
 
         opening = false;
     }
@@ -119,7 +113,7 @@ void MainWindow::on_actionSave_Results_triggered()
     solOutPut.open(outPutFile);
 
     // loop through displacements
-    for(int i = 0; i < myStructure.dxstruct.size(); i++)
+    for(uint i = 0; i < myStructure.dxstruct.size(); i++)
     {
         solOutPut << "Joint " << std::to_string(i+1) << "\t"
                   << "dX = " << std::to_string(myStructure.dxstruct[i][0]) << "\t"
@@ -127,7 +121,7 @@ void MainWindow::on_actionSave_Results_triggered()
     }
 
     // loop through member reactions
-    for(int i = 0; i < myStructure.rmem.size(); i++)
+    for(uint i = 0; i < myStructure.rmem.size(); i++)
     {
         solOutPut << "Member " << std::to_string(i+1) << "\t"
                   << "Axial 1 = " << std::to_string(myStructure.rmem[i][0]) << "\t"
@@ -613,11 +607,22 @@ void MainWindow::on_pushButton_solve_released()
         undoList.clear();
 
         myStructure.preprocessing();
+            ui->progressBar->setValue(5);
+
         myStructure.AssembleStructStiff();
+            ui->progressBar->setValue(15);
+
         myStructure.Triangularization();
+            ui->progressBar->setValue(65);
+
         myStructure.AssembleStructForce();
+            ui->progressBar->setValue(75);
+
         myStructure.BackSub();
+            ui->progressBar->setValue(95);
+
         myStructure.postprocessing();
+            ui->progressBar->setValue(100);
 
         dDeform = 1;
 
@@ -634,65 +639,22 @@ void MainWindow::on_pushButton_solve_released()
 
 void MainWindow::on_pushButton_Disp_released()
 {
-    if(solved==true)
-    {
-        ui->pushButton_Disp->setEnabled(false);
-        ui->pushButton_Stress->setEnabled(true);
 
-        if(displace == false)
-        {
-            displace = true;
+    ui->pushButton_Disp->setEnabled(false);
+    ui->pushButton_Stress->setEnabled(true);
 
-            drawDStructure();
+    displace = true;
 
-            if(force == true)
-            {
-                drawForces();
-            }
-        }
-        else if(displace == true)
-        {
-            displace = false;
-
-            scene->clear();         
-
-            if(constraint == true)
-            {
-                drawConstraints();
-            }
-
-            drawMembers();
-            drawJoint();
-
-            if(force == true)
-            {
-                drawForces();
-            }
-        }
-    }
+    drawThings();
 }
 
 void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
 {
     if(solved==true)
     {
-        dDeform = 1;
-        dDeform*=position;
+        dDeform = position;
 
-        //drawStructure();
-        if(displace==true)
-        {
-            if(constraint==true)
-            {
-                drawConstraints();
-            }
-            drawDStructure();
-            if(force==true)
-            {
-                drawForces();
-            }
-
-        }
+        drawThings();
     }
 }
 
@@ -732,50 +694,13 @@ void MainWindow::on_checkBox_const_toggled(bool checked)
     if(checked==true)
     {
         constraint = true;
-
-        scene->clear();
-        drawConstraints();
-
-        // redraw other options if there
-        if(displace == true)
-        {
-            drawDStructure();
-        }
-        else
-        {
-           drawMembers();
-           drawJoint();
-        }
-        if(force == true)
-        {
-            drawForces();
-        }
-        if(mToolBarActive)
-            drawJNums();
     }
     else
     {
         constraint = false;
-        scene->clear();
-
-        // redraw other options if there
-        if(displace == true)
-        {
-            drawDStructure();
-        }
-        else
-        {
-           drawMembers();
-           drawJoint();
-        }
-        if(force == true)
-        {
-            drawForces();
-        }
-        if(mToolBarActive)
-            drawJNums();
     }
 
+    drawThings();
 
 }
 
@@ -785,30 +710,13 @@ void MainWindow::on_checkBox_Force_toggled(bool checked)
     if(checked==true)
     {
         force = true;
-        drawForces();
     }
     else
     {
         force = false;
-        scene->clear();
-
-        // redraw other options if there
-        if(constraint == true)
-        {
-            drawConstraints();
-        }
-        if(displace == true)
-        {
-            drawDStructure();
-        }
-        else
-        {
-            drawMembers();
-            drawJoint();
-        }
-        if(mToolBarActive)
-            drawJNums();
     }
+
+    drawThings();
 }
 
 void MainWindow::selectS()
@@ -1145,12 +1053,40 @@ void MainWindow::drawMemMap()
     }
 }
 
+void MainWindow::drawThings()
+{
+    // clear scene
+    scene->clear();
+
+    // draw constraints
+    if(ui->checkBox_const->isChecked())
+        drawConstraints();
+
+    // draw members
+    drawMembers();
+
+    // draw Joints
+    drawJoint();
+
+    // draw Forces
+    if(ui->checkBox_Force->isChecked())
+        drawForces();
+
+    // label joints
+    if(jToolBarActive || mToolBarActive || cToolBarActive || fToolBarActive)
+        drawJNums();
+
+    // draw displaced
+    if(displace)
+        drawDStructure();
+}
+
 void MainWindow::drawJoint()
 {
     QBrush jgrey(Qt::gray);
     QPen jPen(Qt::white);
 
-    for(int i = 0; i < myStructure.xstruct.size(); i++)
+    for(uint i = 0; i < myStructure.xstruct.size(); i++)
     {
         scene->addEllipse(myStructure.xstruct[i][0]-5,-myStructure.xstruct[i][1]-5,10,10,jPen,jgrey);
     }
@@ -1223,8 +1159,6 @@ void MainWindow::drawConstraints()
 
 void MainWindow::drawForces()
 {
-    for(int i = myText.size()-1; i >= 0; i--)
-    //    delete myText[i];
     myText.clear();
 
     QBrush momBrush(Qt::transparent);
@@ -1377,17 +1311,6 @@ void MainWindow::drawForces()
 
 void MainWindow::drawDStructure()
 {
-    // clear gview
-    scene->clear();
-
-    if(constraint == true)
-    {
-        drawConstraints();
-    }
-
-    drawMembers();
-    drawJoint();
-
     double x1;
     double y1;
     double x2;
@@ -1452,24 +1375,7 @@ void MainWindow::pushButton_addJoint()
             displace = false;
             solved = false;
 
-            scene->clear();
-
-//            QString jointNumb = QString::fromStdString(std::to_string(myStructure.xstruct.size()));
-
-//            QGraphicsTextItem *newText = new QGraphicsTextItem;
-//            newText->setDefaultTextColor(Qt::white);
-//            newText->setPos(x,-y);
-//            newText->setPlainText(jointNumb);
-//            jText.push_back(newText);
-
-            if(constraint==true)
-                drawConstraints();
-            drawMembers();
-            drawJoint();
-            if(force==true)
-                drawForces();
-
-            drawJNums();
+            drawThings();
 
             solveReady();
 
@@ -1532,16 +1438,7 @@ void MainWindow::pushButton_addmember()
                solved = false;
                displace = false;
 
-               scene->clear();
-
-               if(constraint==true)
-                   drawConstraints();
-               drawMembers();
-               drawJoint();
-               if(force==true)
-                   drawForces();
-
-               drawJNums();
+               drawThings();
 
                redoList.clear();
 
@@ -1678,13 +1575,7 @@ void MainWindow::pushButton_addconstraint()
             solved = false;
             displace = false;
 
-            scene->clear();
-
-            drawConstraints();
-            drawMembers();
-            drawJoint();
-            if(force==true)
-                drawForces();
+            drawThings();
 
             redoList.clear();
 
@@ -1809,13 +1700,7 @@ void MainWindow::pushButton_addforce()
             solved = false;
             displace = false;
 
-            scene->clear();
-
-            if(constraint==true)
-                drawConstraints();
-            drawMembers();
-            drawJoint();
-            drawForces();
+            drawThings();
 
             redoList.clear();
 
@@ -1859,12 +1744,7 @@ void MainWindow::pushButton_setDProperties()
         ui->pushButton_Disp->setEnabled(false);
         ui->pushButton_Stress->setEnabled(false);
 
-        if(constraint==true)
-            drawConstraints();
-        drawMembers();
-        drawJoint();
-        if(force==true)
-            drawForces();
+        drawThings();
 
         solved = false;
         displace = false;
@@ -2408,7 +2288,8 @@ void MainWindow::on_actionUndo_triggered()
             undoList.pop_back();
         }
 
-        clearDraw();
+//        clearDraw();
+        drawThings();
     }
 }
 
@@ -2543,7 +2424,7 @@ void MainWindow::on_actionRedo_triggered()
         }
     }
 
-    clearDraw();
+    drawThings();
 }
 
 void MainWindow::redoJoint()

@@ -16,17 +16,20 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLCDNumber>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -46,18 +49,21 @@ public:
     QAction *actionRedo;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
-    QCheckBox *checkBox_Force;
-    QPushButton *pushButton_solve;
-    QCheckBox *checkBox_const;
     QGraphicsView *graphicsView;
+    QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer_2;
+    QSpacerItem *verticalSpacer_3;
     QSpacerItem *verticalSpacer;
+    QCheckBox *checkBox_Force;
+    QCheckBox *checkBox_const;
     QPushButton *pushButton_Disp;
-    QLCDNumber *lcdNumber;
+    QPushButton *pushButton_Stress;
+    QPushButton *pushButton_solve;
+    QHBoxLayout *horizontalLayout;
     QSlider *horizontalSlider_scaleDisp;
     QLabel *label;
-    QPushButton *pushButton_Stress;
-    QSpacerItem *verticalSpacer_3;
+    QLCDNumber *lcdNumber;
+    QProgressBar *progressBar;
     QMenuBar *menuBar;
     QMenu *menuFile;
     QMenu *menuInsert;
@@ -69,7 +75,7 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(502, 334);
+        MainWindow->resize(531, 451);
         QIcon icon;
         icon.addFile(QStringLiteral("../build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug/10876-200.png"), QSize(), QIcon::Normal, QIcon::Off);
         MainWindow->setWindowIcon(icon);
@@ -100,45 +106,77 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        graphicsView = new QGraphicsView(centralWidget);
+        graphicsView->setObjectName(QStringLiteral("graphicsView"));
+        graphicsView->setMouseTracking(true);
+        graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+        graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+
+        gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
+
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setSpacing(6);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalSpacer_2 = new QSpacerItem(58, 56, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
+
+        verticalSpacer_3 = new QSpacerItem(58, 57, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_3);
+
+        verticalSpacer = new QSpacerItem(68, 57, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
+
         checkBox_Force = new QCheckBox(centralWidget);
         checkBox_Force->setObjectName(QStringLiteral("checkBox_Force"));
 
-        gridLayout->addWidget(checkBox_Force, 4, 2, 1, 1);
+        verticalLayout->addWidget(checkBox_Force);
+
+        checkBox_const = new QCheckBox(centralWidget);
+        checkBox_const->setObjectName(QStringLiteral("checkBox_const"));
+
+        verticalLayout->addWidget(checkBox_const);
+
+        pushButton_Disp = new QPushButton(centralWidget);
+        pushButton_Disp->setObjectName(QStringLiteral("pushButton_Disp"));
+        pushButton_Disp->setEnabled(false);
+
+        verticalLayout->addWidget(pushButton_Disp);
+
+        pushButton_Stress = new QPushButton(centralWidget);
+        pushButton_Stress->setObjectName(QStringLiteral("pushButton_Stress"));
+        pushButton_Stress->setEnabled(false);
+
+        verticalLayout->addWidget(pushButton_Stress);
 
         pushButton_solve = new QPushButton(centralWidget);
         pushButton_solve->setObjectName(QStringLiteral("pushButton_solve"));
         pushButton_solve->setEnabled(false);
         pushButton_solve->setAutoFillBackground(false);
 
-        gridLayout->addWidget(pushButton_solve, 8, 2, 1, 1);
+        verticalLayout->addWidget(pushButton_solve);
 
-        checkBox_const = new QCheckBox(centralWidget);
-        checkBox_const->setObjectName(QStringLiteral("checkBox_const"));
 
-        gridLayout->addWidget(checkBox_const, 5, 2, 1, 1);
+        gridLayout->addLayout(verticalLayout, 0, 1, 1, 1);
 
-        graphicsView = new QGraphicsView(centralWidget);
-        graphicsView->setObjectName(QStringLiteral("graphicsView"));
-        graphicsView->setMouseTracking(true);
-        graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        graphicsView->setDragMode(QGraphicsView::NoDrag);
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalSlider_scaleDisp = new QSlider(centralWidget);
+        horizontalSlider_scaleDisp->setObjectName(QStringLiteral("horizontalSlider_scaleDisp"));
+        horizontalSlider_scaleDisp->setSliderPosition(0);
+        horizontalSlider_scaleDisp->setOrientation(Qt::Horizontal);
 
-        gridLayout->addWidget(graphicsView, 0, 0, 9, 2);
+        horizontalLayout->addWidget(horizontalSlider_scaleDisp);
 
-        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        label = new QLabel(centralWidget);
+        label->setObjectName(QStringLiteral("label"));
 
-        gridLayout->addItem(verticalSpacer_2, 2, 2, 1, 1);
-
-        verticalSpacer = new QSpacerItem(20, 54, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer, 3, 2, 1, 1);
-
-        pushButton_Disp = new QPushButton(centralWidget);
-        pushButton_Disp->setObjectName(QStringLiteral("pushButton_Disp"));
-        pushButton_Disp->setEnabled(false);
-
-        gridLayout->addWidget(pushButton_Disp, 6, 2, 1, 1);
+        horizontalLayout->addWidget(label);
 
         lcdNumber = new QLCDNumber(centralWidget);
         lcdNumber->setObjectName(QStringLiteral("lcdNumber"));
@@ -209,34 +247,22 @@ public:
         lcdNumber->setLineWidth(0);
         lcdNumber->setDigitCount(2);
 
-        gridLayout->addWidget(lcdNumber, 9, 2, 1, 1);
+        horizontalLayout->addWidget(lcdNumber);
 
-        horizontalSlider_scaleDisp = new QSlider(centralWidget);
-        horizontalSlider_scaleDisp->setObjectName(QStringLiteral("horizontalSlider_scaleDisp"));
-        horizontalSlider_scaleDisp->setSliderPosition(0);
-        horizontalSlider_scaleDisp->setOrientation(Qt::Horizontal);
+        progressBar = new QProgressBar(centralWidget);
+        progressBar->setObjectName(QStringLiteral("progressBar"));
+        progressBar->setValue(0);
+        progressBar->setTextVisible(false);
 
-        gridLayout->addWidget(horizontalSlider_scaleDisp, 9, 0, 1, 1);
+        horizontalLayout->addWidget(progressBar);
 
-        label = new QLabel(centralWidget);
-        label->setObjectName(QStringLiteral("label"));
 
-        gridLayout->addWidget(label, 9, 1, 1, 1);
-
-        pushButton_Stress = new QPushButton(centralWidget);
-        pushButton_Stress->setObjectName(QStringLiteral("pushButton_Stress"));
-        pushButton_Stress->setEnabled(false);
-
-        gridLayout->addWidget(pushButton_Stress, 7, 2, 1, 1);
-
-        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        gridLayout->addItem(verticalSpacer_3, 1, 2, 1, 1);
+        gridLayout->addLayout(horizontalLayout, 1, 0, 1, 2);
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 502, 17));
+        menuBar->setGeometry(QRect(0, 0, 531, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuInsert = new QMenu(menuBar);
@@ -285,11 +311,11 @@ public:
         actionUndo->setText(QApplication::translate("MainWindow", "Undo", 0));
         actionRedo->setText(QApplication::translate("MainWindow", "Redo", 0));
         checkBox_Force->setText(QApplication::translate("MainWindow", "Forces", 0));
-        pushButton_solve->setText(QApplication::translate("MainWindow", "Solve", 0));
         checkBox_const->setText(QApplication::translate("MainWindow", "Constraints", 0));
         pushButton_Disp->setText(QApplication::translate("MainWindow", "Displacement", 0));
-        label->setText(QApplication::translate("MainWindow", "Scale Factor:", 0));
         pushButton_Stress->setText(QApplication::translate("MainWindow", "Stress", 0));
+        pushButton_solve->setText(QApplication::translate("MainWindow", "Solve", 0));
+        label->setText(QApplication::translate("MainWindow", "Scale Factor:", 0));
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuInsert->setTitle(QApplication::translate("MainWindow", "Insert", 0));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0));
