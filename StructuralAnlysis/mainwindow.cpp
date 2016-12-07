@@ -27,6 +27,7 @@
 // forces disappear when click redo after a solve
 // jnumbs dissapear after click add constraint tool bar 1st time
 // prevent member from one joint to same joint
+// reset progress bar when solve reset
 // ////////////////////
 
 // global variables
