@@ -17,6 +17,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpinBox>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -77,6 +78,8 @@ private slots:
     void readFile(std::string fileName);
     void clearToolbars();
     void solveReady();
+    void setStates();
+    QString trimString(std::string reaction);
 
     // undo things
     void on_actionUndo_triggered();
@@ -85,7 +88,6 @@ private slots:
     void clearConstraint();
     void clearForce();
     void clearFile(int num);
-    void clearDraw();
 
     // redo things
     void on_actionRedo_triggered();
