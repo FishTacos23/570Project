@@ -757,7 +757,7 @@ void MainWindow::selectS()
     int s = sSelect->value()-1;
 
     // get information about member
-    double length = myStructure.lenRot[s][0];
+    double length = myStructure.lenRot[s][0]*zoom;
 
     std::string ax1 = std::to_string(myStructure.rmem[s][0]);
     std::string ax2 = std::to_string(myStructure.rmem[s][3]);
@@ -1072,10 +1072,10 @@ void MainWindow::drawMemMap()
 
         // scale values
             // first translate center to origin
-        x1 = x1/scale - xMax;
-        x2 = x2/scale - xMax;
-        y1 = y1/scale - yMin;
-        y2 = y2/scale - yMin;
+        x1 = (x1/scale - xMax)*zoom;
+        x2 = (x2/scale - xMax)*zoom;
+        y1 = (y1/scale - yMin)*zoom;
+        y2 = (y2/scale - yMin)*zoom;
 
         // draw member
         if(s==i+1) // if selected draw red
@@ -1123,7 +1123,7 @@ void MainWindow::drawJoint()
     for(uint i = 0; i < myStructure.xstruct.size(); i++)
     {
         // draw ellipse
-        scene->addEllipse(myStructure.xstruct[i][0]-5,-myStructure.xstruct[i][1]-5,10,10,jPen,jgrey);
+        scene->addEllipse(myStructure.xstruct[i][0]*zoom-5,-myStructure.xstruct[i][1]*zoom-5,10,10,jPen,jgrey);
     }
 }
 
@@ -1153,10 +1153,10 @@ void MainWindow::drawMembers()
         int Two = myStructure.conn[i][1];
 
         // get points values
-        double x1 = myStructure.xstruct[One-1][0];
-        double y1 = -myStructure.xstruct[One-1][1];
-        double x2 = myStructure.xstruct[Two-1][0];
-        double y2 = -myStructure.xstruct[Two-1][1];
+        double x1 = myStructure.xstruct[One-1][0]*zoom;
+        double y1 = -myStructure.xstruct[One-1][1]*zoom;
+        double x2 = myStructure.xstruct[Two-1][0]*zoom;
+        double y2 = -myStructure.xstruct[Two-1][1]*zoom;
 
         // add line to scene
         scene->addLine(x1,y1,x2,y2,mPen);
@@ -1177,8 +1177,8 @@ void MainWindow::drawConstraints()
         int m = myStructure.constMat[i][0]-1;
         int dir = myStructure.constMat[i][1];
 
-        double x1 = myStructure.xstruct[m][0];
-        double y1 = -myStructure.xstruct[m][1];
+        double x1 = myStructure.xstruct[m][0]*zoom;
+        double y1 = -myStructure.xstruct[m][1]*zoom;
 
         // draw based on direction
         if(dir==1)
@@ -1276,8 +1276,8 @@ void MainWindow::drawForces()
         newText->setDefaultTextColor(Qt::gray);
         newText->setPlainText(forceT);
 
-        double x1 = myStructure.xstruct[m][0];
-        double y1 = -myStructure.xstruct[m][1];
+        double x1 = myStructure.xstruct[m][0]*zoom;
+        double y1 = -myStructure.xstruct[m][1]*zoom;
 
         // draw based on direction
         if(dir==1)
@@ -1400,10 +1400,10 @@ void MainWindow::drawDStructure()
         int n = myStructure.conn[i][1]-1;
 
         // get x and y with magnified displacements
-        x1 = (myStructure.xstruct[m][0]+myStructure.dxstruct[m][0]*dDeform);
-        y1 = -(myStructure.xstruct[m][1]+myStructure.dxstruct[m][1]*dDeform);
-        x2 = (myStructure.xstruct[n][0]+myStructure.dxstruct[n][0]*dDeform);
-        y2 = -(myStructure.xstruct[n][1]+myStructure.dxstruct[n][1]*dDeform);
+        x1 = (myStructure.xstruct[m][0]+myStructure.dxstruct[m][0]*dDeform)*zoom;
+        y1 = -(myStructure.xstruct[m][1]+myStructure.dxstruct[m][1]*dDeform)*zoom;
+        x2 = (myStructure.xstruct[n][0]+myStructure.dxstruct[n][0]*dDeform)*zoom;
+        y2 = -(myStructure.xstruct[n][1]+myStructure.dxstruct[n][1]*dDeform)*zoom;
 
         // add line
         myStrucLine = scene->addLine(x1,y1,x2,y2,linePen);
@@ -1873,195 +1873,84 @@ void MainWindow::pushButton_setDProperties()
 
 void MainWindow::wheelEvent(QWheelEvent *event)
 {
-    // test
-    std::cout << "You Scrolled the Wheel ";
+    // accept mouse wheel inputs
 
     QPoint numDegrees = event->angleDelta() / 8;
     QPoint numSteps = numDegrees / 15;
-    QPoint mousePos = event->pos();
 
     double myZoomY = numSteps.y();
-    double myPosX = mousePos.x();
-    double myPosY = mousePos.y();
 
-    std::cout << "to Position: y = "<< myZoomY << std::endl;
-    std::cout << "The mouse position is: x = " << myPosX << " y = " << myPosY << std::endl;
 
     // zoom depending on sign of y
     if(myZoomY < 0)
-    {
         zoomOut();
-    }
     else
-    {
         zoomIn();
-    }
 
     event->accept();
 }
 
 void MainWindow::zoomIn()
 {
-    if(zoom >= 1)
-    {   // clear the scene of the lines
-        scene->clear();
+    // get mouse position
+    QPoint origin = ui->graphicsView->mapFromGlobal(QCursor::pos());
+    QPointF relativeOrigin = ui->graphicsView->mapToScene(origin);
 
+    // get relative to zoom
+    relativeOrigin.setX(relativeOrigin.x()/zoom);
+    relativeOrigin.setX(relativeOrigin.x()/zoom);
+
+    if(zoom >= 1)
+    {
         // set new zoom factor
         zoom++;
 
         // draw the shapes again
-        if(displace)
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawDStructure();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
-        else
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawMembers();
-            drawJoint();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
+        drawThings();
     }
     else if(zoom < 1)
     {
-        // clear the scene of the lines
-        scene->clear();
-
         zoom = zoom + 0.1;
 
         // draw the shapes again
-        if(displace)
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawDStructure();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
-        else
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawMembers();
-            drawJoint();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
+        drawThings();
     }
+
+    // set scene to point under mouse
 }
 
 void MainWindow::zoomOut()
 {
+    // get mouse position
+    QPoint origin = ui->graphicsView->mapFromGlobal(QCursor::pos());
+    QPointF relativeOrigin = ui->graphicsView->mapToScene(origin);
+
+    // get relative to zoom
+    relativeOrigin.setX(relativeOrigin.x()/zoom);
+    relativeOrigin.setX(relativeOrigin.x()/zoom);
+
     if(zoom > 1)
     {
-        // clear the scene of the lines
-        scene->clear();
-
         // set new zoom factor
         zoom--;
 
         // draw the shapes again
-        if(displace)
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawDStructure();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
-        else
-        {
-            if(ui->checkBox_const->isChecked())
-            {
-                drawConstraints();
-            }
-
-            drawMembers();
-            drawJoint();
-
-            if(ui->checkBox_Force->isChecked())
-            {
-                drawForces();
-            }
-        }
+        drawThings();
     }
     else if(zoom <= 1)
     {
         if(zoom > .1)
         {
-            // clear the scene of the lines
-            scene->clear();
-
+            // set new zoom factor
             zoom = zoom - 0.1;
 
             // draw the shapes again
-            if(displace)
-            {
-                if(ui->checkBox_const->isChecked())
-                {
-                    drawConstraints();
-                }
-
-                drawDStructure();
-
-                if(ui->checkBox_Force->isChecked())
-                {
-                    drawForces();
-                }
-            }
-            else
-            {
-                if(ui->checkBox_const->isChecked())
-                {
-                    drawConstraints();
-                }
-
-                drawMembers();
-                drawJoint();
-
-                if(ui->checkBox_Force->isChecked())
-                {
-                    drawForces();
-                }
-            }
+            drawThings();
         }
     }
+
+    // set scene to point under mouse
+
 }
 
 void MainWindow::readFile(std::string fileName)
