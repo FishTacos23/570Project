@@ -47,6 +47,8 @@ public:
     QAction *actionForces;
     QAction *actionUndo;
     QAction *actionRedo;
+    QAction *actionAbout;
+    QAction *actionHelp_Document;
     QWidget *centralWidget;
     QGridLayout *gridLayout;
     QGraphicsView *graphicsView;
@@ -68,6 +70,7 @@ public:
     QMenu *menuFile;
     QMenu *menuInsert;
     QMenu *menuEdit;
+    QMenu *menuHelp;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -100,6 +103,10 @@ public:
         actionUndo->setObjectName(QStringLiteral("actionUndo"));
         actionRedo = new QAction(MainWindow);
         actionRedo->setObjectName(QStringLiteral("actionRedo"));
+        actionAbout = new QAction(MainWindow);
+        actionAbout->setObjectName(QStringLiteral("actionAbout"));
+        actionHelp_Document = new QAction(MainWindow);
+        actionHelp_Document->setObjectName(QStringLiteral("actionHelp_Document"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         gridLayout = new QGridLayout(centralWidget);
@@ -109,9 +116,10 @@ public:
         graphicsView = new QGraphicsView(centralWidget);
         graphicsView->setObjectName(QStringLiteral("graphicsView"));
         graphicsView->setMouseTracking(true);
-        graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-        graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+        graphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        graphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        graphicsView->setDragMode(QGraphicsView::NoDrag);
+        graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
         graphicsView->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
         gridLayout->addWidget(graphicsView, 0, 0, 1, 1);
@@ -262,13 +270,15 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 531, 21));
+        menuBar->setGeometry(QRect(0, 0, 531, 17));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QStringLiteral("menuFile"));
         menuInsert = new QMenu(menuBar);
         menuInsert->setObjectName(QStringLiteral("menuInsert"));
         menuEdit = new QMenu(menuBar);
         menuEdit->setObjectName(QStringLiteral("menuEdit"));
+        menuHelp = new QMenu(menuBar);
+        menuHelp->setObjectName(QStringLiteral("menuHelp"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -280,6 +290,7 @@ public:
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuInsert->menuAction());
         menuBar->addAction(menuEdit->menuAction());
+        menuBar->addAction(menuHelp->menuAction());
         menuFile->addAction(actionOpen);
         menuFile->addAction(actionSave_Results);
         menuFile->addAction(actionClear);
@@ -290,6 +301,8 @@ public:
         menuInsert->addAction(actionProperties);
         menuEdit->addAction(actionUndo);
         menuEdit->addAction(actionRedo);
+        menuHelp->addAction(actionAbout);
+        menuHelp->addAction(actionHelp_Document);
 
         retranslateUi(MainWindow);
         QObject::connect(horizontalSlider_scaleDisp, SIGNAL(sliderMoved(int)), lcdNumber, SLOT(display(int)));
@@ -310,6 +323,8 @@ public:
         actionForces->setText(QApplication::translate("MainWindow", "Forces", 0));
         actionUndo->setText(QApplication::translate("MainWindow", "Undo", 0));
         actionRedo->setText(QApplication::translate("MainWindow", "Redo", 0));
+        actionAbout->setText(QApplication::translate("MainWindow", "About", 0));
+        actionHelp_Document->setText(QApplication::translate("MainWindow", "Help Document", 0));
         checkBox_Force->setText(QApplication::translate("MainWindow", "Forces", 0));
         checkBox_const->setText(QApplication::translate("MainWindow", "Constraints", 0));
         pushButton_Disp->setText(QApplication::translate("MainWindow", "Displacement", 0));
@@ -319,6 +334,7 @@ public:
         menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
         menuInsert->setTitle(QApplication::translate("MainWindow", "Insert", 0));
         menuEdit->setTitle(QApplication::translate("MainWindow", "Edit", 0));
+        menuHelp->setTitle(QApplication::translate("MainWindow", "Help", 0));
     } // retranslateUi
 
 };

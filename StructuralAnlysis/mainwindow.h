@@ -25,10 +25,29 @@
 #include <QVBoxLayout>
 #include <QSpinBox>
 #include <QString>
+#include <QGraphicsScene>
 
 namespace Ui {
+
 class MainWindow;
 }
+
+class SceneListener
+{
+public:
+    virtual void ScrollChange() = 0;
+};
+
+// costum method to accept clicks
+class CustomScene : public QGraphicsScene
+{
+public:
+    void addSceneListener(SceneListener *listener);
+
+protected:
+   void mousePressEvent(QGraphicsSceneMouseEvent *event);
+   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+};
 
 class MainWindow : public QMainWindow
 {
@@ -78,8 +97,10 @@ private slots:
 
     // view methods
     void wheelEvent(QWheelEvent *event);
-    void zoomIn();
-    void zoomOut();
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *eventRelease);
+    void pressThings();
+    void releaseThings();
 
     // other methods
     void readFile(std::string fileName);
@@ -107,9 +128,13 @@ private slots:
     // draw joint nums
     void drawJNums();
 
+    void on_actionAbout_triggered();
+
+    void on_actionHelp_Document_triggered();
+
 private:
     Ui::MainWindow *ui;
-    QGraphicsScene *scene;
+    CustomScene *scene;
     QGraphicsLineItem *myStrucLine;
     QGraphicsEllipseItem *myStructCirc;
     Analyze myStruct();
@@ -121,6 +146,7 @@ private:
     std::vector<QGraphicsTextItem*> rText;
     QPolygonF noTransShape;
     QFont font;
+    void ScrollChange();
 
     QPolygonF noDrawnTransShape;
     QGraphicsRectItem *noDrawnRot;
@@ -138,8 +164,6 @@ private:
     double xmin;
     double ymax;
     double ymin;
-
-    int smem;
 
     // checks
     bool constraint;

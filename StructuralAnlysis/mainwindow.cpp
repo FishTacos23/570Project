@@ -27,6 +27,8 @@
 #include <fstream>
 #include <QSpinBox>
 #include <QMatrix4x4>
+#include <QScrollBar>
+#include <QTextBrowser>
 
 // global variables
 static Analyze myStructure;
@@ -34,6 +36,7 @@ static Analyze myStructure;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
+//    SceneListener()
 {
     ui->setupUi(this);
     QMainWindow::showMaximized();
@@ -47,9 +50,13 @@ MainWindow::MainWindow(QWidget *parent) :
     fToolBarActive = false;
     pToolBarActive = false;
     sToolBarActive = false;
+    ui->graphicsView->verticalScrollBar()->blockSignals(true);
+    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
 
     // set up graphics scene
-    scene = new QGraphicsScene(this);
+    scene = new CustomScene();
+//    scene->addSceneListener(this);
+
     ui->graphicsView->setScene(scene);
     scene->setBackgroundBrush(Qt::black);
 }
@@ -59,14 +66,20 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//void MainWindow::ScrollChange()
+//{
+//    //Do stuff to scroll bars
+
+//}
+
 void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-//    std::string fileName = fileNameQ.toStdString();
+    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+    std::string fileName = fileNameQ.toStdString();
 
-    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
+//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
 
     // check file for errors
     try
@@ -621,6 +634,9 @@ void MainWindow::on_pushButton_solve_released()
         undoList.clear();
         redoList.clear();
 
+        // set mouse to hourglass
+        QApplication::setOverrideCursor(Qt::BusyCursor);
+
         // perform sturctural calculation and set progress bar
         myStructure.preprocessing();
             ui->progressBar->setValue(5);
@@ -641,6 +657,7 @@ void MainWindow::on_pushButton_solve_released()
             ui->progressBar->setValue(100);
 
         // set states
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
         dDeform = 1;
         solved = true;
         setStates();
@@ -1875,82 +1892,74 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 {
     // accept mouse wheel inputs
 
-    QPoint numDegrees = event->angleDelta() / 8;
-    QPoint numSteps = numDegrees / 15;
+    // code on zooming comes from here
+    //http://www.qtcentre.org/threads/52603-Zoom-effect-by-mouse-Wheel-in-QGraphicsview
 
-    double myZoomY = numSteps.y();
+    // set point of scale
+    ui->graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
+    // zoom factor
+    double scaleFactor = 1.15;
 
-    // zoom depending on sign of y
-    if(myZoomY < 0)
-        zoomOut();
+    // if in or out
+    if(event->delta() > 0)
+        ui->graphicsView->scale(scaleFactor, scaleFactor);
     else
-        zoomIn();
+        ui->graphicsView->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
 
-    event->accept();
 }
 
-void MainWindow::zoomIn()
+void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    // get mouse position
-    QPoint origin = ui->graphicsView->mapFromGlobal(QCursor::pos());
-    QPointF relativeOrigin = ui->graphicsView->mapToScene(origin);
+//    // allow scrolling
+//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+//    ui->graphicsView->verticalScrollBar()->blockSignals(false);
+//    ui->graphicsView->horizontalScrollBar()->blockSignals(false);
 
-    // get relative to zoom
-    relativeOrigin.setX(relativeOrigin.x()/zoom);
-    relativeOrigin.setX(relativeOrigin.x()/zoom);
+    std::cout << "WD You Pressed" << std::endl;
 
-    if(zoom >= 1)
-    {
-        // set new zoom factor
-        zoom++;
-
-        // draw the shapes again
-        drawThings();
-    }
-    else if(zoom < 1)
-    {
-        zoom = zoom + 0.1;
-
-        // draw the shapes again
-        drawThings();
-    }
-
-    // set scene to point under mouse
+//    event->accept();
 }
 
-void MainWindow::zoomOut()
+void MainWindow::mouseReleaseEvent(QMouseEvent *eventRelease)
 {
-    // get mouse position
-    QPoint origin = ui->graphicsView->mapFromGlobal(QCursor::pos());
-    QPointF relativeOrigin = ui->graphicsView->mapToScene(origin);
+//    // allow scrolling
+//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+//    ui->graphicsView->verticalScrollBar()->blockSignals(true);
+//    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
 
-    // get relative to zoom
-    relativeOrigin.setX(relativeOrigin.x()/zoom);
-    relativeOrigin.setX(relativeOrigin.x()/zoom);
+//    // set back to arrow
+//    QApplication::setOverrideCursor(Qt::ArrowCursor);
 
-    if(zoom > 1)
-    {
-        // set new zoom factor
-        zoom--;
+    std::cout << "WD You Released" << std::endl;
 
-        // draw the shapes again
-        drawThings();
-    }
-    else if(zoom <= 1)
-    {
-        if(zoom > .1)
-        {
-            // set new zoom factor
-            zoom = zoom - 0.1;
+    //    eventRelease->accept();
+}
 
-            // draw the shapes again
-            drawThings();
-        }
-    }
+void MainWindow::pressThings()
+{
+    std::cout << "clicked scene" << std::endl;
 
-    // set scene to point under mouse
+    // allow scrolling
+    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+    ui->graphicsView->verticalScrollBar()->blockSignals(false);
+    ui->graphicsView->horizontalScrollBar()->blockSignals(false);
 
+    // set to hand
+    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+}
+
+void MainWindow::releaseThings()
+{
+    std::cout << "released scene" << std::endl;
+
+    // allow scrolling
+    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+    ui->graphicsView->verticalScrollBar()->blockSignals(true);
+    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
+
+    // set back to arrow
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 void MainWindow::readFile(std::string fileName)
@@ -2610,4 +2619,51 @@ void MainWindow::drawJNums()
     // draw joint numbers
     for(int i = 0; i < jText.size(); i++)
         scene->addItem(jText[i]);
+}
+
+void CustomScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    std::cout << "CS clicked scene" << std::endl;
+
+    // allow scrolling
+//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
+//    ui->graphicsView->verticalScrollBar()->blockSignals(false);
+//    ui->graphicsView->horizontalScrollBar()->blockSignals(false);
+
+//    // set to hand
+//    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+}
+
+void CustomScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    std::cout << "CS released scene" << std::endl;
+
+//    // allow scrolling
+//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
+//    ui->graphicsView->verticalScrollBar()->blockSignals(true);
+//    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
+
+//    // set back to arrow
+//    QApplication::setOverrideCursor(Qt::ArrowCursor);
+}
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this,"About","DynoSim is a state of the art \n Structural Simulation Package \n"
+                                    "IT HAS AN UNDO BUTTON");
+}
+
+void MainWindow::on_actionHelp_Document_triggered()
+{
+    QString fileName1 = "helpDoc.txt";
+    QFile file1(fileName1);
+    if(!file1.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+//    // show the directory path of opened file
+//    dir->setText(QFileInfo(file1).dir().path());
+
+    QTextBrowser *b = new QTextBrowser;
+    b->setText(file1.readAll());
+    b->show();
 }

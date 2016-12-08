@@ -1,7 +1,0 @@
-Joint 1	dX = -0.033333	dY = -11.111111
-Joint 2	dX = 0.000000	dY = 0.000000
-Joint 3	dX = -22.055556	dY = 0.033333
-Joint 4	dX = -22.022222	dY = 44.144444
-Member 1	Axial 1 = -100.000000	Shear 1 = -100.000000	Moment 1 = -10000.000000	Axial 2 = 100.000000	Shear 2 = 100.000000	Moment 2 = -0.000000
-Member 2	Axial 1 = -100.000000	Shear 1 = 100.000000	Moment 1 = 9900.000000	Axial 2 = 100.000000	Shear 2 = -100.000000	Moment 2 = 100.000000
-Member 3	Axial 1 = -100.000000	Shear 1 = -100.000000	Moment 1 = -10000.000000	Axial 2 = 100.000000	Shear 2 = 100.000000	Moment 2 = -0.000000

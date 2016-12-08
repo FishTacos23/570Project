@@ -173,12 +173,12 @@ std::vector<std::vector<double> > PFrame::PFrameStiff(std::vector<double> lenRot
 
 std::vector<std::vector<double> > PFrame::PFrameDistrib()
 {
-
+    // only used for distributed loads
 }
 
 std::vector<std::vector<double> > PFrame::PFrameForce()
 {
-
+    // only used for distributed loads / support displacements
 }
 
 std::vector<std::vector<double> > PFrame::PFrameReac(std::vector<std::vector<double>> lenRot, std::vector<std::vector<std::vector<double>>> kmem, std::vector<std::vector<double>> umem, std::vector<std::vector<double>> fmem, int nmems)
@@ -199,7 +199,7 @@ std::vector<std::vector<double> > PFrame::PFrameReac(std::vector<std::vector<dou
         rmemRot.push_back(row);
     }
 
-    // loop through member
+    // get global reactions
     for(int i = 0; i < nmems; i++)
     {
         for(int j = 0; j < 6; j++)

@@ -16,8 +16,10 @@ Analyze::Analyze()
 
 void Analyze::preprocessing()
 {
+    // clear structure vector
     lenRot.clear();
 
+    // set variables
     njoints = xstruct.size();
     ndofs = PFrame().ndofs;
     nmems = conn.size();
@@ -36,18 +38,20 @@ void Analyze::preprocessing()
         // PFrameLenRot
         oneLenRot = PFrame::PFrameLenRot(memberCoordinates);
 
+        // push to structure vector
         lenRot.push_back(oneLenRot);
     }
-
-
 
 }
 
 void Analyze::AssembleStructStiff()
 {
+    // clear structure vectors
     KStruct.clear();
+    compMtoS.clear();
+    kmem.clear();
 
-    // initialize Struct Stiff Mat
+    // initialize Struct Stiff Mat and Comps
     for(int i = 0; i < nSDOF-1; i++)
     {
         std::vector<double> row;
@@ -58,8 +62,6 @@ void Analyze::AssembleStructStiff()
         KStruct.push_back(row);
     }
 
-    compMtoS.clear();
-
     for(int i = 0; i < nmems; i++)
     {
         std::vector<int> row;
@@ -69,8 +71,6 @@ void Analyze::AssembleStructStiff()
         }
         compMtoS.push_back(row);
     }
-
-    kmem.clear();
 
     // loop through members
     for(int i = 0; i < nmems; i++)
@@ -105,7 +105,7 @@ void Analyze::AssembleStructStiff()
             }
         }
 
-        // loop through compMtoS
+        // Fill Structure Stiffness Matrix
         for(int j=0; j<ndofs*2; j++)
         {
             if(compMtoS[i][j] != 0)
@@ -126,6 +126,8 @@ void Analyze::AssembleStructStiff()
 
 void Analyze::Triangularization()
 {
+    // triangularize structure stiffness Matrix
+
     // MatTriangSelf
     int s = KStruct.size();
 
@@ -151,6 +153,8 @@ void Analyze::Triangularization()
 
 void Analyze::AssembleStructForce()
 {
+    // clear structure vector
+
     FStruct.clear();
 
     for(int i = 0; i < nSDOF-1; i++)
@@ -158,7 +162,7 @@ void Analyze::AssembleStructForce()
         FStruct.push_back(0);
     }
 
-    // loop through joints and directions
+    // Fill Structure Force Vector
     int j;
     int dir;
 
@@ -168,7 +172,6 @@ void Analyze::AssembleStructForce()
         j = loadMat[i][0];
         dir = loadMat[i][1];
 
-
         int m = SDOF[j-1][dir-1]-1;
 
         FStruct[m] = loadMat[i][2];
@@ -177,15 +180,20 @@ void Analyze::AssembleStructForce()
 
 void Analyze::BackSub()
 {
+    // cal back substitution
     MatBackSelf();
 }
 
 void Analyze::postprocessing()
 {
+    // clear structure vectors
     dxstruct.clear();
+    umem.clear();
+    fmem.clear();
 
     int s = SDOF.size();
 
+    // initialize vector
     for(int i = 0; i < s; i++)
     {
         std::vector<double> row;
@@ -196,6 +204,7 @@ void Analyze::postprocessing()
         dxstruct.push_back(row);
     }
 
+    // structure displacement vectors
     // loop through joints and disp
         // loop through SDOF
     for(int i = 0; i < s; i++)
@@ -210,9 +219,7 @@ void Analyze::postprocessing()
         }
     }
 
-    umem.clear();
-    fmem.clear();
-
+    // initialize member displacement and force vectors
     for(int i = 0; i < nmems; i++)
     {
         std::vector<double> row;
@@ -224,6 +231,7 @@ void Analyze::postprocessing()
         fmem.push_back(row);
     }
 
+    // fill member displacement vectors
     // loop through members
     for(int i = 0; i < nmems; i++)
     {
@@ -243,8 +251,10 @@ void Analyze::postprocessing()
 
 void Analyze::StructDOF()
 {
+    // clear structure stuff
     SDOF.clear();
 
+    // get variables
     int num = 1;
     int s = constMat.size();
     int m;
@@ -290,7 +300,8 @@ void Analyze::StructDOF()
 
 std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
 {
-    // loop through conn matrix
+    // compares structure coordinates and member coordinates
+
     std::vector<std::vector<double>> memCoord;
 
     std::vector<double> jCoord;
@@ -316,7 +327,11 @@ std::vector<std::vector<double> > Analyze::StructToMemCoord(int memNum)
 
 bool Analyze::checkReady()
 {
+    // check if structure is ready to be solved
+
+    // assume no
     bool Ready = false;
+
     if(!conn.empty()&&!properties.empty()&&!constMat.empty()&&!loadMat.empty()) // make nothing is empty
     {
         // check that all joints are connected to something
@@ -342,7 +357,6 @@ bool Analyze::checkReady()
 
                 if(foundI==true)
                     break;
-
             }
         }
 
@@ -362,6 +376,8 @@ void Analyze::MatBackSelf()
 
     std::vector<double> e;
     std::vector<double> d;
+
+    // initialize structure displacement vector
     for(int i = 0; i < nSDOF-1; i++)
     {
         e.push_back(0);
@@ -399,11 +415,13 @@ void Analyze::MatBackSelf()
 
 void Analyze::CalcReacs()
 {
+    // get values from PFrame
     rmem = PFrame::PFrameReac(lenRot, kmem, umem, fmem, nmems);
 }
 
 void Analyze::clearStructVar()
 {
+    // clear structure matrices
     KStruct.clear();
     FStruct.clear();
     UStruct.clear();
