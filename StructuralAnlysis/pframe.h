@@ -1,3 +1,11 @@
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+// Title:           Spencer's PFrame Analysis
+// Description:     Solve Structure PFrame Variables
+//                  Code is based off learning and methods from Dr. Balling's class
+// Author:          Spencer Bunnell
+// Date:            October 2016
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef PFRAME_H
 #define PFRAME_H
 #include <vector>

@@ -1,10 +1,16 @@
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+// Title:           Spencer's Tokenized Application
+// Description:     Parse Text
+//                  Based off of code presented by Professor McBride
+// Author:          Spencer Bunnell
+// Date:            October 2016
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "tokenize.h"
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <iostream>
-
-// this function came from Dr. Merkley's LS example
 
 tokenize::tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters)
 {

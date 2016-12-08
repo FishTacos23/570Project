@@ -1,3 +1,10 @@
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+// Title:           Spencer's Structural Analysis Program
+// Description:     Solve and Visualize Displacements and Reaction Forces on Structures
+// Author:          Spencer Bunnell
+// Date:            October 2016
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
@@ -19,13 +26,7 @@
 #include <QGraphicsTextItem>
 #include <fstream>
 #include <QSpinBox>
-
-// to DO //////////////
-// zoom and pan
-// forces disappear when click redo after a solve
-// prevent member from one joint to same joint
-// reset progress bar when solve reset
-// ////////////////////
+#include <QMatrix4x4>
 
 // global variables
 static Analyze myStructure;
@@ -40,8 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // initialize checks and states
     solved = false;
     displace = false;
-    constraint = false;
-    force = false;
     jToolBarActive = false;
     mToolBarActive = false;
     cToolBarActive = false;
@@ -64,10 +63,10 @@ void MainWindow::on_actionOpen_triggered()
 {
 
     // get file name
-    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
-    std::string fileName = fileNameQ.toStdString();
+//    QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
+//    std::string fileName = fileNameQ.toStdString();
 
-//    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
+    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
 
     // check file for errors
     try
@@ -85,8 +84,9 @@ void MainWindow::on_actionOpen_triggered()
         // draw to scene
         drawThings();
 
-        // set new state
+        // set new states
         opening = false;
+        setStates();
     }
     catch(std::invalid_argument)
     {
@@ -162,6 +162,7 @@ void MainWindow::on_actionClear_triggered()
         // set states
         solved = false;
         displace = false;
+        stress = false;
         jToolBarActive = false;
         mToolBarActive = false;
         cToolBarActive = false;
@@ -203,6 +204,7 @@ void MainWindow::on_actionClear_triggered()
             // set states
             solved = false;
             displace = false;
+            stress = false;
             jToolBarActive = false;
             mToolBarActive = false;
             cToolBarActive = false;
@@ -229,6 +231,7 @@ void MainWindow::on_actionJoints_triggered()
     // clear and set states
     clearToolbars();
     jToolBarActive = true;
+    setStates();
 
     // create toolbars and widgets
     jointToolBar = new QToolBar("Place Joints  ");
@@ -289,6 +292,7 @@ void MainWindow::on_actionMembers_triggered()
     // clear tool bars and set states
     clearToolbars();
     mToolBarActive = true;
+    setStates();
 
     // create toolbar and widgets
     memberToolBar = new QToolBar("Place Members");
@@ -349,6 +353,7 @@ void MainWindow::on_actionConstraints_triggered()
     // clear toolbars and set states
     clearToolbars();
     cToolBarActive = true;
+    setStates();
 
     // create toolbar and widgets
     constraintToolBar = new QToolBar("Place Constraint");
@@ -428,6 +433,7 @@ void MainWindow::on_actionForces_triggered()
     // clear toolbars and set states
     clearToolbars();
     fToolBarActive = true;
+    setStates();
 
     // create toolbar and widgets
     forceToolBar = new QToolBar("Place Force");
@@ -518,6 +524,7 @@ void MainWindow::on_actionProperties_triggered()
     // clear toolbars and set states
     clearToolbars();
     pToolBarActive = true;
+    setStates();
 
     // create toolbar and widgets
     propToolBar = new QToolBar("Set Properties");
@@ -655,7 +662,7 @@ void MainWindow::on_pushButton_Disp_released()
 
 void MainWindow::on_horizontalSlider_scaleDisp_sliderMoved(int position)
 {
-    if(solved)
+    if(displace)
     {
         // set magnification
         dDeform = position;
@@ -707,25 +714,13 @@ void MainWindow::on_pushButton_Stress_released()
 
 void MainWindow::on_checkBox_const_toggled(bool checked)
 {
-    // set states
-    if(checked)
-        constraint = true;
-    else
-        constraint = false;
-
-    // draw to scene
+    // redraw
     drawThings();
 }
 
 void MainWindow::on_checkBox_Force_toggled(bool checked)
 {
-    // set states
-    if(checked==true)
-        force = true;
-    else
-        force = false;
-
-    // draw to scene
+    // redraw
     drawThings();
 }
 
@@ -830,7 +825,7 @@ void MainWindow::selectS()
     rText.push_back(newTextax1);
 
     QGraphicsTextItem *newTextax2 = new QGraphicsTextItem;
-    newTextax2->setDefaultTextColor(Qt::darkMagenta);
+    newTextax2->setDefaultTextColor(Qt::magenta);
     newTextax2->setPlainText(axs2);
     newTextax2->setX(length+40);
     newTextax2->setY(5);
@@ -841,42 +836,38 @@ void MainWindow::selectS()
     // left side
     if(negativeAx1)
     {
-        noDrawnTransShape << QPointF(-50,0) << QPointF(-30,5) << QPointF(-30,-5);
-        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
         noDrawnTransShape.clear();
+        noDrawnTransShape << QPointF(-50,0) << QPointF(-30,5) << QPointF(-30,-5);
+        noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);       
     }
     else
     {
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(0,0) << QPointF(-20,5) << QPointF(-20,-5);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
     // right side
     if(negativeAx2)
     {
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length,0) << QPointF(length+20,5) << QPointF(length+20,-5);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
     else
     {
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length+50,0) << QPointF(length+30,5) << QPointF(length+30,-5);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
 
     // shear /////////////////////////////////////////////////////////////////////////////////////////
 
     // create text items
     QGraphicsTextItem *newTextsh1 = new QGraphicsTextItem;
-    newTextsh1->setDefaultTextColor(Qt::darkMagenta);
+    newTextsh1->setDefaultTextColor(Qt::magenta);
     newTextsh1->setPlainText(shs1);
     QGraphicsTextItem *newTextsh2 = new QGraphicsTextItem;
-    newTextsh2->setDefaultTextColor(Qt::darkMagenta);
+    newTextsh2->setDefaultTextColor(Qt::magenta);
     newTextsh2->setPlainText(shs2);
 
     // left side
@@ -890,10 +881,9 @@ void MainWindow::selectS()
         myStrucLine = scene->addLine(0,0,0,50,loadPen);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(0,50) << QPointF(5,30) << QPointF(-5,30);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
     else
     {
@@ -905,10 +895,9 @@ void MainWindow::selectS()
         myStrucLine = scene->addLine(0,0,0,-50,loadPen);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(0,-50) << QPointF(5,-30) << QPointF(-5,-30);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
 
     // add to list
@@ -925,10 +914,9 @@ void MainWindow::selectS()
         myStrucLine = scene->addLine(length,0,length,50,loadPen);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length,50) << QPointF(5+length,30) << QPointF(length-5,30);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
     else
     {
@@ -940,10 +928,9 @@ void MainWindow::selectS()
         myStrucLine = scene->addLine(length,0,length,-50,loadPen);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length,-50) << QPointF(5+length,-30) << QPointF(length-5,-30);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,loadPen,loadBrush);
-
-        noDrawnTransShape.clear();
     }
 
     // push to list
@@ -953,10 +940,10 @@ void MainWindow::selectS()
 
     // create texts
     QGraphicsTextItem *newTextmo1 = new QGraphicsTextItem;
-    newTextmo1->setDefaultTextColor(Qt::darkMagenta);
+    newTextmo1->setDefaultTextColor(Qt::magenta);
     newTextmo1->setPlainText(mos1);
     QGraphicsTextItem *newTextmo2 = new QGraphicsTextItem;
-    newTextmo2->setDefaultTextColor(Qt::darkMagenta);
+    newTextmo2->setDefaultTextColor(Qt::magenta);
     newTextmo2->setPlainText(mos2);
 
     // draw circles
@@ -971,10 +958,9 @@ void MainWindow::selectS()
         newTextmo1->setY(-30);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(10,-20) << QPointF(-10,-15) << QPointF(-10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
-
-        noDrawnTransShape.clear();
     }
     else
     {
@@ -983,10 +969,9 @@ void MainWindow::selectS()
         newTextmo1->setY(-30);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(-10,-20) << QPointF(10,-15) << QPointF(10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
-
-        noDrawnTransShape.clear();
     }
 
     // push text to list
@@ -1000,10 +985,9 @@ void MainWindow::selectS()
         newTextmo2->setY(-30);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length+10,-20) << QPointF(length-10,-15) << QPointF(length-10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
-
-        noDrawnTransShape.clear();
     }
     else
     {
@@ -1012,10 +996,9 @@ void MainWindow::selectS()
         newTextmo2->setY(-30);
 
         // draw arrow head
+        noDrawnTransShape.clear();
         noDrawnTransShape << QPointF(length-10,-20) << QPointF(length+10,-15) << QPointF(length+10,-25);
         noDrawnTrans = scene->addPolygon(noDrawnTransShape,momPen,momBrush2);
-
-        noDrawnTransShape.clear();
     }
 
     // push text to list
@@ -1031,6 +1014,8 @@ void MainWindow::selectS()
 
 void MainWindow::drawMemMap()
 {
+    // draw greyed- out structure to the side highlighting which member you are looking at
+
     // create and format and variables
     QPen noSelectPen(Qt::gray);
     QPen SelectPen(Qt::red);
@@ -1072,12 +1057,6 @@ void MainWindow::drawMemMap()
     double x2;
     double y1;
     double y2;
-    double midx;
-    double midy;
-    double tempy1;
-    double tempy2;
-    double tempx1;
-    double tempx2;
     double scale = 3;
 
     // draw members
@@ -1087,36 +1066,22 @@ void MainWindow::drawMemMap()
         J2 = myStructure.conn[i][1]-1;
 
         x1 = myStructure.xstruct[J1][0];
-        y1 = myStructure.xstruct[J1][1];
+        y1 = -myStructure.xstruct[J1][1];
         x2 = myStructure.xstruct[J2][0];
-        y2 = myStructure.xstruct[J2][1];
+        y2 = -myStructure.xstruct[J2][1];
 
         // scale values
             // first translate center to origin
-        midx = (x1 + x2)/2;
-        tempx1 = x1 - midx;
-        tempx2 = x2 - midx;
-        midy = (y1 + y2)/2;
-        tempy1 = y1 - midx;
-        tempy2 = y2 - midx;
-
-            // scale
-        tempx1 /= scale;
-        tempx2 /= scale;
-        tempy1 /= scale;
-        tempy2 /= scale;
-
-            // move
-        tempx1 -= xMax-midx;
-        tempx2 -= xMax-midx;
-        tempy1 += yMin-midy;
-        tempy2 += yMin-midy;
+        x1 = x1/scale - xMax;
+        x2 = x2/scale - xMax;
+        y1 = y1/scale - yMin;
+        y2 = y2/scale - yMin;
 
         // draw member
         if(s==i+1) // if selected draw red
-            scene->addLine(tempx1,tempy1,tempx2,tempy2,SelectPen);
+            scene->addLine(x1,y1,x2,y2,SelectPen);
         else
-            scene->addLine(tempx1,tempy1,tempx2,tempy2,noSelectPen);
+            scene->addLine(x1,y1,x2,y2,noSelectPen);
     }
 }
 
@@ -1605,7 +1570,6 @@ void MainWindow::pushButton_addconstraint()
         // state
         bool repeat = false;
         ui->checkBox_const->setChecked(true);
-        constraint = true;
 
         // variables
         int numRep = 0;         // count number repeated
@@ -1734,7 +1698,6 @@ void MainWindow::pushButton_addforce()
         // state
         bool repeat = false;
         ui->checkBox_Force->setChecked(true);
-        force = true;
 
         // variables
         int numRep = 0;         // number of repeated
@@ -1947,23 +1910,23 @@ void MainWindow::zoomIn()
         zoom++;
 
         // draw the shapes again
-        if(displace == true)
+        if(displace)
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
 
             drawDStructure();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
         }
         else
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
@@ -1971,7 +1934,7 @@ void MainWindow::zoomIn()
             drawMembers();
             drawJoint();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
@@ -1985,23 +1948,23 @@ void MainWindow::zoomIn()
         zoom = zoom + 0.1;
 
         // draw the shapes again
-        if(displace == true)
+        if(displace)
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
 
             drawDStructure();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
         }
         else
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
@@ -2009,7 +1972,7 @@ void MainWindow::zoomIn()
             drawMembers();
             drawJoint();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
@@ -2028,23 +1991,23 @@ void MainWindow::zoomOut()
         zoom--;
 
         // draw the shapes again
-        if(displace == true)
+        if(displace)
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
 
             drawDStructure();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
         }
         else
         {
-            if(constraint == true)
+            if(ui->checkBox_const->isChecked())
             {
                 drawConstraints();
             }
@@ -2052,7 +2015,7 @@ void MainWindow::zoomOut()
             drawMembers();
             drawJoint();
 
-            if(force == true)
+            if(ui->checkBox_Force->isChecked())
             {
                 drawForces();
             }
@@ -2068,23 +2031,23 @@ void MainWindow::zoomOut()
             zoom = zoom - 0.1;
 
             // draw the shapes again
-            if(displace == true)
+            if(displace)
             {
-                if(constraint == true)
+                if(ui->checkBox_const->isChecked())
                 {
                     drawConstraints();
                 }
 
                 drawDStructure();
 
-                if(force == true)
+                if(ui->checkBox_Force->isChecked())
                 {
                     drawForces();
                 }
             }
             else
             {
-                if(constraint == true)
+                if(ui->checkBox_const->isChecked())
                 {
                     drawConstraints();
                 }
@@ -2092,7 +2055,7 @@ void MainWindow::zoomOut()
                 drawMembers();
                 drawJoint();
 
-                if(force == true)
+                if(ui->checkBox_Force->isChecked())
                 {
                     drawForces();
                 }
@@ -2263,8 +2226,6 @@ void MainWindow::readFile(std::string fileName)
     oneLine.push_back("file");
     oneLine.push_back(NumObj);
     undoList.push_back(oneLine);
-
-    setStates();
 }
 
 void MainWindow::clearToolbars()
@@ -2397,7 +2358,7 @@ void MainWindow::solveReady()
 {
     // check if structure is ready to solve
 
-    if(myStructure.checkReady()==true)
+    if(myStructure.checkReady() && !solved)
         ui->pushButton_solve->setEnabled(true);
     else
         ui->pushButton_solve->setEnabled(false);
@@ -2411,12 +2372,14 @@ void MainWindow::setStates()
         ui->pushButton_Disp->setEnabled(false);
         ui->pushButton_Stress->setEnabled(true);
         ui->actionSave_Results->setEnabled(true);
+        ui->pushButton_solve->setEnabled(false);
     }
     else if(stress)
     {
         ui->pushButton_Disp->setEnabled(true);
         ui->pushButton_Stress->setEnabled(false);
         ui->actionSave_Results->setEnabled(true);
+        ui->pushButton_solve->setEnabled(false);
     }
     else if(solved)
     {
@@ -2532,6 +2495,9 @@ void MainWindow::on_actionUndo_triggered()
 
         // draw to scene
         drawThings();
+
+        // set states
+        setStates();
     }
 }
 
@@ -2651,7 +2617,11 @@ void MainWindow::on_actionRedo_triggered()
         }
     }
 
+    // draw new things
     drawThings();
+
+    // set states
+    setStates();
 }
 
 void MainWindow::redoJoint()

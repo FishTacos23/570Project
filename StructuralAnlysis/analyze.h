@@ -1,3 +1,11 @@
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+// Title:           Spencer's Structure Stiffness Matrix Method
+// Description:     Solve Structure Stiffness Matrix
+//                  Code is based off learning and methods from Dr. Balling's class
+// Author:          Spencer Bunnell
+// Date:            October 2016
+// /////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #ifndef ANALYZE_H
 #define ANALYZE_H
 #include <vector>
