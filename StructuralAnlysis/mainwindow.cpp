@@ -237,6 +237,10 @@ void MainWindow::on_actionJoints_triggered()
     // clear and set states
     clearToolbars();
     jToolBarActive = true;
+    solved = false;
+    stress = false;
+    displace = false;
+    drawThings();
     setStates();
 
     // create toolbars and widgets
@@ -298,7 +302,11 @@ void MainWindow::on_actionMembers_triggered()
     // clear tool bars and set states
     clearToolbars();
     mToolBarActive = true;
+    solved = false;
+    stress = false;
+    displace = false;
     setStates();
+    drawThings();
 
     // create toolbar and widgets
     memberToolBar = new QToolBar("Place Members");
@@ -359,7 +367,11 @@ void MainWindow::on_actionConstraints_triggered()
     // clear toolbars and set states
     clearToolbars();
     cToolBarActive = true;
+    solved = false;
+    stress = false;
+    displace = false;
     setStates();
+    drawThings();
 
     // create toolbar and widgets
     constraintToolBar = new QToolBar("Place Constraint");
@@ -439,7 +451,11 @@ void MainWindow::on_actionForces_triggered()
     // clear toolbars and set states
     clearToolbars();
     fToolBarActive = true;
+    solved = false;
+    stress = false;
+    displace = false;
     setStates();
+    drawThings();
 
     // create toolbar and widgets
     forceToolBar = new QToolBar("Place Force");
@@ -530,6 +546,10 @@ void MainWindow::on_actionProperties_triggered()
     // clear toolbars and set states
     clearToolbars();
     pToolBarActive = true;
+    solved = false;
+    stress = false;
+    displace = false;
+    drawThings();
     setStates();
 
     // create toolbar and widgets
@@ -687,6 +707,7 @@ void MainWindow::on_pushButton_Stress_released()
     // pointers deleted on clear tool bar
 
     // set states
+    clearToolbars();
     sToolBarActive = true;
     displace = false;
     stress = true;
@@ -724,14 +745,18 @@ void MainWindow::on_pushButton_Stress_released()
 
 void MainWindow::on_checkBox_const_toggled(bool checked)
 {
-    // redraw
-    drawThings();
+    if(stress)
+        selectS();
+    else
+        drawThings();
 }
 
 void MainWindow::on_checkBox_Force_toggled(bool checked)
 {
-    // redraw
-    drawThings();
+    if(stress)
+        selectS();
+    else
+        drawThings();
 }
 
 void MainWindow::selectS()
@@ -1115,7 +1140,7 @@ void MainWindow::drawThings()
         drawForces();
 
     // label joints
-    if(jToolBarActive || mToolBarActive || cToolBarActive || fToolBarActive)
+//    if(jToolBarActive || mToolBarActive || cToolBarActive || fToolBarActive || pToolBarActive)
         drawJNums();
 
     // draw displaced
@@ -2267,6 +2292,7 @@ void MainWindow::setStates()
         ui->pushButton_Stress->setEnabled(false);
         ui->actionSave_Results->setEnabled(true);
         ui->pushButton_solve->setEnabled(false);
+        drawThings();
     }
     else if(solved)
     {

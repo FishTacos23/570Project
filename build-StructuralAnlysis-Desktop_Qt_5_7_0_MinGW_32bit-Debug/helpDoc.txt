@@ -1,8 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%  DynoSim  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%						                 %
-%  	Spencer Bunnell's Structural Analsyis Program  		 %
-%						  		 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%  DynoSim  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%												%
+%				Spencer Bunnell's Structural Analsyis Program				%
+%												%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 This program solves and displays structural simulations
 using the Structure Stiffness Method. The current edition
