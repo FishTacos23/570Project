@@ -32,23 +32,6 @@ namespace Ui {
 class MainWindow;
 }
 
-class SceneListener
-{
-public:
-    virtual void ScrollChange() = 0;
-};
-
-// costum method to accept clicks
-class CustomScene : public QGraphicsScene
-{
-public:
-    void addSceneListener(SceneListener *listener);
-
-protected:
-   void mousePressEvent(QGraphicsSceneMouseEvent *event);
-   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-};
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -98,7 +81,6 @@ private slots:
     // view methods
     void wheelEvent(QWheelEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *eventRelease);
     void pressThings();
     void releaseThings();
 
@@ -128,13 +110,13 @@ private slots:
     // draw joint nums
     void drawJNums();
 
+    // help tools
     void on_actionAbout_triggered();
-
     void on_actionHelp_Document_triggered();
 
 private:
     Ui::MainWindow *ui;
-    CustomScene *scene;
+    QGraphicsScene *scene;
     QGraphicsLineItem *myStrucLine;
     QGraphicsEllipseItem *myStructCirc;
     Analyze myStruct();
@@ -146,7 +128,6 @@ private:
     std::vector<QGraphicsTextItem*> rText;
     QPolygonF noTransShape;
     QFont font;
-    void ScrollChange();
 
     QPolygonF noDrawnTransShape;
     QGraphicsRectItem *noDrawnRot;
@@ -160,11 +141,6 @@ private:
     std::vector<std::vector<double>> undidLoad;
     std::vector<std::vector<int>> undidConst;
 
-    double xmax;
-    double xmin;
-    double ymax;
-    double ymin;
-
     // checks
     bool constraint;
     bool force;
@@ -177,6 +153,7 @@ private:
     bool pToolBarActive;
     bool sToolBarActive;
     bool opening;
+    bool scroll;
 
     // Line Edits
     QLineEdit *addXText;
@@ -241,6 +218,7 @@ private:
     QRadioButton *constY;
     QRadioButton *constRz;
 
+    // Spin Box
     QSpinBox *sSelect;
 
     // Tool Bars

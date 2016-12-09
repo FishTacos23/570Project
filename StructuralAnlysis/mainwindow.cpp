@@ -36,7 +36,6 @@ static Analyze myStructure;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-//    SceneListener()
 {
     ui->setupUi(this);
     QMainWindow::showMaximized();
@@ -50,13 +49,12 @@ MainWindow::MainWindow(QWidget *parent) :
     fToolBarActive = false;
     pToolBarActive = false;
     sToolBarActive = false;
+    scroll = false;
     ui->graphicsView->verticalScrollBar()->blockSignals(true);
     ui->graphicsView->horizontalScrollBar()->blockSignals(true);
 
     // set up graphics scene
-    scene = new CustomScene();
-//    scene->addSceneListener(this);
-
+    scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
     scene->setBackgroundBrush(Qt::black);
 }
@@ -66,12 +64,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::ScrollChange()
-//{
-//    //Do stuff to scroll bars
-
-//}
-
 void MainWindow::on_actionOpen_triggered()
 {
 
@@ -79,6 +71,7 @@ void MainWindow::on_actionOpen_triggered()
     QString fileNameQ = QFileDialog::getOpenFileName(this,"Open Shape File", "","*.txt");
     std::string fileName = fileNameQ.toStdString();
 
+    // USE THIS ONE WHEN DEBUGGING ON NON-ORIGINAL COMPUTER
 //    std::string fileName = "C:\\Users\\Spencer\\Documents\\570project\\build-StructuralAnlysis-Desktop_Qt_5_7_0_MinGW_32bit-Debug\\StructureInput2.6.txt";
 
     // check file for errors
@@ -1215,7 +1208,8 @@ void MainWindow::drawConstraints()
         else
         {
             // draw rectangle
-            noDrawnRot = scene->addRect(x1-10,y1-10,20,20,constPen,constBrush);
+            //noDrawnRot = scene->addRect(x1-10,y1-10,20,20,constPen,constBrush);
+            scene->addRect(x1-10,y1-10,20,20,constPen,constBrush);
         }
 
     }
@@ -1911,29 +1905,18 @@ void MainWindow::wheelEvent(QWheelEvent *event)
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-//    // allow scrolling
-//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-//    ui->graphicsView->verticalScrollBar()->blockSignals(false);
-//    ui->graphicsView->horizontalScrollBar()->blockSignals(false);
+    // If you click the middle button, allow dragging
+    if(event->button()==Qt::MiddleButton)
+    {
+        if(!scroll)
+            pressThings();
+        else
+            releaseThings();
 
-    std::cout << "WD You Pressed" << std::endl;
+        std::cout << "WD You Pressed" << std::endl;
 
-//    event->accept();
-}
-
-void MainWindow::mouseReleaseEvent(QMouseEvent *eventRelease)
-{
-//    // allow scrolling
-//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
-//    ui->graphicsView->verticalScrollBar()->blockSignals(true);
-//    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
-
-//    // set back to arrow
-//    QApplication::setOverrideCursor(Qt::ArrowCursor);
-
-    std::cout << "WD You Released" << std::endl;
-
-    //    eventRelease->accept();
+        event->accept();
+    }
 }
 
 void MainWindow::pressThings()
@@ -1947,6 +1930,9 @@ void MainWindow::pressThings()
 
     // set to hand
     QApplication::setOverrideCursor(Qt::ClosedHandCursor);
+
+    // set switcher
+    scroll = true;
 }
 
 void MainWindow::releaseThings()
@@ -1960,6 +1946,9 @@ void MainWindow::releaseThings()
 
     // set back to arrow
     QApplication::setOverrideCursor(Qt::ArrowCursor);
+
+    // set switcher
+    scroll = false;
 }
 
 void MainWindow::readFile(std::string fileName)
@@ -2621,32 +2610,6 @@ void MainWindow::drawJNums()
         scene->addItem(jText[i]);
 }
 
-void CustomScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
-{
-    std::cout << "CS clicked scene" << std::endl;
-
-    // allow scrolling
-//    ui->graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
-//    ui->graphicsView->verticalScrollBar()->blockSignals(false);
-//    ui->graphicsView->horizontalScrollBar()->blockSignals(false);
-
-//    // set to hand
-//    QApplication::setOverrideCursor(Qt::ClosedHandCursor);
-}
-
-void CustomScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    std::cout << "CS released scene" << std::endl;
-
-//    // allow scrolling
-//    ui->graphicsView->setDragMode(QGraphicsView::NoDrag);
-//    ui->graphicsView->verticalScrollBar()->blockSignals(true);
-//    ui->graphicsView->horizontalScrollBar()->blockSignals(true);
-
-//    // set back to arrow
-//    QApplication::setOverrideCursor(Qt::ArrowCursor);
-}
-
 void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::about(this,"About","DynoSim is a state of the art \n Structural Simulation Package \n"
@@ -2655,13 +2618,12 @@ void MainWindow::on_actionAbout_triggered()
 
 void MainWindow::on_actionHelp_Document_triggered()
 {
+    // Text viewer code from this guy
+    // http://stackoverflow.com/questions/18555367/qtcreator-gui-open-text-file
     QString fileName1 = "helpDoc.txt";
     QFile file1(fileName1);
     if(!file1.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
-
-//    // show the directory path of opened file
-//    dir->setText(QFileInfo(file1).dir().path());
 
     QTextBrowser *b = new QTextBrowser;
     b->setText(file1.readAll());
