@@ -151,6 +151,8 @@ void MainWindow::on_actionClear_triggered()
         // clear the scene and window
         scene->clear();
         clearToolbars();
+        redoList.clear();
+        undoList.clear();
 
         // clear variables
         myStructure.xstruct.clear();
@@ -216,6 +218,8 @@ void MainWindow::on_actionClear_triggered()
             cToolBarActive = false;
             fToolBarActive = false;
             pToolBarActive = false;
+            redoList.clear();
+            undoList.clear();
 
             break;
         case QMessageBox::Cancel: // do nothing if cancel
@@ -1279,13 +1283,15 @@ void MainWindow::drawForces()
         if(posdot < strSize)
         {
             // loop until dot
-            for(int j = strSize; j >= posdot-1; j--)
+            for(int j = strSize-1; j >= posdot-1; j--)
             {
                 // if there's a zero or dot
-                if(forceMag.substr(j-1,1)=="0" || forceMag.substr(j,1)==".")
+                if(forceMag.substr(j,1)=="0" || forceMag.substr(j,1)==".")
                 {
                     if(!nonZero) // if value is a zero
                     {
+                        if(forceMag.substr(j,1)==".")
+                            nonZero = true;
                         forceMag.erase(j);
                     }
                 }
@@ -2653,5 +2659,7 @@ void MainWindow::on_actionHelp_Document_triggered()
 
     QTextBrowser *b = new QTextBrowser;
     b->setText(file1.readAll());
+    b->setMinimumWidth(1200);
+    b->setMinimumHeight(600);
     b->show();
 }
