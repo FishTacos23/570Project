@@ -1,0 +1,31 @@
+Joint 1	dX = 0.000000	dY = 0.000000
+Joint 2	dX = 1.697050	dY = -6.530479
+Joint 3	dX = -0.002683	dY = -4.882948
+Joint 4	dX = 9.802532	dY = -7.492636
+Joint 5	dX = 3.084698	dY = -9.277289
+Joint 6	dX = -0.187769	dY = -12.533998
+Joint 7	dX = -0.822808	dY = -14.857701
+Joint 8	dX = -1.301181	dY = -13.121695
+Joint 9	dX = -4.596719	dY = -9.842115
+Joint 10	dX = -12.417951	dY = -7.763423
+Joint 11	dX = -0.215483	dY = -4.514667
+Joint 12	dX = -1.486884	dY = -5.740666
+Joint 13	dX = -0.044714	dY = -6.528488
+Joint 14	dX = -0.174719	dY = -5.741022
+Member 1	Axial 1 = 69.104014	Shear 1 = 34.726401	Moment 1 = 3322.930659	Axial 2 = -69.104014	Shear 2 = -34.726401	Moment 2 = 3146.253882
+Member 2	Axial 1 = 59.321570	Shear 1 = -18.472895	Moment 1 = -1733.314006	Axial 2 = -59.321570	Shear 2 = 18.472895	Moment 2 = -1715.135603
+Member 3	Axial 1 = -7.836045	Shear 1 = 22.247046	Moment 1 = 2977.253708	Axial 2 = 7.836045	Shear 2 = -22.247046	Moment 2 = 1167.150572
+Member 4	Axial 1 = 10.533809	Shear 1 = -6.446774	Moment 1 = -1167.150572	Axial 2 = -10.533809	Shear 2 = 6.446774	Moment 2 = -33.819537
+Member 5	Axial 1 = 17.906983	Shear 1 = 1.163787	Moment 1 = 33.819537	Axial 2 = -17.906983	Shear 2 = -1.163787	Moment 2 = 183.431840
+Member 6	Axial 1 = 23.938984	Shear 1 = 1.375395	Moment 1 = -183.431840	Axial 2 = -23.938984	Shear 2 = -1.375395	Moment 2 = 439.654326
+Member 7	Axial 1 = 24.021835	Shear 1 = -1.064707	Moment 1 = -439.654326	Axial 2 = -24.021835	Shear 2 = 1.064707	Moment 2 = 241.309982
+Member 8	Axial 1 = 18.134350	Shear 1 = -0.936420	Moment 1 = -241.309982	Axial 2 = -18.134350	Shear 2 = 0.936420	Moment 2 = 66.502576
+Member 9	Axial 1 = 10.844498	Shear 1 = 6.529624	Moment 1 = -66.502576	Axial 2 = -10.844498	Shear 2 = -6.529624	Moment 2 = 1282.906856
+Member 10	Axial 1 = -8.146733	Shear 1 = -22.164195	Moment 1 = -1282.906856	Axial 2 = 8.146733	Shear 2 = 22.164195	Moment 2 = -2846.063253
+Member 11	Axial 1 = 51.592473	Shear 1 = 22.131617	Moment 1 = 2393.167609	Axial 2 = -51.592473	Shear 2 = -22.131617	Moment 2 = 1738.278319
+Member 12	Axial 1 = 68.403489	Shear 1 = -32.099430	Moment 1 = -2961.304423	Axial 2 = -68.403489	Shear 2 = 32.099430	Moment 2 = -3018.501452
+Member 13	Axial 1 = 0.808643	Shear 1 = 15.692212	Moment 1 = 1223.026104	Axial 2 = -0.808643	Shear 2 = -15.692212	Moment 2 = 848.345927
+Member 14	Axial 1 = -4.524990	Shear 1 = -12.814023	Moment 1 = -1412.939875	Axial 2 = 4.524990	Shear 2 = 12.814023	Moment 2 = -278.511114
+Member 15	Axial 1 = -95.523923	Shear 1 = -10.723603	Moment 1 = -153.397489	Axial 2 = 95.523923	Shear 2 = 10.723603	Moment 2 = -1262.118105
+Member 16	Axial 1 = 92.645733	Shear 1 = -2.992744	Moment 1 = -847.937848	Axial 2 = -92.645733	Shear 2 = 2.992744	Moment 2 = 452.895644
+Member 17	Axial 1 = 108.337945	Shear 1 = 1.198613	Moment 1 = 431.908603	Axial 2 = -108.337945	Shear 2 = -1.198613	Moment 2 = -0.408079

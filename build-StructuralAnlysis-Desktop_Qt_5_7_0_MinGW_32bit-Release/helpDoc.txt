@@ -1,0 +1,105 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%  DynoSim  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%												%
+%				Spencer Bunnell's Structural Analsyis Program				%
+%												%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This program solves and displays structural simulations
+using the Structure Stiffness Method. The current edition
+is set up to only allow for Plane Frames but future work 
+could easily modify this to accept Plane Trusses, Space Frames
+and Space Trusses.
+
+******************* Creating the Structure **************************
+
+To have a valid structure you will need 5 things
+
+1.) Joints
+2.) Members
+3.) Constraints
+4.) Forces
+5.) Properties
+
+There are two options for creating a structure
+
+1.) open an input file
+
+	- File -> Open
+
+2.) Interactively input with tool bars
+
+	- Edit
+	- Select the toolbar you wish to use
+
+	
+************************** Solving *****************************
+
+When a structure has sufficient data the "SOLVE" button will
+become activated. When clicked, a progress bar will show the 
+progress of the solution and then remain green and full when
+the solution is done.
+
+Three options become active when a solution is done.
+
+1.) Save Results
+	
+	- File -> Save Results
+
+	This will save a text file with the joint displacements
+	and the member support reactions
+
+2.) Displacement
+
+	This will allow the user to visualize how the structure 
+	displaces
+
+3.) Stress
+	
+	This will allow the user to visualize the support reactions
+	on the member
+
+	* It is not a true stress, just forces!
+
+************************** Displacement ******************************
+
+When the user clicks displace they will visualize how the displacement
+
+Wheb the user moves the slide bar along the bottom of the screen the
+magnification of the displacement will change with the scale factor 
+showing to the side of the slide bar.
+
+*************************** Stress *************************************
+
+The user will see a single member with the support reactions displayed 
+horizontally on the screen
+
+To the left of this will be a map of the structure with the currently
+visualized member highlighted
+
+A toolbar will appear that will allow the user to change the selected
+member
+
+************************** Other Functions ***************************
+   
+   Clear
+
+	Clears all information from the program
+
+   UNDO
+
+	The user may undo any command. 
+
+   REDO
+
+	The user may redo any undid command.
+
+	* The undo/redo cash are emptied when the structure is solved
+		or when you click clear
+
+   Forces
+
+	If checked the forces on the structure are displayed
+
+   Constraints
+
+	If checked the constraints on the structure are displayed

@@ -688,6 +688,7 @@ void MainWindow::on_pushButton_Disp_released()
 
     // set state
     displace = true;
+    stress = false;
     setStates();
 
     // draw to scene
@@ -1126,30 +1127,47 @@ void MainWindow::drawMemMap()
 
 void MainWindow::drawThings()
 {
-    // clear scene
-    scene->clear();
+    try
+    {
+        // clear scene
+        scene->clear();
 
-    // draw constraints
-    if(ui->checkBox_const->isChecked())
-        drawConstraints();
+        // draw constraints
+        if(ui->checkBox_const->isChecked())
+            drawConstraints();
 
-    // draw members
-    drawMembers();
+        // draw members
+        drawMembers();
 
-    // draw Joints
-    drawJoint();
+        // draw Joints
+        drawJoint();
 
-    // draw Forces
-    if(ui->checkBox_Force->isChecked())
-        drawForces();
+        // draw Forces
+        if(ui->checkBox_Force->isChecked())
+            drawForces();
 
-    // label joints
-//    if(jToolBarActive || mToolBarActive || cToolBarActive || fToolBarActive || pToolBarActive)
+        // label joints
         drawJNums();
 
-    // draw displaced
-    if(displace)
-        drawDStructure();
+        // draw displaced
+        if(displace)
+            drawDStructure();
+    }
+    catch(std::invalid_argument)
+    {
+        // clear bad stuff
+        on_actionClear_triggered();
+
+        // diplay open file failed message
+        QMessageBox noGood;
+
+        noGood.setText("File Formatt is Incorrect");
+        noGood.setInformativeText("please follow example file");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::drawJoint()
@@ -1984,25 +2002,27 @@ void MainWindow::releaseThings()
 
 void MainWindow::readFile(std::string fileName)
 {
-    // number of actions from file
-    int numTotalObj = 0;
-
-    // line from text
-    std::string line;
-
-    // file to read
-    std::ifstream infile (fileName);
-
-    // section counter
-    int sections = 0;
-
-    // read until end of file
-    while (std::getline(infile,line, '\n'))
+    try
     {
-        // make sure line isn't blank
-        if(line!="")
+        // number of actions from file
+        int numTotalObj = 0;
+
+        // line from text
+        std::string line;
+
+        // file to read
+        std::ifstream infile (fileName);
+
+        // section counter
+        int sections = 0;
+
+        // read until end of file
+        while (std::getline(infile,line, '\n'))
         {
-           // parse the line for the data
+            // make sure line isn't blank
+            if(line!="")
+            {
+                // parse the line for the data
 
                 // define vector of strings
                 std::vector<std::string> tokens;
@@ -2134,16 +2154,29 @@ void MainWindow::readFile(std::string fileName)
                 {
                     sections++;
                 }
+            }
         }
-    }
 
-    // push action to undolist
-    std::string NumObj;
-    NumObj = std::to_string(numTotalObj);
-    std::vector<std::string> oneLine;
-    oneLine.push_back("file");
-    oneLine.push_back(NumObj);
-    undoList.push_back(oneLine);
+        // push action to undolist
+        std::string NumObj;
+        NumObj = std::to_string(numTotalObj);
+        std::vector<std::string> oneLine;
+        oneLine.push_back("file");
+        oneLine.push_back(NumObj);
+        undoList.push_back(oneLine);
+    }
+    catch(std::invalid_argument)
+    {
+        // diplay open file failed message
+        QMessageBox noGood;
+
+        noGood.setText("File Formatt is Incorrect");
+        noGood.setInformativeText("please follow example file");
+        noGood.setStandardButtons(QMessageBox::Ok);
+        noGood.setDefaultButton(QMessageBox::Ok);
+        noGood.setWindowTitle("WARNING");
+        noGood.exec();
+    }
 }
 
 void MainWindow::clearToolbars()
