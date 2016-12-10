@@ -114,6 +114,9 @@ private slots:
     void on_actionAbout_triggered();
     void on_actionHelp_Document_triggered();
 
+    // keyboard commands
+    void keyPressEvent(QKeyEvent *KS);
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

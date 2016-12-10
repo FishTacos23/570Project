@@ -2663,3 +2663,34 @@ void MainWindow::on_actionHelp_Document_triggered()
     b->setMinimumHeight(600);
     b->show();
 }
+
+void MainWindow::keyPressEvent(QKeyEvent *KS)
+{
+    switch (KS->key())
+    {
+    case Qt::Key_Z:
+        on_actionUndo_triggered();
+        break;
+    case Qt::Key_Y:
+        on_actionRedo_triggered();
+        break;
+    case Qt::Key_J:
+        on_actionJoints_triggered();
+        break;
+    case Qt::Key_M:
+        on_actionMembers_triggered();
+        break;
+    case Qt::Key_F:
+        on_actionForces_triggered();
+        break;
+    case Qt::Key_C:
+        on_actionConstraints_triggered();
+        break;
+    case Qt::Key_P:
+        on_actionProperties_triggered();
+        break;
+    case Qt::Key_O:
+        on_actionOpen_triggered();
+        break;
+    }
+}
